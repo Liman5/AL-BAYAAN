@@ -1,44 +1,70 @@
-// Lazily import the Supabase client to avoid accessing environment variables
-// during server-side prerender/build time when pages import this module.
+import { HAS_SUPABASE } from '@/lib/env';
+import { getUserById, signInLocal } from '@/lib/localAuth';
+
 async function getSupabase() {
+  if (!HAS_SUPABASE) {
+    return null;
+  }
+
   try {
     const mod = await import('../lib/supabaseClient');
     return mod.supabase;
-  } catch (err) {
-    // Supabase client couldn't be loaded (likely missing env vars during build).
-    return null as any;
+  } catch {
+    return null;
   }
 }
 
 export async function signIn(email: string, password: string) {
+  if (!HAS_SUPABASE) {
+    return signInLocal(email, password);
+  }
+
   const supabase = await getSupabase();
   if (!supabase) {
-    // Local/dev fallback: return a mock user object
-    return { data: { user: { id: 'local-user' } }, error: null } as any;
+    return signInLocal(email, password);
   }
+
   return await supabase.auth.signInWithPassword({ email, password });
 }
 
 export async function signUp(email: string, password: string) {
+  if (!HAS_SUPABASE) {
+    return signInLocal(email, password);
+  }
+
   const supabase = await getSupabase();
   if (!supabase) {
-    return { data: { user: { id: 'local-user' } }, error: null } as any;
+    return signInLocal(email, password);
   }
+
   return await supabase.auth.signUp({ email, password });
 }
 
 export async function signOut() {
+  if (!HAS_SUPABASE) {
+    return { error: null } as any;
+  }
+
   const supabase = await getSupabase();
-  if (!supabase) return { error: null } as any;
+  if (!supabase) {
+    return { error: null } as any;
+  }
+
   return await supabase.auth.signOut();
 }
 
 export async function getProfileByUserId(userId: string) {
+  if (!HAS_SUPABASE) {
+    const user = getUserById(userId);
+    return { data: user ? { role: user.role } : null, error: null };
+  }
+
   const supabase = await getSupabase();
   if (!supabase) {
-    // Unable to query DB in local mode — caller should handle redirect accordingly.
-    return { data: null, error: null } as any;
+    const user = getUserById(userId);
+    return { data: user ? { role: user.role } : null, error: null };
   }
+
   const { data, error } = await supabase.from('profiles').select('role').eq('user_id', userId).single();
   return { data, error };
 }

@@ -2,17 +2,31 @@
 
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { registerParentLocal } from '@/lib/localAuth';
 
 export default function ParentRegisterPage() {
   const [submitted, setSubmitted] = useState(false);
-  const router = useRouter();
+  const [message, setMessage] = useState<string | null>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
-    // Redirect user to login after successful (local) registration
-    router.push('/auth/login');
+    const form = event.currentTarget;
+    const result = registerParentLocal({
+      first_name: (form.elements.namedItem('first_name') as HTMLInputElement).value,
+      last_name: (form.elements.namedItem('last_name') as HTMLInputElement).value,
+      email: (form.elements.namedItem('email') as HTMLInputElement).value,
+      password: (form.elements.namedItem('password') as HTMLInputElement).value,
+      phone: (form.elements.namedItem('phone') as HTMLInputElement).value,
+      parent_for: [],
+    });
+
+    if (result.success) {
+      setSubmitted(true);
+      setMessage('Compte parent créé avec succès. Vous pouvez maintenant vous connecter.');
+      form.reset();
+    } else {
+      setMessage(result.message);
+    }
   }
 
   return (
@@ -28,27 +42,27 @@ export default function ParentRegisterPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
               <span className="text-sm text-slate-700">Prénom</span>
-              <input required type="text" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500" />
+              <input name="first_name" required type="text" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500" />
             </label>
             <label className="block">
               <span className="text-sm text-slate-700">Nom</span>
-              <input required type="text" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500" />
+              <input name="last_name" required type="text" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500" />
             </label>
           </div>
 
           <label className="block">
             <span className="text-sm text-slate-700">Adresse e-mail</span>
-            <input required type="email" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500" />
+            <input name="email" required type="email" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500" />
           </label>
 
           <label className="block">
             <span className="text-sm text-slate-700">Mot de passe</span>
-            <input required type="password" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500" />
+            <input name="password" required type="password" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500" />
           </label>
 
           <label className="block">
-            <span className="text-sm text-slate-700">Nom de l'enfant</span>
-            <input type="text" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500" placeholder="Ex: Youssef" />
+            <span className="text-sm text-slate-700">Téléphone</span>
+            <input name="phone" required type="tel" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500" placeholder="Ex: +212600000000" />
           </label>
 
           <button type="submit" className="w-full rounded-full bg-amber-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-amber-800">
@@ -56,10 +70,10 @@ export default function ParentRegisterPage() {
           </button>
         </form>
 
-        {submitted ? (
+        {message ? (
           <div className="mt-8 rounded-3xl border border-amber-100 bg-amber-50/80 p-5 text-amber-900 shadow-sm">
-            <p className="font-semibold">Inscription réussie !</p>
-            <p className="mt-2 text-sm text-amber-900">Votre compte parent a été créé localement. Vous pouvez maintenant retourner à la connexion.</p>
+            <p className="font-semibold">{submitted ? 'Inscription réussie !' : 'Informations'}</p>
+            <p className="mt-2 text-sm text-amber-900">{message}</p>
           </div>
         ) : null}
 

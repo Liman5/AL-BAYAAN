@@ -2,17 +2,31 @@
 
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { registerTeacherLocal } from '@/lib/localAuth';
 
 export default function TeacherRegisterPage() {
   const [submitted, setSubmitted] = useState(false);
-  const router = useRouter();
+  const [message, setMessage] = useState<string | null>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
-    // Redirect user to login after successful (local) registration
-    router.push('/auth/login');
+    const form = event.currentTarget;
+    const result = registerTeacherLocal({
+      first_name: (form.elements.namedItem('first_name') as HTMLInputElement).value,
+      last_name: (form.elements.namedItem('last_name') as HTMLInputElement).value,
+      email: (form.elements.namedItem('email') as HTMLInputElement).value,
+      password: (form.elements.namedItem('password') as HTMLInputElement).value,
+      subjects: ((form.elements.namedItem('subjects') as HTMLInputElement).value || '').split(',').map((value) => value.trim()).filter(Boolean),
+      assigned_class: (form.elements.namedItem('assigned_class') as HTMLInputElement).value || undefined,
+    });
+
+    if (result.success) {
+      setSubmitted(true);
+      setMessage('Compte enseignant créé avec succès. Vous pouvez maintenant vous connecter.');
+      form.reset();
+    } else {
+      setMessage(result.message);
+    }
   }
 
   return (
@@ -28,27 +42,32 @@ export default function TeacherRegisterPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
               <span className="text-sm text-slate-700">Prénom</span>
-              <input required type="text" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500" />
+              <input name="first_name" required type="text" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500" />
             </label>
             <label className="block">
               <span className="text-sm text-slate-700">Nom</span>
-              <input required type="text" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500" />
+              <input name="last_name" required type="text" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500" />
             </label>
           </div>
 
           <label className="block">
             <span className="text-sm text-slate-700">Adresse e-mail</span>
-            <input required type="email" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500" />
+            <input name="email" required type="email" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500" />
           </label>
 
           <label className="block">
             <span className="text-sm text-slate-700">Mot de passe</span>
-            <input required type="password" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500" />
+            <input name="password" required type="password" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500" />
           </label>
 
           <label className="block">
-            <span className="text-sm text-slate-700">École ou matière</span>
-            <input type="text" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500" placeholder="Ex: Mathématiques, Sciences" />
+            <span className="text-sm text-slate-700">Classe affectée</span>
+            <input name="assigned_class" type="text" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500" placeholder="Ex: 5A" />
+          </label>
+
+          <label className="block">
+            <span className="text-sm text-slate-700">Matières</span>
+            <input name="subjects" type="text" className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500" placeholder="Ex: Mathématiques, Sciences" />
           </label>
 
           <button type="submit" className="w-full rounded-full bg-emerald-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800">
@@ -56,10 +75,10 @@ export default function TeacherRegisterPage() {
           </button>
         </form>
 
-        {submitted ? (
+        {message ? (
           <div className="mt-8 rounded-3xl border border-emerald-100 bg-emerald-50/80 p-5 text-emerald-900 shadow-sm">
-            <p className="font-semibold">Inscription réussie !</p>
-            <p className="mt-2 text-sm text-emerald-900">Votre compte enseignant a été créé localement. Vous pouvez maintenant retourner à la connexion.</p>
+            <p className="font-semibold">{submitted ? 'Inscription réussie !' : 'Veuillez vérifier les informations'}</p>
+            <p className="mt-2 text-sm text-emerald-900">{message}</p>
           </div>
         ) : null}
 

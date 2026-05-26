@@ -1,49 +1,27 @@
  'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn, getProfileByUserId } from '@/services/auth.service';
 import { roles } from '@/lib/constants';
 import { HAS_SUPABASE } from '@/lib/env';
+import { setAuthCookies } from '@/lib/authClient';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState<string>(roles.STUDENT);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      if (!HAS_SUPABASE) {
-        // Local/dev mode: redirect based on selected role without contacting Supabase
-        switch (selectedRole) {
-          case roles.TEACHER:
-            router.push('/dashboard/teacher');
-            break;
-          case roles.STUDENT:
-            router.push('/dashboard/student');
-            break;
-          case roles.PARENT:
-            router.push('/dashboard/parent');
-            break;
-          case roles.SCHOOL_ADMIN:
-          case roles.SUPER_ADMIN:
-            router.push('/dashboard/admin');
-            break;
-          default:
-            router.push('/dashboard');
-        }
-        return;
-      }
-
       const res = await signIn(email, password);
       if (res.error) {
         setError(res.error.message);
@@ -60,33 +38,55 @@ export default function LoginPage() {
         return;
       }
 
-      // Retrieve profile to get role
-      const { data, error: profileError } = await getProfileByUserId(userId);
-      if (profileError) {
-        // fallback to a generic dashboard
-        router.push('/dashboard');
+      const role = user.role as string | undefined;
+      setAuthCookies(role as any, userId);
+
+      if (!HAS_SUPABASE) {
+        switch (role) {
+          case roles.TEACHER:
+            router.push('/teacher/dashboard');
+            break;
+          case roles.STUDENT:
+            router.push('/student/dashboard');
+            break;
+          case roles.PARENT:
+            router.push('/parent/dashboard');
+            break;
+          case roles.SCHOOL_ADMIN:
+          case roles.SUPER_ADMIN:
+            router.push('/admin/dashboard');
+            break;
+          default:
+            router.push('/auth/login');
+        }
         return;
       }
 
-      const role = data?.role as string | undefined;
+      const { data, error: profileError } = await getProfileByUserId(userId);
+      if (profileError || !data?.role) {
+        router.push('/auth/login');
+        return;
+      }
 
-      // Redirect according to role
-      switch (role) {
+      const profileRole = data.role as string;
+      setAuthCookies(profileRole as any, userId);
+
+      switch (profileRole) {
         case roles.TEACHER:
-          router.push('/dashboard/teacher');
+          router.push('/teacher/dashboard');
           break;
         case roles.STUDENT:
-          router.push('/dashboard/student');
+          router.push('/student/dashboard');
           break;
         case roles.PARENT:
-          router.push('/dashboard/parent');
+          router.push('/parent/dashboard');
           break;
         case roles.SCHOOL_ADMIN:
         case roles.SUPER_ADMIN:
-          router.push('/dashboard/admin');
+          router.push('/admin/dashboard');
           break;
         default:
-          router.push('/dashboard');
+          router.push('/auth/login');
       }
     } catch (err: any) {
       setError(err?.message ?? 'Erreur lors de la connexion');
@@ -110,19 +110,6 @@ export default function LoginPage() {
             <span className="text-sm text-slate-700">Mot de passe</span>
             <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500" />
           </label>
-
-          {!HAS_SUPABASE ? (
-            <label className="block">
-              <span className="text-sm text-slate-700">Se connecter en tant que</span>
-              <select value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)} className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none">
-                <option value={roles.STUDENT}>Élève</option>
-                <option value={roles.TEACHER}>Enseignant</option>
-                <option value={roles.PARENT}>Parent</option>
-                <option value={roles.SCHOOL_ADMIN}>Admin école</option>
-                <option value={roles.SUPER_ADMIN}>Super admin</option>
-              </select>
-            </label>
-          ) : null}
 
           <button disabled={loading} type="submit" className="w-full rounded-full bg-emerald-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:opacity-60">
             {loading ? 'Connexion...' : 'Se connecter'}
