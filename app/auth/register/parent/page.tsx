@@ -25,7 +25,7 @@ export default function ParentRegisterPage() {
       setMessage('Compte parent créé avec succès. Vous pouvez maintenant vous connecter.');
       form.reset();
     } else {
-      setMessage(result.message);
+      setMessage(result.message ?? 'Une erreur est survenue pendant l’inscription.');
     }
   }
 

@@ -33,7 +33,7 @@ export default function StudentRegisterPage() {
       setMessage('Votre demande d’inscription est en attente d’approbation par l’administrateur.');
       form.reset();
     } else {
-      setMessage(result.message);
+      setMessage(result.message ?? 'Une erreur est survenue pendant l’envoi de la demande.');
     }
   }
 
