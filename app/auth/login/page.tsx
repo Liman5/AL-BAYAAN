@@ -5,10 +5,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn, getProfileByUserId } from '@/services/auth.service';
 import { roles } from '@/lib/constants';
+import { HAS_SUPABASE } from '@/lib/env';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedRole, setSelectedRole] = useState<string>(roles.STUDENT);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,6 +22,28 @@ export default function LoginPage() {
     setError(null);
 
     try {
+      if (!HAS_SUPABASE) {
+        // Local/dev mode: redirect based on selected role without contacting Supabase
+        switch (selectedRole) {
+          case roles.TEACHER:
+            router.push('/dashboard/teacher');
+            break;
+          case roles.STUDENT:
+            router.push('/dashboard/student');
+            break;
+          case roles.PARENT:
+            router.push('/dashboard/parent');
+            break;
+          case roles.SCHOOL_ADMIN:
+          case roles.SUPER_ADMIN:
+            router.push('/dashboard/admin');
+            break;
+          default:
+            router.push('/dashboard');
+        }
+        return;
+      }
+
       const res = await signIn(email, password);
       if (res.error) {
         setError(res.error.message);
@@ -86,6 +110,20 @@ export default function LoginPage() {
             <span className="text-sm text-slate-700">Mot de passe</span>
             <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500" />
           </label>
+
+          {!HAS_SUPABASE ? (
+            <label className="block">
+              <span className="text-sm text-slate-700">Se connecter en tant que</span>
+              <select value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)} className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none">
+                <option value={roles.STUDENT}>Élève</option>
+                <option value={roles.TEACHER}>Enseignant</option>
+                <option value={roles.PARENT}>Parent</option>
+                <option value={roles.SCHOOL_ADMIN}>Admin école</option>
+                <option value={roles.SUPER_ADMIN}>Super admin</option>
+              </select>
+            </label>
+          ) : null}
+
           <button disabled={loading} type="submit" className="w-full rounded-full bg-emerald-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:opacity-60">
             {loading ? 'Connexion...' : 'Se connecter'}
           </button>
