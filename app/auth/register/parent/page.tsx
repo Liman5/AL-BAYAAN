@@ -2,13 +2,17 @@
 
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function ParentRegisterPage() {
   const [submitted, setSubmitted] = useState(false);
+  const router = useRouter();
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitted(true);
+    // Redirect user to login after successful (local) registration
+    router.push('/auth/login');
   }
 
   return (

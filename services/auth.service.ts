@@ -11,3 +11,8 @@ export async function signUp(email: string, password: string) {
 export async function signOut() {
   return await supabase.auth.signOut();
 }
+
+export async function getProfileByUserId(userId: string) {
+  const { data, error } = await supabase.from('profiles').select('role').eq('user_id', userId).single();
+  return { data, error };
+}
