@@ -4,7 +4,7 @@ import Link from 'next/link';
 export default function StudentLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-slate-100">
-      <aside className="fixed left-0 top-0 z-20 h-full w-72 border-r border-slate-200 bg-white px-5 py-8 shadow-sm lg:static lg:h-auto lg:w-80">
+      <aside className="hidden lg:block lg:fixed lg:left-0 lg:top-0 lg:z-20 lg:h-full lg:w-80 lg:border-r lg:border-slate-200 lg:bg-white lg:px-5 lg:py-8 lg:shadow-sm">
         <div className="space-y-6">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-900">Espace Élève</p>
@@ -17,7 +17,7 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <div className="ml-0 min-h-screen lg:ml-72">
+      <div className="ml-0 min-h-screen lg:ml-80">
         <header className="border-b border-slate-200 bg-white px-6 py-5 shadow-sm">
           <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
             <div>

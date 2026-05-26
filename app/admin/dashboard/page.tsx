@@ -24,7 +24,7 @@ export default function AdminDashboardPage() {
       setActionMessage(`Étudiant approuvé avec succès. Mot de passe initial : student123`);
       refresh();
     } else {
-      setActionMessage(result.message);
+      setActionMessage(result.message ?? 'Impossible d’approuver la demande.');
     }
   }
 
