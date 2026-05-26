@@ -23,6 +23,10 @@ export default function RegisterPage() {
               <p className="text-lg font-semibold text-amber-900">Parent</p>
               <p className="mt-2 text-sm text-slate-600">Inscription dédiée pour les parents, pour suivre la progression de votre enfant et la communication scolaire.</p>
             </Link>
+            <Link href="/auth/register/student" className="rounded-[1.5rem] border border-sky-900/15 bg-sky-50 px-6 py-6 text-left shadow-sm transition hover:border-sky-900/30 hover:bg-sky-100">
+              <p className="text-lg font-semibold text-sky-900">Élève</p>
+              <p className="mt-2 text-sm text-slate-600">Inscription dédiée pour les élèves — accédez à votre tableau de bord et vos cours.</p>
+            </Link>
           </div>
         </div>
 
