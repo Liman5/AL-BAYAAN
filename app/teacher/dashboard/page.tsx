@@ -77,21 +77,21 @@ export default function TeacherDashboardPage() {
       case 'Students':
         return (
           <div className="space-y-4">
-            <div className="grid gap-4 lg:grid-cols-2">
-              <div className="rounded-3xl bg-slate-900/60 p-6 backdrop-blur-xl border border-white/10 shadow-lg">
-                <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Classe active</p>
-                <h3 className="mt-3 text-2xl font-semibold text-white">{activeClass.name}</h3>
-                <p className="mt-2 text-slate-400">{activeClass.subject}</p>
+            <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+              <div className="rounded-3xl bg-white/90 p-6 backdrop-blur-xl border border-slate-200/80 shadow-lg">
+                <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Classe active</p>
+                <h3 className="mt-3 text-2xl font-semibold text-slate-950">{activeClass.name}</h3>
+                <p className="mt-2 text-slate-600">{activeClass.subject}</p>
               </div>
-              <div className="rounded-3xl bg-slate-900/60 p-6 backdrop-blur-xl border border-white/10 shadow-lg">
-                <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Élèves</p>
-                <p className="mt-3 text-4xl font-semibold text-white">{activeClass.students}</p>
-                <p className="mt-2 text-slate-400">Taux de présence {activeClass.attendance}</p>
+              <div className="rounded-3xl bg-white/90 p-6 backdrop-blur-xl border border-slate-200/80 shadow-lg">
+                <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Élèves</p>
+                <p className="mt-3 text-4xl font-semibold text-slate-950">{activeClass.students}</p>
+                <p className="mt-2 text-slate-600">Taux de présence {activeClass.attendance}</p>
               </div>
             </div>
-            <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900/60 shadow-lg backdrop-blur-xl">
-              <table className="min-w-full divide-y divide-white/10">
-                <thead className="bg-slate-950/70 text-left text-xs uppercase tracking-[0.24em] text-slate-400">
+            <div className="overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white/90 shadow-lg backdrop-blur-xl">
+              <table className="min-w-full divide-y divide-slate-200">
+                <thead className="bg-slate-100 text-left text-xs uppercase tracking-[0.24em] text-slate-500">
                   <tr>
                     <th className="px-4 py-4">Élève</th>
                     <th className="px-4 py-4">Classe</th>
@@ -99,9 +99,9 @@ export default function TeacherDashboardPage() {
                     <th className="px-4 py-4">Statut</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/10 text-sm text-slate-200">
+                <tbody className="divide-y divide-slate-200 text-sm text-slate-700">
                   {students.map((student) => (
-                    <tr key={student.name} className="hover:bg-white/5 transition-colors duration-200">
+                    <tr key={student.name} className="hover:bg-slate-50 transition-colors duration-200">
                       <td className="px-4 py-4">{student.name}</td>
                       <td className="px-4 py-4">{student.class}</td>
                       <td className="px-4 py-4">{student.average}</td>
@@ -116,42 +116,42 @@ export default function TeacherDashboardPage() {
       case 'Grades':
         return (
           <div className="space-y-6">
-            <div className="grid gap-4 xl:grid-cols-3">
+            <div className="grid gap-4 grid-cols-1 xl:grid-cols-3">
               {['Devoir 1', 'Devoir 2', 'Interro'].map((item) => (
-                <div key={item} className="rounded-3xl bg-slate-900/60 p-6 backdrop-blur-xl border border-white/10 shadow-lg">
-                  <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{item}</p>
-                  <p className="mt-4 text-3xl font-semibold text-white">{(12 + Math.random() * 6).toFixed(1)}</p>
-                  <p className="mt-2 text-slate-400">Moyenne de la classe</p>
+                <div key={item} className="rounded-3xl bg-white/90 p-6 backdrop-blur-xl border border-slate-200/80 shadow-lg">
+                  <p className="text-sm uppercase tracking-[0.3em] text-slate-500">{item}</p>
+                  <p className="mt-4 text-3xl font-semibold text-slate-950">{(12 + Math.random() * 6).toFixed(1)}</p>
+                  <p className="mt-2 text-slate-600">Moyenne de la classe</p>
                 </div>
               ))}
             </div>
-            <div className="rounded-[2rem] border border-white/10 bg-slate-900/60 p-6 shadow-lg backdrop-blur-xl">
-              <h3 className="text-lg font-semibold text-white">Aperçu des notes</h3>
-              <p className="mt-3 text-slate-400">Modifier les notes et visualiser les tendances rapidement.</p>
+            <div className="rounded-[2rem] border border-slate-200/80 bg-white/90 p-6 shadow-lg backdrop-blur-xl">
+              <h3 className="text-lg font-semibold text-slate-950">Aperçu des notes</h3>
+              <p className="mt-3 text-slate-600">Modifier les notes et visualiser les tendances rapidement.</p>
             </div>
           </div>
         );
       case 'Attendance':
         return (
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
             {['Présence', 'Retards', 'Absences'].map((item, index) => (
-              <div key={item} className="rounded-3xl bg-slate-900/60 p-6 backdrop-blur-xl border border-white/10 shadow-lg">
-                <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{item}</p>
-                <p className="mt-4 text-4xl font-semibold text-white">{index === 0 ? '94%' : index === 1 ? '3%' : '4%'}</p>
-                <p className="mt-2 text-slate-400">Dernière semaine</p>
+              <div key={item} className="rounded-3xl bg-white/90 p-6 backdrop-blur-xl border border-slate-200/80 shadow-lg">
+                <p className="text-sm uppercase tracking-[0.3em] text-slate-500">{item}</p>
+                <p className="mt-4 text-4xl font-semibold text-slate-950">{index === 0 ? '94%' : index === 1 ? '3%' : '4%'}</p>
+                <p className="mt-2 text-slate-600">Dernière semaine</p>
               </div>
             ))}
           </div>
         );
       case 'Classes':
         return (
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
             {classes.map((item) => (
-              <div key={item.id} className="rounded-3xl border border-white/10 bg-slate-900/60 p-6 shadow-lg backdrop-blur-xl transition hover:-translate-y-1">
-                <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{item.subject}</p>
-                <h3 className="mt-3 text-2xl font-semibold text-white">{item.name}</h3>
-                <p className="mt-3 text-slate-400">{item.students} élèves</p>
-                <p className="mt-2 text-slate-400">Présence moyenne {item.attendance}</p>
+              <div key={item.id} className="rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-lg backdrop-blur-xl transition hover:-translate-y-1">
+                <p className="text-sm uppercase tracking-[0.3em] text-slate-500">{item.subject}</p>
+                <h3 className="mt-3 text-2xl font-semibold text-slate-950">{item.name}</h3>
+                <p className="mt-3 text-slate-600">{item.students} élèves</p>
+                <p className="mt-2 text-slate-600">Présence moyenne {item.attendance}</p>
               </div>
             ))}
           </div>
@@ -160,14 +160,14 @@ export default function TeacherDashboardPage() {
         return (
           <div className="space-y-4">
             {homework.map((item) => (
-              <div key={item.title} className="rounded-3xl border border-white/10 bg-slate-900/50 p-5 shadow-lg backdrop-blur-xl transition hover:-translate-y-1 hover:border-slate-300/10">
+              <div key={item.title} className="rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-lg backdrop-blur-xl transition hover:-translate-y-1 hover:border-slate-300/30">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h4 className="text-lg font-semibold text-white">{item.title}</h4>
-                    <p className="mt-2 text-slate-400">Classe {item.klass}</p>
+                    <h4 className="text-lg font-semibold text-slate-950">{item.title}</h4>
+                    <p className="mt-2 text-slate-600">Classe {item.klass}</p>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-300">
-                    <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">{item.status}</span>
+                  <div className="flex items-center gap-3 text-sm text-slate-600">
+                    <span className="rounded-full border border-slate-200/80 bg-slate-50 px-3 py-1">{item.status}</span>
                     <span>{item.due}</span>
                   </div>
                 </div>
@@ -177,12 +177,12 @@ export default function TeacherDashboardPage() {
         );
       case 'Exams':
         return (
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
             {exams.map((exam) => (
-              <div key={exam.title} className="rounded-3xl border border-white/10 bg-slate-900/50 p-6 shadow-lg backdrop-blur-xl">
-                <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{exam.title}</p>
-                <p className="mt-3 text-2xl font-semibold text-white">{exam.date}</p>
-                <p className="mt-2 text-slate-400">Classe {exam.klass}</p>
+              <div key={exam.title} className="rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-lg backdrop-blur-xl">
+                <p className="text-sm uppercase tracking-[0.3em] text-slate-500">{exam.title}</p>
+                <p className="mt-3 text-2xl font-semibold text-slate-950">{exam.date}</p>
+                <p className="mt-2 text-slate-600">Classe {exam.klass}</p>
               </div>
             ))}
           </div>
@@ -191,31 +191,31 @@ export default function TeacherDashboardPage() {
         return (
           <div className="grid gap-4 sm:grid-cols-2">
             {documents.map((doc) => (
-              <div key={doc.name} className="rounded-3xl border border-white/10 bg-slate-900/50 p-6 shadow-lg backdrop-blur-xl">
-                <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{doc.type}</p>
-                <h4 className="mt-3 text-lg font-semibold text-white">{doc.name}</h4>
-                <p className="mt-2 text-slate-400">Mis à jour {doc.updated}</p>
+              <div key={doc.name} className="rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-lg backdrop-blur-xl">
+                <p className="text-sm uppercase tracking-[0.3em] text-slate-500">{doc.type}</p>
+                <h4 className="mt-3 text-lg font-semibold text-slate-950">{doc.name}</h4>
+                <p className="mt-2 text-slate-600">Mis à jour {doc.updated}</p>
               </div>
             ))}
           </div>
         );
       case 'Reports':
         return (
-          <div className="grid gap-5 lg:grid-cols-2">
-            <div className="rounded-3xl border border-white/10 bg-slate-900/50 p-6 shadow-lg backdrop-blur-xl">
-              <h4 className="text-lg font-semibold text-white">Rapport de la classe</h4>
-              <p className="mt-3 text-slate-400">Exportez les résultats, générez des bilans trimestriels et partagez-les avec les parents.</p>
+          <div className="grid gap-5 grid-cols-1 lg:grid-cols-2">
+            <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-lg backdrop-blur-xl">
+              <h4 className="text-lg font-semibold text-slate-950">Rapport de la classe</h4>
+              <p className="mt-3 text-slate-600">Exportez les résultats, générez des bilans trimestriels et partagez-les avec les parents.</p>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-slate-900/50 p-6 shadow-lg backdrop-blur-xl">
-              <h4 className="text-lg font-semibold text-white">Performance générale</h4>
-              <p className="mt-3 text-slate-400">Synthèse rapide des tendances et du comportement de la classe.</p>
+            <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-lg backdrop-blur-xl">
+              <h4 className="text-lg font-semibold text-slate-950">Performance générale</h4>
+              <p className="mt-3 text-slate-600">Synthèse rapide des tendances et du comportement de la classe.</p>
             </div>
           </div>
         );
       default:
         return (
-          <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-6 shadow-lg backdrop-blur-xl">
-            <p className="text-slate-300">Sélectionnez un module pour afficher son contenu.</p>
+          <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-lg backdrop-blur-xl">
+            <p className="text-slate-700">Sélectionnez un module pour afficher son contenu.</p>
           </div>
         );
     }
@@ -223,86 +223,92 @@ export default function TeacherDashboardPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-24 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
-          <div className="flex min-w-0 flex-1 items-center gap-4">
-            <div className="rounded-3xl border border-white/10 bg-white/10 px-4 py-3 shadow-sm backdrop-blur-xl">
-              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">École</p>
-              <p className="mt-1 font-semibold text-white">AL-BAYAAN</p>
+      <div className="fixed inset-x-0 top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl shadow-sm">
+        <div className="mx-auto flex flex-col gap-3 px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+              <div className="rounded-3xl border border-slate-200/70 bg-white/80 px-4 py-3 shadow-sm backdrop-blur-xl">
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-500">École</p>
+                <p className="mt-1 font-semibold text-slate-900">AL-BAYAAN</p>
+              </div>
+              <div className="rounded-3xl border border-slate-200/70 bg-white/80 px-4 py-3 shadow-sm backdrop-blur-xl">
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Enseignant</p>
+                <p className="mt-1 text-base font-semibold text-slate-900">Mme Hana</p>
+              </div>
             </div>
-            <div className="min-w-0 rounded-3xl border border-white/10 bg-slate-900/70 px-4 py-3 shadow-sm backdrop-blur-xl">
-              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Enseignant</p>
-              <p className="mt-1 text-base font-semibold text-white">Mme Hana</p>
-            </div>
-            <div className="flex items-center gap-3 rounded-3xl border border-white/10 bg-slate-900/60 px-4 py-3 shadow-sm backdrop-blur-xl">
-              <span className="text-sm text-slate-400">Classe active</span>
-              <select value={selectedClassId} onChange={(event) => setSelectedClassId(event.target.value)} className="min-w-[11rem] bg-transparent text-sm text-white outline-none">
-                {classes.map((item) => (
-                  <option key={item.id} value={item.id} className="bg-slate-950 text-white">{item.name} — {item.subject}</option>
-                ))}
-              </select>
-              <IconDropdown />
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <button className="rounded-3xl border border-white/10 bg-slate-900/60 px-4 py-3 transition hover:bg-slate-900">
-              <IconBell />
-            </button>
-            <div className="rounded-3xl border border-white/10 bg-slate-900/60 px-4 py-3 shadow-sm backdrop-blur-xl">
-              <p className="text-sm text-slate-400">Profil</p>
-              <p className="text-sm font-semibold text-white">H. Mansour</p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
+              <div className="flex flex-col gap-2 rounded-3xl border border-slate-200/70 bg-white/90 px-4 py-3 shadow-sm backdrop-blur-xl sm:flex-row sm:items-center">
+                <span className="text-sm text-slate-500">Classe active</span>
+                <div className="min-w-[11rem]">
+                  <select value={selectedClassId} onChange={(event) => setSelectedClassId(event.target.value)} className="w-full bg-transparent text-sm text-slate-900 outline-none">
+                    {classes.map((item) => (
+                      <option key={item.id} value={item.id} className="bg-white text-slate-900">{item.name} — {item.subject}</option>
+                    ))}
+                  </select>
+                </div>
+                <IconDropdown />
+              </div>
+              <div className="flex items-center gap-3">
+                <button className="rounded-3xl border border-slate-200/70 bg-white/90 px-4 py-3 text-slate-700 transition hover:bg-slate-50">
+                  <IconBell />
+                </button>
+                <div className="rounded-3xl border border-slate-200/70 bg-white/90 px-4 py-3 shadow-sm backdrop-blur-xl">
+                  <p className="text-sm text-slate-500">Profil</p>
+                  <p className="text-sm font-semibold text-slate-900">H. Mansour</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 pb-16 pt-32 sm:px-6 lg:px-8">
         <div className="space-y-8">
-          <section className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-8 shadow-2xl shadow-slate-950/20 backdrop-blur-xl">
-            <div className="grid gap-6 lg:grid-cols-[1.8fr_1fr] lg:items-end">
+          <section className="rounded-[2rem] border border-slate-200/80 bg-white/80 p-6 shadow-2xl shadow-slate-200/40 backdrop-blur-xl">
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-[1.8fr_1fr] lg:items-end">
               <div className="space-y-4">
-                <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Bonjour, professeur</p>
-                <h1 className="text-4xl font-semibold text-white">Tableau de bord enseignant</h1>
-                <p className="max-w-2xl text-slate-300">Accédez rapidement aux classes, élèves et activités pédagogiques. Tout est organisé pour un flux de travail clair et rapide.</p>
+                <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Bonjour, professeur</p>
+                <h1 className="text-4xl font-semibold text-slate-950">Tableau de bord enseignant</h1>
+                <p className="max-w-2xl text-slate-600">Accédez rapidement aux classes, élèves et activités pédagogiques. Tout est organisé pour un flux de travail clair et rapide.</p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 shadow-lg backdrop-blur-xl">
-                  <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Élèves</p>
-                  <p className="mt-4 text-3xl font-semibold text-white">{stats.students}</p>
+                <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-lg backdrop-blur-xl">
+                  <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Élèves</p>
+                  <p className="mt-4 text-3xl font-semibold text-slate-950">{stats.students}</p>
                 </div>
-                <div className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 shadow-lg backdrop-blur-xl">
-                  <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Classes</p>
-                  <p className="mt-4 text-3xl font-semibold text-white">{stats.classes}</p>
+                <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-lg backdrop-blur-xl">
+                  <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Classes</p>
+                  <p className="mt-4 text-3xl font-semibold text-slate-950">{stats.classes}</p>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/20 backdrop-blur-xl">
-            <div className="grid gap-4 xl:grid-cols-4">
+          <section className="rounded-[2rem] border border-slate-200/80 bg-white/80 p-6 shadow-2xl shadow-slate-200/40 backdrop-blur-xl">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               {[
                 { label: 'Moyenne', value: stats.average },
                 { label: 'Présence', value: stats.attendance },
                 { label: 'Actions', value: '12 tâches' },
                 { label: 'Messages', value: '5 nouveaux' },
               ].map((item) => (
-                <div key={item.label} className="rounded-3xl border border-white/10 bg-slate-900/60 p-5 shadow-lg backdrop-blur-xl">
-                  <p className="text-xs uppercase tracking-[0.3em] text-slate-400">{item.label}</p>
-                  <p className="mt-4 text-3xl font-semibold text-white">{item.value}</p>
+                <div key={item.label} className="rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-lg backdrop-blur-xl">
+                  <p className="text-xs uppercase tracking-[0.3em] text-slate-500">{item.label}</p>
+                  <p className="mt-4 text-3xl font-semibold text-slate-950">{item.value}</p>
                 </div>
               ))}
             </div>
           </section>
 
-          <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/70 shadow-2xl shadow-slate-950/20 backdrop-blur-xl">
-            <div className="overflow-x-auto border-b border-white/10 bg-slate-900/80 px-4 py-3">
-              <div className="flex gap-3 text-sm font-medium text-slate-300">
+          <section className="overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white/80 shadow-2xl shadow-slate-200/40 backdrop-blur-xl">
+            <div className="overflow-x-auto border-b border-slate-200/80 bg-slate-50/80 px-4 py-3">
+              <div className="flex min-w-full flex-wrap gap-3 text-sm font-medium text-slate-600 md:min-w-[720px]">
                 {modules.map((module) => (
                   <button
                     key={module}
                     type="button"
                     onClick={() => setActiveModule(module)}
-                    className={`whitespace-nowrap rounded-3xl px-4 py-2 transition ${activeModule === module ? 'bg-white/10 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                    className={`whitespace-nowrap rounded-3xl px-4 py-2 transition ${activeModule === module ? 'bg-slate-900/10 text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
                   >
                     {module}
                   </button>
