@@ -3,10 +3,16 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/card';
+import AppHeader from '@/components/ui/app-header';
+import AppHeader from '@/components/ui/app-header';
 
 const teacherData = {
   name: 'Mme Hana Mansour',
   school: 'AL-BAYAAN',
+  notifications: [
+    { id: 1, message: 'Absence détectée', time: 'Il y a 1h' },
+    { id: 2, message: 'Classe confirmée', time: 'Il y a 3h' }
+  ]
 };
 
 const navItems = [
@@ -28,6 +34,7 @@ const planningData = [
 
 export default function PlanningPage() {
   const router = useRouter();
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const groupedByDay: { [key: string]: typeof planningData } = planningData.reduce(
     (acc, item) => {
@@ -43,19 +50,11 @@ export default function PlanningPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 pb-24">
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-sm">
-        <div className="mx-auto flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 text-lg font-bold text-white">
-              📚
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-slate-900">{teacherData.school}</h1>
-              <p className="hidden sm:block text-xs text-slate-500">Plateforme pédagogique</p>
-            </div>
-          </div>
-        </div>
-      </header>
+      <AppHeader
+        showNotifications={showNotifications}
+        notifications={teacherData.notifications}
+        onNotificationClick={() => setShowNotifications(!showNotifications)}
+      />
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
