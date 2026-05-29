@@ -42,9 +42,8 @@ export default function StudentsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
+    <div className="min-h-screen bg-slate-50 pb-24">
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-sm">
         <div className="mx-auto flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 text-lg font-bold text-white">
@@ -52,7 +51,7 @@ export default function StudentsPage() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-slate-900">{teacherData.school}</h1>
-              <p className="text-xs text-slate-500">Plateforme pédagogique</p>
+              <p className="hidden sm:block text-xs text-slate-500">Plateforme pédagogique</p>
             </div>
           </div>
 
@@ -65,15 +64,10 @@ export default function StudentsPage() {
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
-                {teacherData.notifications.length > 0 && (
-                  <span className="absolute top-1 right-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                    {teacherData.notifications.length}
-                  </span>
-                )}
               </button>
 
               {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 rounded-lg border border-slate-200 bg-white shadow-lg">
+                <div className="absolute right-0 mt-2 w-80 rounded-lg border border-slate-200 bg-white shadow-lg z-50">
                   <div className="border-b border-slate-200 px-4 py-3">
                     <h3 className="font-semibold text-slate-900">Notifications</h3>
                   </div>
@@ -97,51 +91,10 @@ export default function StudentsPage() {
                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
                   HM
                 </div>
-                <div className="hidden sm:block">
-                  <p className="text-sm font-medium text-slate-900">Hana M.</p>
-                  <p className="text-xs text-slate-500">Enseignante</p>
-                </div>
               </button>
-
-              {showProfile && (
-                <div className="absolute right-0 mt-2 w-48 rounded-lg border border-slate-200 bg-white shadow-lg">
-                  <div className="border-b border-slate-200 px-4 py-3">
-                    <p className="text-sm font-semibold text-slate-900">{teacherData.name}</p>
-                    <p className="text-xs text-slate-500">Enseignante • {teacherData.school}</p>
-                  </div>
-                  <div className="space-y-1 px-2 py-2">
-                    <button className="w-full rounded px-3 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100">
-                      👤 Mon profil
-                    </button>
-                    <button className="w-full rounded px-3 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100">
-                      ⚙️ Paramètres
-                    </button>
-                  </div>
-                  <div className="border-t border-slate-200 px-2 py-2">
-                    <button className="w-full rounded px-3 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50">
-                      🚪 Déconnexion
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
-
-        <nav className="border-t border-slate-200 bg-white">
-          <div className="mx-auto flex gap-1 overflow-x-auto px-4 py-2 sm:px-6 lg:px-8">
-            {navItems.map((item) => (
-              <button
-                key={item.href}
-                onClick={() => router.push(item.href)}
-                className="flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
-              >
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </div>
-        </nav>
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -150,7 +103,7 @@ export default function StudentsPage() {
           <p className="mt-2 text-slate-600">Gestion et suivi de vos élèves</p>
         </div>
 
-        <div className="mb-6 flex gap-4">
+        <div className="mb-6 flex flex-col sm:flex-row gap-4">
           <input
             type="text"
             placeholder="Rechercher un élève..."
@@ -158,7 +111,7 @@ export default function StudentsPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1 rounded-lg border border-slate-200 px-4 py-2 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
-          <button className="rounded-lg bg-blue-600 px-6 py-2 font-medium text-white transition-colors hover:bg-blue-700">
+          <button className="rounded-lg bg-blue-600 px-6 py-2 font-medium text-white transition-colors hover:bg-blue-700 whitespace-nowrap">
             + Ajouter élève
           </button>
         </div>
@@ -170,10 +123,9 @@ export default function StudentsPage() {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-600">Nom</th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-600">Classe</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-600">Email</th>
+                  <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-600">Email</th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-600">Moyenne</th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-600">Statut</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-600">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 bg-white">
@@ -181,7 +133,7 @@ export default function StudentsPage() {
                   <tr key={student.id} className="hover:bg-slate-50">
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900">{student.name}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">{student.class}</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">{student.email}</td>
+                    <td className="hidden md:table-cell whitespace-nowrap px-6 py-4 text-sm text-slate-600">{student.email}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm">
                       <span className="font-semibold text-blue-600">{student.average}/20</span>
                     </td>
@@ -192,9 +144,6 @@ export default function StudentsPage() {
                         {student.status}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm">
-                      <button className="text-blue-600 hover:text-blue-700 transition-colors">✏️ Voir</button>
-                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -202,6 +151,23 @@ export default function StudentsPage() {
           </div>
         </Card>
       </main>
+
+      {/* Navigation Bar en bas - Mobile Friendly */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white shadow-lg">
+        <div className="mx-auto grid grid-cols-5 gap-1 px-2 py-2 sm:px-4">
+          {navItems.map((item) => (
+            <button
+              key={item.href}
+              onClick={() => router.push(item.href)}
+              className="flex flex-col items-center gap-1 rounded-lg px-2 py-3 text-xs sm:text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900"
+            >
+              <span className="text-xl sm:text-2xl">{item.icon}</span>
+              <span className="hidden sm:inline">{item.label}</span>
+              <span className="sm:hidden text-xs">{item.label.split(' ')[0]}</span>
+            </button>
+          ))}
+        </div>
+      </nav>
     </div>
   );
 }

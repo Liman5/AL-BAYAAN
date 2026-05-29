@@ -7,6 +7,9 @@ import Card from '@/components/ui/card';
 const teacherData = {
   name: 'Mme Hana Mansour',
   school: 'AL-BAYAAN',
+  notifications: [
+    { id: 1, message: 'Sara a remis son devoir', time: 'Il y a 2h' },
+  ]
 };
 
 const navItems = [
@@ -18,19 +21,54 @@ const navItems = [
 ];
 
 const gradesData = [
-  { id: 1, name: 'Devoir 1', class: '3ème A', average: 14.5, min: 8, max: 19 },
-  { id: 2, name: 'Devoir 2', class: '3ème A', average: 13.8, min: 7, max: 18 },
-  { id: 3, name: 'Interro', class: '2nde B', average: 12.3, min: 6, max: 17 },
-  { id: 4, name: 'Contrôle', class: '1ère C', average: 15.2, min: 9, max: 20 },
+  {
+    assessment: 'Contrôle 1 - Algèbre',
+    subject: 'Mathématiques',
+    average: 14.5,
+    min: 8,
+    max: 20,
+    evaluated: 85
+  },
+  {
+    assessment: 'Dissertation - Littérature',
+    subject: 'Français',
+    average: 13.8,
+    min: 10,
+    max: 19,
+    evaluated: 78
+  },
+  {
+    assessment: 'Quiz - Vocabulaire',
+    subject: 'Anglais',
+    average: 15.2,
+    min: 11,
+    max: 20,
+    evaluated: 92
+  },
+  {
+    assessment: 'Projet - Sciences',
+    subject: 'Sciences',
+    average: 16.1,
+    min: 13,
+    max: 20,
+    evaluated: 88
+  }
+];
+
+const stats = [
+  { label: 'Élèves évalués', value: '74', icon: '👥' },
+  { label: 'Moyenne générale', value: '14.9/20', icon: '📊' },
+  { label: 'Meilleure note', value: '20', icon: '⭐' },
+  { label: 'Plus basse note', value: '8', icon: '📉' }
 ];
 
 export default function GradesPage() {
   const router = useRouter();
-  const [showProfile, setShowProfile] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
+    <div className="min-h-screen bg-slate-50 pb-24">
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-sm">
         <div className="mx-auto flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 text-lg font-bold text-white">
@@ -38,96 +76,85 @@ export default function GradesPage() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-slate-900">{teacherData.school}</h1>
-              <p className="text-xs text-slate-500">Plateforme pédagogique</p>
+              <p className="hidden sm:block text-xs text-slate-500">Plateforme pédagogique</p>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="relative">
               <button
-                onClick={() => setShowProfile(!showProfile)}
-                className="flex items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-slate-100"
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100"
               >
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
-                  HM
-                </div>
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
               </button>
             </div>
           </div>
         </div>
-
-        <nav className="border-t border-slate-200 bg-white">
-          <div className="mx-auto flex gap-1 overflow-x-auto px-4 py-2 sm:px-6 lg:px-8">
-            {navItems.map((item) => (
-              <button
-                key={item.href}
-                onClick={() => router.push(item.href)}
-                className="flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
-              >
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </div>
-        </nav>
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-slate-900">Gestion des Notes</h2>
-          <p className="mt-2 text-slate-600">Visualisez et gérez les notes de vos élèves</p>
+          <h2 className="text-3xl font-bold text-slate-900">Mes Notes</h2>
+          <p className="mt-2 text-slate-600">Suivi et analyse des évaluations</p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-          <Card className="p-6">
-            <p className="text-sm text-slate-600">Total élèves évalués</p>
-            <p className="mt-2 text-3xl font-bold text-blue-600">74</p>
-          </Card>
-          <Card className="p-6">
-            <p className="text-sm text-slate-600">Moyenne générale</p>
-            <p className="mt-2 text-3xl font-bold text-green-600">14.2/20</p>
-          </Card>
-          <Card className="p-6">
-            <p className="text-sm text-slate-600">Meilleure note</p>
-            <p className="mt-2 text-3xl font-bold text-purple-600">20</p>
-          </Card>
-          <Card className="p-6">
-            <p className="text-sm text-slate-600">Note la plus basse</p>
-            <p className="mt-2 text-3xl font-bold text-orange-600">6</p>
-          </Card>
+        <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat, idx) => (
+            <Card key={idx} className="text-center">
+              <p className="text-3xl mb-2">{stat.icon}</p>
+              <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+              <p className="mt-2 text-sm text-slate-600">{stat.label}</p>
+            </Card>
+          ))}
         </div>
 
-        <div className="grid gap-6">
-          {gradesData.map((grade) => (
-            <Card key={grade.id} className="p-6">
-              <div className="flex items-start justify-between mb-4">
+        <div className="space-y-4">
+          {gradesData.map((grade, idx) => (
+            <Card key={idx} className="p-6">
+              <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900">{grade.name}</h3>
-                  <p className="text-sm text-slate-600">Classe {grade.class}</p>
+                  <h3 className="font-semibold text-slate-900">{grade.assessment}</h3>
+                  <p className="text-sm text-slate-600 mt-1">{grade.subject}</p>
                 </div>
-                <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
-                  ✏️ Modifier
-                </button>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-3">
-                <div className="rounded-lg bg-slate-50 p-4">
-                  <p className="text-sm text-slate-600">Moyenne</p>
-                  <p className="mt-2 text-2xl font-bold text-blue-600">{grade.average}</p>
-                </div>
-                <div className="rounded-lg bg-slate-50 p-4">
-                  <p className="text-sm text-slate-600">Minimum</p>
-                  <p className="mt-2 text-2xl font-bold text-orange-600">{grade.min}</p>
-                </div>
-                <div className="rounded-lg bg-slate-50 p-4">
-                  <p className="text-sm text-slate-600">Maximum</p>
-                  <p className="mt-2 text-2xl font-bold text-green-600">{grade.max}</p>
+                <div className="grid grid-cols-3 gap-2 md:text-right">
+                  <div>
+                    <p className="text-xs text-slate-500">Moyenne</p>
+                    <p className="text-lg font-bold text-blue-600">{grade.average}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500">Min/Max</p>
+                    <p className="text-sm text-slate-900">{grade.min}/{grade.max}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500">Évalués</p>
+                    <p className="text-sm text-slate-900">{grade.evaluated}</p>
+                  </div>
                 </div>
               </div>
             </Card>
           ))}
         </div>
       </main>
+
+      {/* Navigation Bar en bas - Mobile Friendly */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white shadow-lg">
+        <div className="mx-auto grid grid-cols-5 gap-1 px-2 py-2 sm:px-4">
+          {navItems.map((item) => (
+            <button
+              key={item.href}
+              onClick={() => router.push(item.href)}
+              className="flex flex-col items-center gap-1 rounded-lg px-2 py-3 text-xs sm:text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900"
+            >
+              <span className="text-xl sm:text-2xl">{item.icon}</span>
+              <span className="hidden sm:inline">{item.label}</span>
+              <span className="sm:hidden text-xs">{item.label.split(' ')[0]}</span>
+            </button>
+          ))}
+        </div>
+      </nav>
     </div>
   );
 }

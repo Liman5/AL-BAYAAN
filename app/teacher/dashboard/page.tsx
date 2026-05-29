@@ -50,9 +50,9 @@ export default function TeacherDashboardPage() {
   const [showProfile, setShowProfile] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
+    <div className="min-h-screen bg-slate-50 pb-24">
+      {/* Header simplifié */}
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-sm">
         <div className="mx-auto flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           {/* Logo et école */}
           <div className="flex items-center gap-3">
@@ -61,7 +61,7 @@ export default function TeacherDashboardPage() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-slate-900">{teacherData.school}</h1>
-              <p className="text-xs text-slate-500">Plateforme pédagogique</p>
+              <p className="hidden sm:block text-xs text-slate-500">Plateforme pédagogique</p>
             </div>
           </div>
 
@@ -149,22 +149,6 @@ export default function TeacherDashboardPage() {
             </div>
           </div>
         </div>
-
-        {/* Navigation */}
-        <nav className="border-t border-slate-200 bg-white">
-          <div className="mx-auto flex gap-1 overflow-x-auto px-4 py-2 sm:px-6 lg:px-8">
-            {navItems.map((item) => (
-              <button
-                key={item.href}
-                onClick={() => router.push(item.href)}
-                className="flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
-              >
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </div>
-        </nav>
       </header>
 
       {/* Main Content */}
@@ -384,6 +368,23 @@ export default function TeacherDashboardPage() {
           </div>
         </div>
       </main>
+
+      {/* Navigation Bar en bas - Mobile Friendly */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white shadow-lg">
+        <div className="mx-auto grid grid-cols-5 gap-1 px-2 py-2 sm:px-4">
+          {navItems.map((item) => (
+            <button
+              key={item.href}
+              onClick={() => router.push(item.href)}
+              className="flex flex-col items-center gap-1 rounded-lg px-2 py-3 text-xs sm:text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900"
+            >
+              <span className="text-xl sm:text-2xl">{item.icon}</span>
+              <span className="hidden sm:inline">{item.label}</span>
+              <span className="sm:hidden text-xs">{item.label.split(' ')[0]}</span>
+            </button>
+          ))}
+        </div>
+      </nav>
     </div>
   );
 }
