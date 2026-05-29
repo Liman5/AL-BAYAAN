@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/card';
 import AppHeader from '@/components/ui/app-header';
-import AppHeader from '@/components/ui/app-header';
 
 const teacherData = {
   name: 'Mme Hana Mansour',
