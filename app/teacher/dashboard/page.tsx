@@ -1,9 +1,12 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/card';
 
 const teacherData = {
   name: 'Mme Hana Mansour',
+  school: 'AL-BAYAAN',
   classes: [
     { id: 1, name: '3ème A', subject: 'Mathématiques', students: 28, nextClass: 'Aujourd\'hui 10:00' },
     { id: 2, name: '2nde B', subject: 'Physique', students: 24, nextClass: 'Aujourd\'hui 14:00' },
@@ -25,22 +28,158 @@ const teacherData = {
     classesThisWeek: 12,
     averageGrade: 14.2,
     attendanceRate: '95%'
-  }
+  },
+  notifications: [
+    { id: 1, message: 'Sara a remis son devoir', time: 'Il y a 2h' },
+    { id: 2, message: '5 absences en 3ème A', time: 'Il y a 4h' },
+    { id: 3, message: 'Réunion parents demain', time: 'Il y a 1j' }
+  ]
 };
 
+const navItems = [
+  { label: 'Accueil', icon: '🏠', href: '/teacher/dashboard' },
+  { label: 'Élèves', icon: '👥', href: '/teacher/students' },
+  { label: 'Exercices', icon: '📝', href: '/teacher/exercises' },
+  { label: 'Notes', icon: '📊', href: '/teacher/grades' },
+  { label: 'Plan', icon: '📅', href: '/teacher/planning' }
+];
+
 export default function TeacherDashboardPage() {
+  const router = useRouter();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50">
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
+        <div className="mx-auto flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+          {/* Logo et école */}
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 text-lg font-bold text-white">
+              📚
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-slate-900">{teacherData.school}</h1>
+              <p className="text-xs text-slate-500">Plateforme pédagogique</p>
+            </div>
+          </div>
+
+          {/* Notifications et Profile */}
+          <div className="flex items-center gap-4">
+            {/* Notifications */}
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                {teacherData.notifications.length > 0 && (
+                  <span className="absolute top-1 right-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                    {teacherData.notifications.length}
+                  </span>
+                )}
+              </button>
+
+              {/* Dropdown Notifications */}
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-80 rounded-lg border border-slate-200 bg-white shadow-lg">
+                  <div className="border-b border-slate-200 px-4 py-3">
+                    <h3 className="font-semibold text-slate-900">Notifications</h3>
+                  </div>
+                  <div className="max-h-96 overflow-y-auto">
+                    {teacherData.notifications.map((notif) => (
+                      <div key={notif.id} className="border-b border-slate-100 px-4 py-3 transition-colors hover:bg-slate-50">
+                        <p className="text-sm text-slate-900">{notif.message}</p>
+                        <p className="mt-1 text-xs text-slate-500">{notif.time}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="border-t border-slate-200 px-4 py-2">
+                    <button className="text-sm text-blue-600 transition-colors hover:text-blue-700">
+                      Voir tout
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Profile */}
+            <div className="relative">
+              <button
+                onClick={() => setShowProfile(!showProfile)}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-slate-100"
+              >
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
+                  HM
+                </div>
+                <div className="hidden sm:block">
+                  <p className="text-sm font-medium text-slate-900">Hana M.</p>
+                  <p className="text-xs text-slate-500">Enseignante</p>
+                </div>
+              </button>
+
+              {/* Dropdown Profile */}
+              {showProfile && (
+                <div className="absolute right-0 mt-2 w-48 rounded-lg border border-slate-200 bg-white shadow-lg">
+                  <div className="border-b border-slate-200 px-4 py-3">
+                    <p className="text-sm font-semibold text-slate-900">{teacherData.name}</p>
+                    <p className="text-xs text-slate-500">Enseignante • {teacherData.school}</p>
+                  </div>
+                  <div className="space-y-1 px-2 py-2">
+                    <button className="w-full rounded px-3 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100">
+                      👤 Mon profil
+                    </button>
+                    <button className="w-full rounded px-3 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100">
+                      ⚙️ Paramètres
+                    </button>
+                    <button className="w-full rounded px-3 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100">
+                      🔔 Préférences
+                    </button>
+                  </div>
+                  <div className="border-t border-slate-200 px-2 py-2">
+                    <button className="w-full rounded px-3 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50">
+                      🚪 Déconnexion
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="border-t border-slate-200 bg-white">
+          <div className="mx-auto flex gap-1 overflow-x-auto px-4 py-2 sm:px-6 lg:px-8">
+            {navItems.map((item) => (
+              <button
+                key={item.href}
+                onClick={() => router.push(item.href)}
+                className="flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
+              >
+                <span>{item.icon}</span>
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </nav>
+      </header>
+
+      {/* Main Content */}
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* En-tête */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">
+          <h2 className="text-3xl font-bold text-slate-900">
             Bienvenue, {teacherData.name}
-          </h1>
+          </h2>
           <p className="mt-2 text-slate-600">
             Voici un aperçu de vos activités d'enseignement
           </p>
         </div>
 
+        {/* Statistiques rapides */}
         <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <Card className="bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
@@ -107,15 +246,18 @@ export default function TeacherDashboardPage() {
           </Card>
         </div>
 
+        {/* Contenu principal en 2 colonnes */}
         <div className="grid gap-8 lg:grid-cols-3">
+          {/* Colonne gauche - 2/3 */}
           <div className="space-y-8 lg:col-span-2">
+            {/* Mes classes */}
             <Card className="bg-white p-6 shadow-sm">
               <h2 className="mb-4 text-xl font-semibold text-slate-900">Mes Classes</h2>
               <div className="space-y-4">
                 {teacherData.classes.map((classe) => (
                   <div
                     key={classe.id}
-                    className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all hover:border-blue-300 hover:shadow-md"
+                    className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all hover:border-blue-300 hover:shadow-md cursor-pointer"
                   >
                     <div className="flex-1">
                       <h3 className="font-semibold text-slate-900">{classe.name}</h3>
@@ -134,6 +276,7 @@ export default function TeacherDashboardPage() {
               </div>
             </Card>
 
+            {/* Élèves récents */}
             <Card className="bg-white p-6 shadow-sm">
               <h2 className="mb-4 text-xl font-semibold text-slate-900">Activité récente des élèves</h2>
               <div className="overflow-x-auto">
@@ -187,7 +330,9 @@ export default function TeacherDashboardPage() {
             </Card>
           </div>
 
+          {/* Colonne droite - 1/3 */}
           <div className="space-y-8">
+            {/* Tâches à venir */}
             <Card className="bg-white p-6 shadow-sm">
               <h2 className="mb-4 text-xl font-semibold text-slate-900">Tâches à venir</h2>
               <div className="space-y-3">
@@ -202,7 +347,7 @@ export default function TeacherDashboardPage() {
                         <p className="mt-1 text-sm text-slate-600">{task.dueDate}</p>
                       </div>
                       <span
-                        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold whitespace-nowrap ml-2 ${
                           task.priority === 'Haute'
                             ? 'bg-red-100 text-red-800'
                             : task.priority === 'Moyenne'
@@ -218,6 +363,7 @@ export default function TeacherDashboardPage() {
               </div>
             </Card>
 
+            {/* Actions rapides */}
             <Card className="bg-white p-6 shadow-sm">
               <h2 className="mb-4 text-xl font-semibold text-slate-900">Actions rapides</h2>
               <div className="space-y-2">
@@ -237,7 +383,7 @@ export default function TeacherDashboardPage() {
             </Card>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
