@@ -30,12 +30,12 @@ export default function PlanningPage() {
   const router = useRouter();
   const [showProfile, setShowProfile] = useState(false);
 
-  const groupedByDay = planningData.reduce((acc, item) => {
+  const groupedByDay: { [key: string]: typeof planningData } = planningData.reduce((acc, item) => {
     const day = item.day;
     if (!acc[day]) acc[day] = [];
     acc[day].push(item);
     return acc;
-  }, {});
+  }, {} as { [key: string]: typeof planningData });
 
   return (
     <div className="min-h-screen bg-slate-50">
