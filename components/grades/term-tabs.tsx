@@ -9,9 +9,9 @@ interface TermTabsProps {
 
 export default function TermTabs({ selectedTerm, onTermChange }: TermTabsProps) {
   const terms: { value: Term; label: string; icon: string }[] = [
-    { value: 'first', label: 'First Term', icon: '📍' },
-    { value: 'second', label: 'Second Term', icon: '📍' },
-    { value: 'third', label: 'Third Term', icon: '📍' },
+    { value: 'first', label: '1er Trimestre', icon: '📍' },
+    { value: 'second', label: '2e Trimestre', icon: '📍' },
+    { value: 'third', label: '3e Trimestre', icon: '📍' },
   ];
 
   return (

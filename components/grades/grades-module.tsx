@@ -9,16 +9,16 @@ import TermTabs from './term-tabs';
 import CollapsibleTermSection from './collapsible-term-section';
 
 const assessmentTypes: { type: AssessmentType; label: string; icon: string }[] = [
-  { type: 'class_assignments', label: 'Class Assignments', icon: '📋' },
-  { type: 'homework', label: 'Homework', icon: '📚' },
-  { type: 'continuous_assessment', label: 'Continuous Assessment', icon: '📝' },
-  { type: 'final_exam', label: 'Final Exam / Composition', icon: '📊' },
+  { type: 'class_assignments', label: 'Devoirs en Classe', icon: '📋' },
+  { type: 'homework', label: 'Devoirs à la Maison', icon: '📚' },
+  { type: 'continuous_assessment', label: 'Évaluation Continue', icon: '📝' },
+  { type: 'final_exam', label: 'Examen Final / Composition', icon: '📊' },
 ];
 
 const termLabels = {
-  first: '📍 First Term',
-  second: '📍 Second Term',
-  third: '📍 Third Term',
+  first: '📍 1er Trimestre',
+  second: '📍 2e Trimestre',
+  third: '📍 3e Trimestre',
 };
 
 export default function GradesModule() {
@@ -92,9 +92,9 @@ export default function GradesModule() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">📊 Grades & Assessments</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">📊 Notes et Évaluations</h1>
           <p className="text-gray-600">
-            Manage and track student grades across different terms and assessments
+            Gérez et suivez les notes des élèves selon les trimestres et les évaluations
           </p>
         </div>
 
@@ -108,15 +108,15 @@ export default function GradesModule() {
         <div className="mb-6 bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-600">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <p className="text-xs text-gray-600 font-semibold">SCHOOL</p>
+              <p className="text-xs text-gray-600 font-semibold">ÉCOLE</p>
               <p className="text-lg font-bold text-gray-900">{gradingConfig.schoolName}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-600 font-semibold">CLASS</p>
+              <p className="text-xs text-gray-600 font-semibold">CLASSE</p>
               <p className="text-lg font-bold text-gray-900">{gradingConfig.className}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-600 font-semibold">SUBJECT</p>
+              <p className="text-xs text-gray-600 font-semibold">MATIÈRE</p>
               <p className="text-lg font-bold text-gray-900">{gradingConfig.subject}</p>
             </div>
           </div>
@@ -146,9 +146,9 @@ export default function GradesModule() {
         {/* Footer Info */}
         <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
           <p className="text-sm text-blue-900">
-            <strong>💡 Tip:</strong> Click on any cell to edit scores. Averages and remarks are
-            calculated automatically. Your changes are saved locally. For Primary School and Middle
-            School, coefficients adjust based on the academic level selected above.
+            <strong>💡 Conseil:</strong> Cliquez sur n'importe quelle cellule pour modifier les notes. Les moyennes et les appréciations
+            sont calculées automatiquement. Vos modifications sont enregistrées localement. Pour l'École Primaire et le Collège,
+            les coefficients s'ajustent selon le niveau académique sélectionné ci-dessus.
           </p>
         </div>
       </div>

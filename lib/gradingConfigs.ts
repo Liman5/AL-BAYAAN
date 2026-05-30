@@ -42,11 +42,11 @@ export const getGradingConfig = (academicLevel: AcademicLevel): GradingConfig =>
 
 export const getTeacherRemark = (average: number, config: GradingConfig) => {
   if (average >= config.excellentThreshold) return 'Excellent';
-  if (average >= config.veryGoodThreshold) return 'Very Good';
-  if (average >= config.goodThreshold) return 'Good';
-  if (average >= config.fairThreshold) return 'Fair';
-  if (average >= config.passThreshold) return 'Pass';
-  return 'Fail';
+  if (average >= config.veryGoodThreshold) return 'Très Bon';
+  if (average >= config.goodThreshold) return 'Bon';
+  if (average >= config.fairThreshold) return 'Passable';
+  if (average >= config.passThreshold) return 'Acceptable';
+  return 'Insuffisant';
 };
 
 export const calculateAverage = (

@@ -72,14 +72,19 @@ export default function GradeGridTable({
       case 'Excellent':
         return 'bg-green-100 text-green-800';
       case 'Very Good':
+      case 'Très Bon':
         return 'bg-blue-100 text-blue-800';
       case 'Good':
+      case 'Bon':
         return 'bg-cyan-100 text-cyan-800';
       case 'Fair':
+      case 'Passable':
         return 'bg-yellow-100 text-yellow-800';
       case 'Pass':
+      case 'Acceptable':
         return 'bg-orange-100 text-orange-800';
       case 'Fail':
+      case 'Insuffisant':
         return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -91,19 +96,19 @@ export default function GradeGridTable({
       {/* Statistics */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
-          <div className="text-xs text-blue-600 font-semibold mb-1">Average</div>
+          <div className="text-xs text-blue-600 font-semibold mb-1">Moyenne</div>
           <div className="text-2xl font-bold text-blue-900">{stats.average.toFixed(2)}</div>
         </div>
         <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
-          <div className="text-xs text-green-600 font-semibold mb-1">Max</div>
+          <div className="text-xs text-green-600 font-semibold mb-1">Maximum</div>
           <div className="text-2xl font-bold text-green-900">{stats.max.toFixed(2)}</div>
         </div>
         <div className="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-lg">
-          <div className="text-xs text-red-600 font-semibold mb-1">Min</div>
+          <div className="text-xs text-red-600 font-semibold mb-1">Minimum</div>
           <div className="text-2xl font-bold text-red-900">{stats.min.toFixed(2)}</div>
         </div>
         <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
-          <div className="text-xs text-purple-600 font-semibold mb-1">Evaluated</div>
+          <div className="text-xs text-purple-600 font-semibold mb-1">Évalués</div>
           <div className="text-2xl font-bold text-purple-900">
             {stats.evaluated}/{grades.length}
           </div>
@@ -117,25 +122,25 @@ export default function GradeGridTable({
           <thead>
             <tr className="bg-gray-100 border-b border-gray-200">
               <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 sticky left-0 bg-gray-100 z-10 whitespace-nowrap">
-                Student
+                Élève
               </th>
               <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900">
-                Class Assign.
+                Dev. Classe
               </th>
               <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900">
-                Homework
+                Dev. Maison
               </th>
               <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900">
-                Continuous
+                Éval. Continue
               </th>
               <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900">
-                Final Exam
+                Exam Final
               </th>
               <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900">
-                Average
+                Moyenne
               </th>
               <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900">
-                Remark
+                Appréciation
               </th>
               <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900">
                 Signature
@@ -163,6 +168,7 @@ export default function GradeGridTable({
                     type="number"
                     min="0"
                     max={gradingConfig.maxScore}
+                    step="0.01"
                     value={grade.classAssignments ?? ''}
                     onChange={(e) =>
                       updateGrade(
@@ -182,6 +188,7 @@ export default function GradeGridTable({
                     type="number"
                     min="0"
                     max={gradingConfig.maxScore}
+                    step="0.01"
                     value={grade.homework ?? ''}
                     onChange={(e) =>
                       updateGrade(
@@ -201,6 +208,7 @@ export default function GradeGridTable({
                     type="number"
                     min="0"
                     max={gradingConfig.maxScore}
+                    step="0.01"
                     value={grade.continuousAssessment ?? ''}
                     onChange={(e) =>
                       updateGrade(
@@ -220,6 +228,7 @@ export default function GradeGridTable({
                     type="number"
                     min="0"
                     max={gradingConfig.maxScore}
+                    step="0.01"
                     value={grade.finalExam ?? ''}
                     onChange={(e) =>
                       updateGrade(
@@ -274,12 +283,12 @@ export default function GradeGridTable({
       {/* Summary */}
       <div className="text-xs text-gray-600 p-4 bg-gray-50 rounded-lg">
         <p className="mb-2">
-          <strong>Grading Configuration:</strong> Class Assignments (20%) | Homework (15%) |
-          Continuous Assessment (25%) | Final Exam (40%)
+          <strong>Configuration de Notation:</strong> Dev. Classe (20%) | Dev. Maison (15%) |
+          Éval. Continue (25%) | Exam Final (40%)
         </p>
         <p>
-          <strong>Thresholds:</strong> Excellent (18-20) | Very Good (16-17) | Good (14-15) |
-          Fair (12-13) | Pass (10-11) | Fail (&lt;10)
+          <strong>Seuils:</strong> Excellent (18-20) | Très Bon (16-17) | Bon (14-15) |
+          Passable (12-13) | Acceptable (10-11) | Insuffisant (&lt;10)
         </p>
       </div>
     </div>

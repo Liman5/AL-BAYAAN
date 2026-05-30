@@ -48,7 +48,7 @@ export default function CollapsibleTermSection({
         <div className="border-t border-gray-200 p-6">
           {/* Assessment Type Selector */}
           <div className="mb-6">
-            <p className="text-sm font-medium text-gray-700 mb-3">Select Assessment Type</p>
+            <p className="text-sm font-medium text-gray-700 mb-3">Sélectionner le Type d'Évaluation</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {assessmentTypes.map((assessment) => (
                 <button

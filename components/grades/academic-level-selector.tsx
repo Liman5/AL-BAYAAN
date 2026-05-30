@@ -12,13 +12,13 @@ export default function AcademicLevelSelector({
   onLevelChange,
 }: AcademicLevelSelectorProps) {
   const levels: { value: AcademicLevel; label: string; icon: string }[] = [
-    { value: 'primary', label: 'Primary School (5e)', icon: '📚' },
-    { value: 'middle_school', label: 'Middle School (3e)', icon: '🎓' },
+    { value: 'primary', label: 'École Primaire (5e)', icon: '📚' },
+    { value: 'middle_school', label: 'Collège (3e)', icon: '🎓' },
   ];
 
   return (
     <div className="mb-6">
-      <p className="text-sm font-medium text-gray-700 mb-3">Select Academic Level</p>
+      <p className="text-sm font-medium text-gray-700 mb-3">Sélectionner le Niveau Académique</p>
       <div className="flex gap-3">
         {levels.map((level) => (
           <button
