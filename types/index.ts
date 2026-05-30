@@ -71,3 +71,6 @@ export interface School {
   slug: string;
   address?: string;
 }
+
+// Re-export grades types for convenience
+export * from './grades';
