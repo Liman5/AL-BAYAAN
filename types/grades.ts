@@ -1,7 +1,7 @@
 export type AcademicLevel = 'primary' | 'middle_school';
 export type Term = 'first' | 'second' | 'third';
 export type AssessmentType = 'class_assignments' | 'homework' | 'continuous_assessment' | 'final_exam';
-export type TeacherRemark = 'Excellent' | 'Very Good' | 'Good' | 'Fair' | 'Pass' | 'Fail';
+export type TeacherRemark = 'Excellent' | 'Très Bon' | 'Bon' | 'Passable' | 'Acceptable' | 'Insuffisant';
 
 export interface Student {
   id: string;
