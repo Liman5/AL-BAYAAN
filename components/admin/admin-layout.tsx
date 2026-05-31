@@ -84,12 +84,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   isOpen = true,
 }) => {
   return (
-    <aside
-      className={`fixed md:static left-0 top-16 md:top-0 h-screen md:h-screen bg-gray-900 text-white transition-transform duration-300 transform ${
-        isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-      } w-64 md:w-64 lg:w-72 overflow-y-auto border-r border-gray-800`}
-    >
-      <nav className="p-6 space-y-2">
+    <>
+      <nav className="p-4 lg:p-6 space-y-2 flex-1">
         {items.map((item) => (
           <button
             key={item.id}
@@ -100,10 +96,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 : 'text-gray-300 hover:bg-gray-800 hover:text-white'
             }`}
           >
-            <span className="text-xl">{item.icon}</span>
-            <span className="font-medium flex-1 text-left">{item.label}</span>
+            <span className="text-xl flex-shrink-0">{item.icon}</span>
+            <span className="font-medium flex-1 text-left text-sm lg:text-base">{item.label}</span>
             {item.badge && (
-              <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 font-bold">
+              <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 font-bold flex-shrink-0">
                 {item.badge}
               </span>
             )}
@@ -112,12 +108,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       </nav>
 
       {/* Footer section */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-800 bg-gray-800">
+      <div className="p-4 lg:p-6 border-t border-gray-800 bg-gray-800">
         <p className="text-xs text-gray-400 text-center">
-          © 2024 ALBAYANE | Admin Dashboard v1.0
+          © 2024 ALBAYANE | Admin v1.0
         </p>
       </div>
-    </aside>
+    </>
   );
 };
 

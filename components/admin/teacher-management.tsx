@@ -33,27 +33,27 @@ export const TeacherList: React.FC<TeacherListProps> = ({
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-      <table className="w-full">
+    <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm -mx-4 sm:mx-0">
+      <table className="w-full text-sm lg:text-base">
         <thead className="bg-gray-50 border-b border-gray-200">
           <tr>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Nom Complet</th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Matières</th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Statut</th>
-            <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">Actions</th>
+            <th className="px-3 lg:px-4 py-3 text-left text-xs lg:text-sm font-semibold text-gray-700">Nom Complet</th>
+            <th className="px-3 lg:px-4 py-3 text-left text-xs lg:text-sm font-semibold text-gray-700 hidden md:table-cell">Email</th>
+            <th className="px-3 lg:px-4 py-3 text-left text-xs lg:text-sm font-semibold text-gray-700">Matières</th>
+            <th className="px-3 lg:px-4 py-3 text-left text-xs lg:text-sm font-semibold text-gray-700 hidden sm:table-cell">Statut</th>
+            <th className="px-3 lg:px-4 py-3 text-center text-xs lg:text-sm font-semibold text-gray-700">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
           {filteredTeachers.map((teacher) => (
             <tr key={teacher.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-4 py-3 text-sm font-medium text-gray-900">
+              <td className="px-3 lg:px-4 py-3 text-sm lg:text-base font-medium text-gray-900">
                 {teacher.firstName} {teacher.lastName}
               </td>
-              <td className="px-4 py-3 text-sm text-gray-600">{teacher.email}</td>
-              <td className="px-4 py-3 text-sm text-gray-600">
+              <td className="px-3 lg:px-4 py-3 text-xs lg:text-sm text-gray-600 hidden md:table-cell">{teacher.email}</td>
+              <td className="px-3 lg:px-4 py-3 text-xs lg:text-sm text-gray-600">
                 <div className="flex flex-wrap gap-1">
-                  {teacher.subjects.map((subject, idx) => (
+                  {teacher.subjects.slice(0, 2).map((subject, idx) => (
                     <span
                       key={idx}
                       className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"
@@ -61,9 +61,14 @@ export const TeacherList: React.FC<TeacherListProps> = ({
                       {subject}
                     </span>
                   ))}
+                  {teacher.subjects.length > 2 && (
+                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+                      +{teacher.subjects.length - 2}
+                    </span>
+                  )}
                 </div>
               </td>
-              <td className="px-4 py-3 text-sm">
+              <td className="px-3 lg:px-4 py-3 text-xs lg:text-sm hidden sm:table-cell">
                 <span
                   className={`px-2 py-1 rounded-full text-xs font-semibold ${
                     teacher.status === 'active'
@@ -74,33 +79,33 @@ export const TeacherList: React.FC<TeacherListProps> = ({
                   {teacher.status === 'active' ? 'Actif' : 'Inactif'}
                 </span>
               </td>
-              <td className="px-4 py-3 text-sm">
-                <div className="flex items-center justify-center gap-2">
+              <td className="px-3 lg:px-4 py-3 text-sm">
+                <div className="flex items-center justify-center gap-1 lg:gap-2">
                   {onView && (
                     <button
                       onClick={() => onView(teacher)}
-                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      className="p-1 lg:p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       title="Voir détails"
                     >
-                      <Eye size={18} />
+                      <Eye size={16} className="lg:w-[18px] lg:h-[18px]" />
                     </button>
                   )}
                   {onEdit && (
                     <button
                       onClick={() => onEdit(teacher)}
-                      className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                      className="p-1 lg:p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                       title="Modifier"
                     >
-                      <Edit2 size={18} />
+                      <Edit2 size={16} className="lg:w-[18px] lg:h-[18px]" />
                     </button>
                   )}
                   {onDelete && (
                     <button
                       onClick={() => onDelete(teacher.id)}
-                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-1 lg:p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Supprimer"
                     >
-                      <Trash2 size={18} />
+                      <Trash2 size={16} className="lg:w-[18px] lg:h-[18px]" />
                     </button>
                   )}
                 </div>
