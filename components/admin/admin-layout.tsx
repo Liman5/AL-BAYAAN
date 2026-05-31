@@ -151,7 +151,7 @@ interface StatCardProps {
   value: string | number;
   icon: React.ReactNode;
   trend?: { value: number; isPositive: boolean };
-  color?: 'blue' | 'green' | 'red' | 'yellow';
+  color?: 'blue' | 'green' | 'red' | 'yellow' | 'purple';
 }
 
 const colorClasses = {
@@ -159,6 +159,7 @@ const colorClasses = {
   green: 'bg-green-50 text-green-600 border-green-200',
   red: 'bg-red-50 text-red-600 border-red-200',
   yellow: 'bg-yellow-50 text-yellow-600 border-yellow-200',
+  purple: 'bg-purple-50 text-purple-600 border-purple-200',
 };
 
 export const StatCard: React.FC<StatCardProps> = ({
