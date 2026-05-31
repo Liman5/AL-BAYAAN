@@ -8,7 +8,7 @@ const roleRoutes = [
   { prefix: '/parent', roles: ['parent'] },
 ];
 
-const publicPaths = ['/auth/login', '/auth/register', '/', '/register'];
+const publicPaths = ['/auth/login', '/auth/register', '/', '/register', '/admin'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
