@@ -1,33 +1,50 @@
-import { ReactNode } from 'react';
-import Link from 'next/link';
+'use client';
+
+import { ReactNode, useState } from 'react';
+import { ResponsiveSidebar } from '@/components/ui/responsive-sidebar';
+import { AdminHeaderComponent } from '@/components/admin/admin-header';
+import { Users, BookOpen, BarChart3, FileText } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  return (
-    <div className="min-h-screen bg-slate-100">
-      <aside className="hidden lg:block lg:fixed lg:left-0 lg:top-0 lg:z-20 lg:h-full lg:w-80 lg:border-r lg:border-slate-200 lg:bg-white lg:px-5 lg:py-8 lg:shadow-sm">
-        <div className="space-y-6">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-900">Admin Portal</p>
-            <p className="mt-1 text-sm text-slate-500">Contrôle central et gestion des comptes.</p>
-          </div>
-          <nav className="space-y-2 text-sm text-slate-700">
-            <Link href="/admin/dashboard" className="block rounded-2xl px-4 py-3 hover:bg-slate-50">Dashboard</Link>
-            <Link href="/admin/dashboard" className="block rounded-2xl px-4 py-3 hover:bg-slate-50">Approvals</Link>
-            <Link href="/auth/login" className="block rounded-2xl px-4 py-3 hover:bg-slate-50">Se déconnecter</Link>
-          </nav>
-        </div>
-      </aside>
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-      <div className="ml-0 min-h-screen lg:ml-80">
-        <header className="border-b border-slate-200 bg-white px-6 py-5 shadow-sm">
-          <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Admin</p>
-              <h1 className="text-2xl font-semibold text-slate-900">Espace Administrateur</h1>
-            </div>
-          </div>
-        </header>
-        <main className="px-6 py-8">{children}</main>
+  const navItems = [
+    {
+      id: 'dashboard',
+      label: 'Tableau de Bord',
+      icon: <BarChart3 size={20} />,
+    },
+    {
+      id: 'students',
+      label: 'Élèves',
+      icon: <Users size={20} />,
+    },
+    {
+      id: 'teachers',
+      label: 'Enseignants',
+      icon: <BookOpen size={20} />,
+    },
+    {
+      id: 'classes',
+      label: 'Classes',
+      icon: <Users size={20} />,
+    },
+    {
+      id: 'reports',
+      label: 'Rapports de Notes',
+      icon: <FileText size={20} />,
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <AdminHeaderComponent
+        title="Espace Administrateur"
+        subtitle="Contrôle central et gestion des comptes"
+      />
+      <div className="flex flex-1 relative">
+        {/* Le layout n'a pas de sidebar ici, elle sera gérée au niveau de la page admin*/}
+        <main className="w-full flex-1 md:ml-0">{children}</main>
       </div>
     </div>
   );

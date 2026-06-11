@@ -1,121 +1,7 @@
 import React from 'react';
 import {
-  Users,
-  BookOpen,
-  BarChart3,
-  FileText,
-  Settings,
-  LogOut,
-  Bell,
   Search,
-  Menu,
-  X,
 } from 'lucide-react';
-
-interface AdminHeaderProps {
-  title: string;
-  onMenuToggle?: () => void;
-  isMenuOpen?: boolean;
-}
-
-export const AdminHeader: React.FC<AdminHeaderProps> = ({
-  title,
-  onMenuToggle,
-  isMenuOpen = false,
-}) => {
-  return (
-    <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg sticky top-0 z-50">
-      <div className="flex items-center justify-between px-4 md:px-6 py-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onMenuToggle}
-            className="md:hidden p-2 hover:bg-blue-500 rounded-lg transition-colors"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-          <div className="flex items-center gap-2">
-            <div className="bg-white text-blue-600 rounded-lg p-2">
-              <BookOpen size={24} />
-            </div>
-            <h1 className="text-2xl font-bold hidden sm:block">ALBAYANE</h1>
-          </div>
-        </div>
-
-        <h2 className="text-lg font-semibold flex-1 text-center md:text-left md:ml-4">
-          {title}
-        </h2>
-
-        <div className="flex items-center gap-2 md:gap-4">
-          <button className="p-2 hover:bg-blue-500 rounded-lg transition-colors">
-            <Bell size={20} />
-          </button>
-          <button className="p-2 hover:bg-blue-500 rounded-lg transition-colors">
-            <Settings size={20} />
-          </button>
-          <button className="p-2 hover:bg-red-500 rounded-lg transition-colors">
-            <LogOut size={20} />
-          </button>
-        </div>
-      </div>
-    </header>
-  );
-};
-
-interface AdminNavItem {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  path?: string;
-  onClick?: () => void;
-  badge?: number;
-}
-
-interface AdminSidebarProps {
-  items: AdminNavItem[];
-  activeItem: string;
-  onItemClick: (itemId: string) => void;
-  isOpen?: boolean;
-}
-
-export const AdminSidebar: React.FC<AdminSidebarProps> = ({
-  items,
-  activeItem,
-  onItemClick,
-  isOpen = true,
-}) => {
-  return (
-    <>
-      <nav className="p-4 lg:p-6 space-y-2 flex-1">
-        {items.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => onItemClick(item.id)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-              activeItem === item.id
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-            }`}
-          >
-            <span className="text-xl flex-shrink-0">{item.icon}</span>
-            <span className="font-medium flex-1 text-left text-sm lg:text-base">{item.label}</span>
-            {item.badge && (
-              <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 font-bold flex-shrink-0">
-                {item.badge}
-              </span>
-            )}
-          </button>
-        ))}
-      </nav>
-
-      {/* Footer section */}
-      <div className="p-4 lg:p-6 border-t border-gray-800 bg-gray-800">
-        <p className="text-xs text-gray-400 text-center">
-          © 2024 ALBAYANE | Admin v1.0
-        </p>
-      </div>
-    </>
-  );
-};
 
 interface AdminSearchBarProps {
   placeholder?: string;
@@ -167,23 +53,23 @@ export const StatCard: React.FC<StatCardProps> = ({
 }) => {
   return (
     <div
-      className={`p-6 rounded-lg border ${colorClasses[color]} shadow-sm hover:shadow-md transition-shadow`}
+      className={`p-3 sm:p-6 rounded-lg border ${colorClasses[color]} shadow-sm hover:shadow-md transition-shadow`}
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600 mb-2">{label}</p>
-          <p className="text-3xl font-bold">{value}</p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 sm:mb-2">{label}</p>
+          <p className="text-2xl sm:text-3xl font-bold truncate">{value}</p>
           {trend && (
             <p
-              className={`text-xs mt-2 ${
+              className={`text-xs mt-1 sm:mt-2 ${
                 trend.isPositive ? 'text-green-600' : 'text-red-600'
               }`}
             >
-              {trend.isPositive ? '↑' : '↓'} {trend.value}% par rapport au mois dernier
+              {trend.isPositive ? '↑' : '↓'} {trend.value}% dernier mois
             </p>
           )}
         </div>
-        <div className="p-3 bg-white rounded-lg">{icon}</div>
+        <div className="p-2 sm:p-3 bg-white rounded-lg flex-shrink-0">{React.cloneElement(icon as React.ReactElement, { size: 20 })}</div>
       </div>
     </div>
   );
