@@ -267,7 +267,7 @@ QR → QrPayloadParser → ScanService (transaction)
 flutter test
 ```
 
-**89 tests — 100 % réussis** (dernière exécution : 13 s) :
+**94 tests — 100 % réussis** (dernière exécution : 14 s) :
 
 | Fichier | Couverture |
 |---|---|
@@ -283,6 +283,7 @@ flutter test
 | `sync_apply_test.dart` | **SQLite réel** : élève synchronisé scannable, pas de doublon au 2e passage (id local conservé), badge révoqué → scan refusé sans suppression, élève retiré désactivé, configuration serveur appliquée, configuration partielle non destructive |
 | `sync_service_state_test.dart` | **diagnostic de synchronisation** : non appairé, synchronisation désactivée, mode hors ligne volontaire, cycle réussi — et persistance de `lastSyncAttempt`/`lastSyncError` |
 | `voice_feedback_test.dart` | **retour vocal** : voix désactivée, succès, retard, doublon, tous les cas de refus (badge inconnu/révoqué, élève inactif, QR invalide, erreur base) |
+| `pin_service_test.dart` | **code administrateur** : configuré au 2ᵉ démarrage (non-régression du bug « redéfini à chaque fois »), jamais stocké en clair, remplacement invalide l'ancien, format refusé |
 
 
 

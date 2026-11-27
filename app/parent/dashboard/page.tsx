@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { getAuthUserIdFromCookie } from '@/lib/authClient';
 import { fetchParentData } from '@/services/db.service';
 import AppShell from '@/components/ui/app-shell';
-import { LayoutDashboard, Users, BookOpen, TrendingUp, MessageSquare, Bell, AlertCircle, GraduationCap, Calendar } from 'lucide-react';
+import { LayoutDashboard, Users, BookOpen, TrendingUp, MessageSquare, Bell, AlertCircle, GraduationCap, Calendar, Clock } from 'lucide-react';
 
 const navItems = [
   { label: 'Tableau de bord', href: '/parent/dashboard', icon: <LayoutDashboard size={20} /> },
@@ -135,6 +135,26 @@ export default function ParentDashboardPage() {
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                       Actif
                     </span>
+                    {child.lastScan && (
+                      <p className="mt-2 flex flex-wrap items-center gap-1.5 text-xs font-medium text-slate-600">
+                        <Clock size={12} className="text-emerald-600" />
+                        Dernier pointage :{' '}
+                        {new Date(child.lastScan.scanned_at).toLocaleDateString('fr-FR')} à{' '}
+                        {new Date(child.lastScan.scanned_at).toLocaleTimeString('fr-FR', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                        <span
+                          className={
+                            child.lastScan.status === 'late'
+                              ? 'font-bold text-amber-700'
+                              : 'font-bold text-emerald-700'
+                          }
+                        >
+                          {child.lastScan.status === 'late' ? 'En retard' : 'Présent'}
+                        </span>
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}

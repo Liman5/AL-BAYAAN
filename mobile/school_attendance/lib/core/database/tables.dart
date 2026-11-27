@@ -188,6 +188,11 @@ class Settings extends Table {
       text().withDefault(const Constant('Déjà enregistré'))();
   TextColumn get voiceRefused => text().withDefault(const Constant('Accès refusé'))();
 
+  /// Code administrateur — jamais stocké en clair (sel + empreinte itérée).
+  TextColumn get adminPinSalt => text().nullable()();
+  TextColumn get adminPinHash => text().nullable()();
+  IntColumn get adminPinIterations => integer().withDefault(const Constant(0))();
+
   @override
   Set<Column> get primaryKey => {id};
 }

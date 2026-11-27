@@ -4,7 +4,7 @@ description: >-
   base SQLite locale (Drift), interface Material 3 premium, préparation
   à la synchronisation avec la plateforme AL-BAYAAN.
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.1.0+2
 
 environment:
   sdk: '>=3.4.0 <4.0.0'

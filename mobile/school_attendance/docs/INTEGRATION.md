@@ -416,7 +416,26 @@ installée (ici la clé de debug tant qu'aucun keystore de production n'est
 fourni), sinon Android refuse l'installation. Si `TERMINAL_APP_APK_URL` est
 vide, aucune proposition n'est affichée : rien n'est simulé.
 
-## 14. Ce qui reste volontairement hors périmètre
+## 14. Présences visibles côté plateforme (admin, élève, parent)
+
+Les pointages du scanner sont stockés dans `terminal_attendance_events` et
+exposés en lecture sur trois écrans :
+
+| Écran | Où | Source |
+|---|---|---|
+| **Admin → dossier élève → onglet Présence** | `/admin` → Élèves → dossier | `GET /api/admin/student-detail` → `terminalAttendance` |
+| **Espace élève → tableau de bord** | `/student/dashboard` | `POST /api/student/data` → `terminalAttendance` |
+| **Espace parent → carte enfant** | `/parent/dashboard` | `POST /api/parent/terminal-attendance` (route serveur) |
+
+Le parent ne peut lire que les pointages **de ses propres enfants** : le
+serveur déduit la liste des enfants à partir du `userId` (table `parents`),
+jamais d'une liste fournie par le client.
+
+Les appels de classe (`attendance_records`, faits par les enseignants) restent
+distincts : les deux sources sont affichées séparément pour éviter toute
+confusion (un scan d'entrée n'est pas un appel de présence en classe).
+
+## 15. Ce qui reste volontairement hors périmètre
 
 * Envoi effectif des notifications (fournisseur SMS/WhatsApp/push non choisi).
 * Téléchargement automatique des photos vers le terminal (`sync_photos`

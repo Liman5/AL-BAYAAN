@@ -2246,6 +2246,26 @@ class $SettingsTable extends Settings
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultValue: const Constant('Accès refusé'));
+  static const VerificationMeta _adminPinSaltMeta =
+      const VerificationMeta('adminPinSalt');
+  @override
+  late final GeneratedColumn<String> adminPinSalt = GeneratedColumn<String>(
+      'admin_pin_salt', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _adminPinHashMeta =
+      const VerificationMeta('adminPinHash');
+  @override
+  late final GeneratedColumn<String> adminPinHash = GeneratedColumn<String>(
+      'admin_pin_hash', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _adminPinIterationsMeta =
+      const VerificationMeta('adminPinIterations');
+  @override
+  late final GeneratedColumn<int> adminPinIterations = GeneratedColumn<int>(
+      'admin_pin_iterations', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -2279,7 +2299,10 @@ class $SettingsTable extends Settings
         voiceSuccess,
         voiceLate,
         voiceDuplicate,
-        voiceRefused
+        voiceRefused,
+        adminPinSalt,
+        adminPinHash,
+        adminPinIterations
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2472,6 +2495,24 @@ class $SettingsTable extends Settings
           voiceRefused.isAcceptableOrUnknown(
               data['voice_refused']!, _voiceRefusedMeta));
     }
+    if (data.containsKey('admin_pin_salt')) {
+      context.handle(
+          _adminPinSaltMeta,
+          adminPinSalt.isAcceptableOrUnknown(
+              data['admin_pin_salt']!, _adminPinSaltMeta));
+    }
+    if (data.containsKey('admin_pin_hash')) {
+      context.handle(
+          _adminPinHashMeta,
+          adminPinHash.isAcceptableOrUnknown(
+              data['admin_pin_hash']!, _adminPinHashMeta));
+    }
+    if (data.containsKey('admin_pin_iterations')) {
+      context.handle(
+          _adminPinIterationsMeta,
+          adminPinIterations.isAcceptableOrUnknown(
+              data['admin_pin_iterations']!, _adminPinIterationsMeta));
+    }
     return context;
   }
 
@@ -2549,6 +2590,12 @@ class $SettingsTable extends Settings
           DriftSqlType.string, data['${effectivePrefix}voice_duplicate'])!,
       voiceRefused: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}voice_refused'])!,
+      adminPinSalt: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}admin_pin_salt']),
+      adminPinHash: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}admin_pin_hash']),
+      adminPinIterations: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}admin_pin_iterations'])!,
     );
   }
 
@@ -2608,6 +2655,11 @@ class TerminalSettings extends DataClass
   final String voiceLate;
   final String voiceDuplicate;
   final String voiceRefused;
+
+  /// Code administrateur — jamais stocké en clair (sel + empreinte itérée).
+  final String? adminPinSalt;
+  final String? adminPinHash;
+  final int adminPinIterations;
   const TerminalSettings(
       {required this.id,
       required this.terminalId,
@@ -2640,7 +2692,10 @@ class TerminalSettings extends DataClass
       required this.voiceSuccess,
       required this.voiceLate,
       required this.voiceDuplicate,
-      required this.voiceRefused});
+      required this.voiceRefused,
+      this.adminPinSalt,
+      this.adminPinHash,
+      required this.adminPinIterations});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2690,6 +2745,13 @@ class TerminalSettings extends DataClass
     map['voice_late'] = Variable<String>(voiceLate);
     map['voice_duplicate'] = Variable<String>(voiceDuplicate);
     map['voice_refused'] = Variable<String>(voiceRefused);
+    if (!nullToAbsent || adminPinSalt != null) {
+      map['admin_pin_salt'] = Variable<String>(adminPinSalt);
+    }
+    if (!nullToAbsent || adminPinHash != null) {
+      map['admin_pin_hash'] = Variable<String>(adminPinHash);
+    }
+    map['admin_pin_iterations'] = Variable<int>(adminPinIterations);
     return map;
   }
 
@@ -2741,6 +2803,13 @@ class TerminalSettings extends DataClass
       voiceLate: Value(voiceLate),
       voiceDuplicate: Value(voiceDuplicate),
       voiceRefused: Value(voiceRefused),
+      adminPinSalt: adminPinSalt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(adminPinSalt),
+      adminPinHash: adminPinHash == null && nullToAbsent
+          ? const Value.absent()
+          : Value(adminPinHash),
+      adminPinIterations: Value(adminPinIterations),
     );
   }
 
@@ -2784,6 +2853,9 @@ class TerminalSettings extends DataClass
       voiceLate: serializer.fromJson<String>(json['voiceLate']),
       voiceDuplicate: serializer.fromJson<String>(json['voiceDuplicate']),
       voiceRefused: serializer.fromJson<String>(json['voiceRefused']),
+      adminPinSalt: serializer.fromJson<String?>(json['adminPinSalt']),
+      adminPinHash: serializer.fromJson<String?>(json['adminPinHash']),
+      adminPinIterations: serializer.fromJson<int>(json['adminPinIterations']),
     );
   }
   @override
@@ -2822,6 +2894,9 @@ class TerminalSettings extends DataClass
       'voiceLate': serializer.toJson<String>(voiceLate),
       'voiceDuplicate': serializer.toJson<String>(voiceDuplicate),
       'voiceRefused': serializer.toJson<String>(voiceRefused),
+      'adminPinSalt': serializer.toJson<String?>(adminPinSalt),
+      'adminPinHash': serializer.toJson<String?>(adminPinHash),
+      'adminPinIterations': serializer.toJson<int>(adminPinIterations),
     };
   }
 
@@ -2857,7 +2932,10 @@ class TerminalSettings extends DataClass
           String? voiceSuccess,
           String? voiceLate,
           String? voiceDuplicate,
-          String? voiceRefused}) =>
+          String? voiceRefused,
+          Value<String?> adminPinSalt = const Value.absent(),
+          Value<String?> adminPinHash = const Value.absent(),
+          int? adminPinIterations}) =>
       TerminalSettings(
         id: id ?? this.id,
         terminalId: terminalId ?? this.terminalId,
@@ -2900,6 +2978,11 @@ class TerminalSettings extends DataClass
         voiceLate: voiceLate ?? this.voiceLate,
         voiceDuplicate: voiceDuplicate ?? this.voiceDuplicate,
         voiceRefused: voiceRefused ?? this.voiceRefused,
+        adminPinSalt:
+            adminPinSalt.present ? adminPinSalt.value : this.adminPinSalt,
+        adminPinHash:
+            adminPinHash.present ? adminPinHash.value : this.adminPinHash,
+        adminPinIterations: adminPinIterations ?? this.adminPinIterations,
       );
   TerminalSettings copyWithCompanion(SettingsCompanion data) {
     return TerminalSettings(
@@ -2982,6 +3065,15 @@ class TerminalSettings extends DataClass
       voiceRefused: data.voiceRefused.present
           ? data.voiceRefused.value
           : this.voiceRefused,
+      adminPinSalt: data.adminPinSalt.present
+          ? data.adminPinSalt.value
+          : this.adminPinSalt,
+      adminPinHash: data.adminPinHash.present
+          ? data.adminPinHash.value
+          : this.adminPinHash,
+      adminPinIterations: data.adminPinIterations.present
+          ? data.adminPinIterations.value
+          : this.adminPinIterations,
     );
   }
 
@@ -3019,7 +3111,10 @@ class TerminalSettings extends DataClass
           ..write('voiceSuccess: $voiceSuccess, ')
           ..write('voiceLate: $voiceLate, ')
           ..write('voiceDuplicate: $voiceDuplicate, ')
-          ..write('voiceRefused: $voiceRefused')
+          ..write('voiceRefused: $voiceRefused, ')
+          ..write('adminPinSalt: $adminPinSalt, ')
+          ..write('adminPinHash: $adminPinHash, ')
+          ..write('adminPinIterations: $adminPinIterations')
           ..write(')'))
         .toString();
   }
@@ -3057,7 +3152,10 @@ class TerminalSettings extends DataClass
         voiceSuccess,
         voiceLate,
         voiceDuplicate,
-        voiceRefused
+        voiceRefused,
+        adminPinSalt,
+        adminPinHash,
+        adminPinIterations
       ]);
   @override
   bool operator ==(Object other) =>
@@ -3094,7 +3192,10 @@ class TerminalSettings extends DataClass
           other.voiceSuccess == this.voiceSuccess &&
           other.voiceLate == this.voiceLate &&
           other.voiceDuplicate == this.voiceDuplicate &&
-          other.voiceRefused == this.voiceRefused);
+          other.voiceRefused == this.voiceRefused &&
+          other.adminPinSalt == this.adminPinSalt &&
+          other.adminPinHash == this.adminPinHash &&
+          other.adminPinIterations == this.adminPinIterations);
 }
 
 class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
@@ -3130,6 +3231,9 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
   final Value<String> voiceLate;
   final Value<String> voiceDuplicate;
   final Value<String> voiceRefused;
+  final Value<String?> adminPinSalt;
+  final Value<String?> adminPinHash;
+  final Value<int> adminPinIterations;
   const SettingsCompanion({
     this.id = const Value.absent(),
     this.terminalId = const Value.absent(),
@@ -3163,6 +3267,9 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
     this.voiceLate = const Value.absent(),
     this.voiceDuplicate = const Value.absent(),
     this.voiceRefused = const Value.absent(),
+    this.adminPinSalt = const Value.absent(),
+    this.adminPinHash = const Value.absent(),
+    this.adminPinIterations = const Value.absent(),
   });
   SettingsCompanion.insert({
     this.id = const Value.absent(),
@@ -3197,6 +3304,9 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
     this.voiceLate = const Value.absent(),
     this.voiceDuplicate = const Value.absent(),
     this.voiceRefused = const Value.absent(),
+    this.adminPinSalt = const Value.absent(),
+    this.adminPinHash = const Value.absent(),
+    this.adminPinIterations = const Value.absent(),
   }) : terminalId = Value(terminalId);
   static Insertable<TerminalSettings> custom({
     Expression<int>? id,
@@ -3231,6 +3341,9 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
     Expression<String>? voiceLate,
     Expression<String>? voiceDuplicate,
     Expression<String>? voiceRefused,
+    Expression<String>? adminPinSalt,
+    Expression<String>? adminPinHash,
+    Expression<int>? adminPinIterations,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3269,6 +3382,10 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
       if (voiceLate != null) 'voice_late': voiceLate,
       if (voiceDuplicate != null) 'voice_duplicate': voiceDuplicate,
       if (voiceRefused != null) 'voice_refused': voiceRefused,
+      if (adminPinSalt != null) 'admin_pin_salt': adminPinSalt,
+      if (adminPinHash != null) 'admin_pin_hash': adminPinHash,
+      if (adminPinIterations != null)
+        'admin_pin_iterations': adminPinIterations,
     });
   }
 
@@ -3304,7 +3421,10 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
       Value<String>? voiceSuccess,
       Value<String>? voiceLate,
       Value<String>? voiceDuplicate,
-      Value<String>? voiceRefused}) {
+      Value<String>? voiceRefused,
+      Value<String?>? adminPinSalt,
+      Value<String?>? adminPinHash,
+      Value<int>? adminPinIterations}) {
     return SettingsCompanion(
       id: id ?? this.id,
       terminalId: terminalId ?? this.terminalId,
@@ -3338,6 +3458,9 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
       voiceLate: voiceLate ?? this.voiceLate,
       voiceDuplicate: voiceDuplicate ?? this.voiceDuplicate,
       voiceRefused: voiceRefused ?? this.voiceRefused,
+      adminPinSalt: adminPinSalt ?? this.adminPinSalt,
+      adminPinHash: adminPinHash ?? this.adminPinHash,
+      adminPinIterations: adminPinIterations ?? this.adminPinIterations,
     );
   }
 
@@ -3444,6 +3567,15 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
     if (voiceRefused.present) {
       map['voice_refused'] = Variable<String>(voiceRefused.value);
     }
+    if (adminPinSalt.present) {
+      map['admin_pin_salt'] = Variable<String>(adminPinSalt.value);
+    }
+    if (adminPinHash.present) {
+      map['admin_pin_hash'] = Variable<String>(adminPinHash.value);
+    }
+    if (adminPinIterations.present) {
+      map['admin_pin_iterations'] = Variable<int>(adminPinIterations.value);
+    }
     return map;
   }
 
@@ -3481,7 +3613,10 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
           ..write('voiceSuccess: $voiceSuccess, ')
           ..write('voiceLate: $voiceLate, ')
           ..write('voiceDuplicate: $voiceDuplicate, ')
-          ..write('voiceRefused: $voiceRefused')
+          ..write('voiceRefused: $voiceRefused, ')
+          ..write('adminPinSalt: $adminPinSalt, ')
+          ..write('adminPinHash: $adminPinHash, ')
+          ..write('adminPinIterations: $adminPinIterations')
           ..write(')'))
         .toString();
   }
@@ -5257,6 +5392,9 @@ typedef $$SettingsTableCreateCompanionBuilder = SettingsCompanion Function({
   Value<String> voiceLate,
   Value<String> voiceDuplicate,
   Value<String> voiceRefused,
+  Value<String?> adminPinSalt,
+  Value<String?> adminPinHash,
+  Value<int> adminPinIterations,
 });
 typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
   Value<int> id,
@@ -5291,6 +5429,9 @@ typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
   Value<String> voiceLate,
   Value<String> voiceDuplicate,
   Value<String> voiceRefused,
+  Value<String?> adminPinSalt,
+  Value<String?> adminPinHash,
+  Value<int> adminPinIterations,
 });
 
 class $$SettingsTableFilterComposer
@@ -5407,6 +5548,16 @@ class $$SettingsTableFilterComposer
 
   ColumnFilters<String> get voiceRefused => $composableBuilder(
       column: $table.voiceRefused, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get adminPinSalt => $composableBuilder(
+      column: $table.adminPinSalt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get adminPinHash => $composableBuilder(
+      column: $table.adminPinHash, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get adminPinIterations => $composableBuilder(
+      column: $table.adminPinIterations,
+      builder: (column) => ColumnFilters(column));
 }
 
 class $$SettingsTableOrderingComposer
@@ -5534,6 +5685,18 @@ class $$SettingsTableOrderingComposer
   ColumnOrderings<String> get voiceRefused => $composableBuilder(
       column: $table.voiceRefused,
       builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get adminPinSalt => $composableBuilder(
+      column: $table.adminPinSalt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get adminPinHash => $composableBuilder(
+      column: $table.adminPinHash,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get adminPinIterations => $composableBuilder(
+      column: $table.adminPinIterations,
+      builder: (column) => ColumnOrderings(column));
 }
 
 class $$SettingsTableAnnotationComposer
@@ -5640,6 +5803,15 @@ class $$SettingsTableAnnotationComposer
 
   GeneratedColumn<String> get voiceRefused => $composableBuilder(
       column: $table.voiceRefused, builder: (column) => column);
+
+  GeneratedColumn<String> get adminPinSalt => $composableBuilder(
+      column: $table.adminPinSalt, builder: (column) => column);
+
+  GeneratedColumn<String> get adminPinHash => $composableBuilder(
+      column: $table.adminPinHash, builder: (column) => column);
+
+  GeneratedColumn<int> get adminPinIterations => $composableBuilder(
+      column: $table.adminPinIterations, builder: (column) => column);
 }
 
 class $$SettingsTableTableManager extends RootTableManager<
@@ -5700,6 +5872,9 @@ class $$SettingsTableTableManager extends RootTableManager<
             Value<String> voiceLate = const Value.absent(),
             Value<String> voiceDuplicate = const Value.absent(),
             Value<String> voiceRefused = const Value.absent(),
+            Value<String?> adminPinSalt = const Value.absent(),
+            Value<String?> adminPinHash = const Value.absent(),
+            Value<int> adminPinIterations = const Value.absent(),
           }) =>
               SettingsCompanion(
             id: id,
@@ -5734,6 +5909,9 @@ class $$SettingsTableTableManager extends RootTableManager<
             voiceLate: voiceLate,
             voiceDuplicate: voiceDuplicate,
             voiceRefused: voiceRefused,
+            adminPinSalt: adminPinSalt,
+            adminPinHash: adminPinHash,
+            adminPinIterations: adminPinIterations,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -5768,6 +5946,9 @@ class $$SettingsTableTableManager extends RootTableManager<
             Value<String> voiceLate = const Value.absent(),
             Value<String> voiceDuplicate = const Value.absent(),
             Value<String> voiceRefused = const Value.absent(),
+            Value<String?> adminPinSalt = const Value.absent(),
+            Value<String?> adminPinHash = const Value.absent(),
+            Value<int> adminPinIterations = const Value.absent(),
           }) =>
               SettingsCompanion.insert(
             id: id,
@@ -5802,6 +5983,9 @@ class $$SettingsTableTableManager extends RootTableManager<
             voiceLate: voiceLate,
             voiceDuplicate: voiceDuplicate,
             voiceRefused: voiceRefused,
+            adminPinSalt: adminPinSalt,
+            adminPinHash: adminPinHash,
+            adminPinIterations: adminPinIterations,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (

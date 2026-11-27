@@ -95,6 +95,15 @@ Aucun bouton à presser, aucune confirmation manuelle.
 | **ÉLÈVE INACTIF** | élève radié/transféré | orienter vers l'administration |
 | **PRÉSENCE NON ENREGISTRÉE** | problème de stockage | refaire scanner, prévenir le responsable |
 
+### Le code administrateur est-il redemandé à chaque fois ?
+
+Non. Depuis la version 1.1.0, le code est enregistré **dans la base locale**
+du téléphone (haché + salé, jamais en clair) : il n'est demandé qu'une seule
+fois, puis à chaque entrée dans l'espace administration.
+
+Si vous aviez défini un code avec une version précédente, il est **repris
+automatiquement** : vous pouvez continuer à utiliser le même.
+
 ### Changer de caméra
 
 Le bouton en forme d'appareil photo inversé bascule entre la caméra avant et

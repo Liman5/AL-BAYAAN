@@ -10,7 +10,8 @@ class AppConfig {
   static const String appName = 'School Attendance';
 
   /// Version affichée dans l'écran « À propos ».
-  static const String appVersion = '1.0.0';
+  /// À incrémenter à chaque publication (pilote aussi la mise à jour OTA).
+  static const String appVersion = '1.1.0';
 
   /// Identifiant d'application Android (doit rester identique au build.gradle).
   static const String androidApplicationId = 'com.albayaan.schoolattendance';

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { User, BookOpen, FileText, Calendar, TrendingUp, AlertCircle, CheckCircle2, XCircle, Clock, Wallet, ArrowLeft, CreditCard, Loader2 } from 'lucide-react';
+import { User, BookOpen, FileText, Calendar, TrendingUp, AlertCircle, CheckCircle2, XCircle, Clock, Wallet, ArrowLeft, CreditCard, Loader2, QrCode } from 'lucide-react';
 import { getCurrentAcademicYear } from '@/lib/schoolData';
 
 interface StudentDossierProps {
@@ -96,6 +96,8 @@ export default function StudentDossier({ student, onBack }: StudentDossierProps)
     assignmentType: g.grade_type || 'note',
   }));
   const attendance = summarizeAttendance(db?.attendance || []);
+  // Pointages enregistrés par le scanner d'entrée (terminal Android).
+  const terminalAttendance: any[] = db?.terminalAttendance || [];
   const homeworks = (db?.homeworks || []).map((h: any) => ({
     id: h.id,
     title: h.title,
@@ -322,6 +324,52 @@ export default function StudentDossier({ student, onBack }: StudentDossierProps)
             ) : (
               <p className="py-8 text-center text-sm text-slate-500">Aucun enregistrement de présence.</p>
             )}
+
+            <div className="mt-6 border-t border-slate-100 pt-5">
+              <h4 className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-900">
+                <QrCode size={16} className="text-emerald-600" />
+                Pointage à l’entrée (scanner QR)
+              </h4>
+              {terminalAttendance.length > 0 ? (
+                <div className="space-y-2">
+                  {terminalAttendance.map((e: any) => {
+                    const late = e.status === 'late';
+                    const at = e.scanned_at ? new Date(e.scanned_at) : null;
+                    return (
+                      <div
+                        key={e.id}
+                        className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/40 px-4 py-2 text-sm"
+                      >
+                        <span className="font-medium text-slate-700">
+                          {at ? at.toLocaleDateString('fr-FR') : e.local_date}
+                        </span>
+                        <span className="font-mono text-xs text-slate-600">
+                          {at
+                            ? at.toLocaleTimeString('fr-FR', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })
+                            : '—'}
+                        </span>
+                        <span
+                          className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${
+                            late
+                              ? 'bg-amber-100 text-amber-800'
+                              : 'bg-emerald-100 text-emerald-800'
+                          }`}
+                        >
+                          {late ? 'En retard' : 'Présent'}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="py-4 text-center text-xs text-slate-500">
+                  Aucun pointage enregistré par le scanner d’entrée pour cet élève.
+                </p>
+              )}
+            </div>
           </div>
         )}
 

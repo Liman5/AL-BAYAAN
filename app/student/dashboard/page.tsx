@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { getAuthUserIdFromCookie } from '@/lib/authClient';
 import {
   LayoutDashboard, BookOpen, FileText, Users, Calendar, TrendingUp,
-  GraduationCap, Bell, AlertCircle, Clock, Wallet
+  GraduationCap, Bell, AlertCircle, Clock, Wallet, QrCode
 } from 'lucide-react';
 import { fetchStudentData, computeStudentAverage, computeAttendanceSummary } from '@/services/db.service';
 
@@ -296,6 +296,49 @@ export default function StudentDashboardPage() {
                     </span>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Pointages du scanner d'entrée (badge QR) */}
+          {(data.dbData?.terminalAttendance?.length || 0) > 0 && (
+            <div className="mt-4">
+              <p className="mb-2 flex items-center gap-1.5 text-xs font-bold text-slate-700">
+                <QrCode size={14} className="text-emerald-600" />
+                Arrivées enregistrées à l’entrée (badge QR)
+              </p>
+              <div className="max-h-56 overflow-y-auto space-y-1.5">
+                {data.dbData.terminalAttendance.map((e: any) => {
+                  const at = e.scanned_at ? new Date(e.scanned_at) : null;
+                  const late = e.status === 'late';
+                  return (
+                    <div
+                      key={e.id}
+                      className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50/40 px-3 py-2 text-xs"
+                    >
+                      <span className="font-medium text-slate-700">
+                        {at ? at.toLocaleDateString('fr-FR') : e.local_date}
+                      </span>
+                      <span className="font-mono text-slate-600">
+                        {at
+                          ? at.toLocaleTimeString('fr-FR', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
+                          : '—'}
+                      </span>
+                      <span
+                        className={`inline-flex rounded-full px-2 py-0.5 font-semibold ${
+                          late
+                            ? 'bg-amber-100 text-amber-700'
+                            : 'bg-emerald-100 text-emerald-700'
+                        }`}
+                      >
+                        {late ? 'En retard' : 'Présent'}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

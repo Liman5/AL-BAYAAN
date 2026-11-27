@@ -29,7 +29,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration {
@@ -58,6 +58,12 @@ class AppDatabase extends _$AppDatabase {
           await m.addColumn(settings, settings.voiceLate);
           await m.addColumn(settings, settings.voiceDuplicate);
           await m.addColumn(settings, settings.voiceRefused);
+        }
+        // v5 : code administrateur persistant (sel + empreinte en base locale).
+        if (from < 5) {
+          await m.addColumn(settings, settings.adminPinSalt);
+          await m.addColumn(settings, settings.adminPinHash);
+          await m.addColumn(settings, settings.adminPinIterations);
         }
       },
       beforeOpen: (OpeningDetails details) async {

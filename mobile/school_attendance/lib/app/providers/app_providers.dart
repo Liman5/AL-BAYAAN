@@ -74,7 +74,9 @@ final historyExporterProvider = Provider<HistoryExporter>((ref) {
   return HistoryExporter(ref.watch(attendanceRepositoryProvider));
 });
 
-final pinServiceProvider = Provider<PinService>((ref) => PinService());
+final pinServiceProvider = Provider<PinService>((ref) {
+  return PinService(ref.watch(databaseProvider));
+});
 
 final scanServiceProvider = Provider<ScanService>((ref) {
   return ScanService(

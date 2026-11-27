@@ -90,7 +90,7 @@ export async function GET(request: Request) {
     student.parents = studentParent;
 
     // 2. Notes / Présences / Paiement / Soumissions en parallèle
-    const [gradesRes, attendanceRes, paymentRes, submissionsRes] = await Promise.all([
+    const [gradesRes, attendanceRes, terminalAttendanceRes, paymentRes, submissionsRes] = await Promise.all([
       supabaseAdmin
         .from('student_grades')
         .select('*')
@@ -101,6 +101,13 @@ export async function GET(request: Request) {
         .select('*')
         .eq('student_id', studentId)
         .order('date', { ascending: false }),
+      // Pointages enregistrés par le scanner d'entrée (terminal Android)
+      supabaseAdmin
+        .from('terminal_attendance_events')
+        .select('id, local_date, scanned_at, session, status, terminal_id')
+        .eq('student_id', studentId)
+        .order('scanned_at', { ascending: false })
+        .limit(60),
       supabaseAdmin
         .from('student_payments')
         .select('*')
@@ -141,6 +148,7 @@ export async function GET(request: Request) {
         student,
         grades: gradesRes.data || [],
         attendance: attendanceRes.data || [],   // ✅ VRAIES présences de la base
+        terminalAttendance: terminalAttendanceRes.data || [], // ✅ pointages QR
         payment: paymentRes.data || null,
         homeworks,
         submissions: submissionsRes.data || [],

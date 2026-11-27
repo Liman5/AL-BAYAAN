@@ -655,6 +655,22 @@ export async function fetchParentData(userId: string) {
 
   const childrenData = children || [];
 
+  // Pointages du scanner d'entrée — via une route serveur (RLS interdit
+  // l'accès direct à `terminal_attendance_events` depuis le navigateur).
+  let terminalAttendance: any[] = [];
+  try {
+    const res = await fetch('/api/parent/terminal-attendance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId }),
+      cache: 'no-store',
+    });
+    const payload = await res.json();
+    if (payload?.success) terminalAttendance = payload.data?.attendance || [];
+  } catch (error) {
+    console.error('Erreur pointages terminal (parent):', error);
+  }
+
   // Pour chaque enfant, charger ses données récentes
   const enrichedChildren = await Promise.all(
     childrenData.map(async (child: any) => {
@@ -676,11 +692,17 @@ export async function fetchParentData(userId: string) {
         .eq('student_id', child.id)
         .neq('status', 'present');
 
+      const childScans = terminalAttendance.filter(
+        (event: any) => event.student_id === child.id,
+      );
+
       return {
         ...child,
         className: enrollments?.[0]?.classes?.name || 'Non affecté',
         gradesCount: gradesCount || 0,
         absencesCount: absencesCount || 0,
+        lastScan: childScans[0] || null,
+        scanCount: childScans.length,
       };
     })
   );

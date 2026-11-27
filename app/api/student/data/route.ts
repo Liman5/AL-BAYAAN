@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     if (!homeworkQuery) homeworkQuery = Promise.resolve({ data: [] });
 
     // 3. ⚡ CHARGER TOUT EN PARALLÈLE (Promise.all)
-    const [homeworksRes, gradesRes, attendanceRes, paymentRes, announcementsRes, submissionsRes] = await Promise.all([
+    const [homeworksRes, gradesRes, attendanceRes, terminalAttendanceRes, paymentRes, announcementsRes, submissionsRes] = await Promise.all([
       // Devoirs de la classe (résolus ci-dessus)
       homeworkQuery,
       // Notes de l'élève
@@ -94,6 +94,13 @@ export async function POST(request: Request) {
         .select('*')
         .eq('student_id', student.id)
         .order('date', { ascending: false }),
+      // Pointages du scanner d'entrée (terminal Android)
+      supabaseAdmin
+        .from('terminal_attendance_events')
+        .select('id, local_date, scanned_at, session, status, terminal_id')
+        .eq('student_id', student.id)
+        .order('scanned_at', { ascending: false })
+        .limit(60),
       // Paiement
       supabaseAdmin
         .from('student_payments')
@@ -138,6 +145,7 @@ export async function POST(request: Request) {
         homeworks: homeworksRes.data || [],
         grades: gradesRes.data || [],
         attendance: attendanceRes.data || [],
+        terminalAttendance: terminalAttendanceRes.data || [],
         payment,
         announcements: announcementsRes.data || [],
         submissions: submissionsRes.data || [],
