@@ -101,6 +101,9 @@ CREATE TABLE IF NOT EXISTS scanner_terminals (
 );
 
 CREATE INDEX IF NOT EXISTS idx_scanner_terminals_school
+  ON scanner_terminals (school_id);
+CREATE INDEX IF NOT EXISTS idx_scanner_terminals_status
+  ON scanner_terminals (status);
 
 -- ------------------------------------------------------------
 -- 3. ÉVÉNEMENTS DE PRÉSENCE ISSUS DES TERMINAUX
@@ -231,6 +234,3 @@ REVOKE ALL ON public.scanner_settings FROM anon, authenticated;
 
 -- ✅ Migration 30 appliquée.
 
-  ON scanner_terminals (school_id);
-CREATE INDEX IF NOT EXISTS idx_scanner_terminals_status
-  ON scanner_terminals (status);
