@@ -1,0 +1,12 @@
+student_code,first_name,last_name,class_name,class_id,qr_token,student_uuid,is_active,badge_revoked,photo
+DEMO-0001,Adjovi,Kodjo,3e A,,DEMO-BADGE-0001,,1,0,DEMO-0001.jpg
+DEMO-0002,Youssef,Ait,3e A,,DEMO-BADGE-0002,,1,0,DEMO-0002.jpg
+DEMO-0003,Imane,Mahmoud,4e B,,DEMO-BADGE-0003,,1,0,
+DEMO-0004,Karim,El Amrani,4e B,,DEMO-BADGE-0004,,1,0,
+DEMO-0005,Aminata,Diallo,5e A,,DEMO-BADGE-0005,,1,0,
+DEMO-0006,Sara,Bensalem,5e A,,DEMO-BADGE-0006,,1,0,
+EL-0248,Adjovi,Kodjo,3e A,class-3a,BADGE-0248-KD,stu-uuid-0248,1,0,
+EL-0249,Youssef,Ait,3e A,class-3a,BADGE-0249-YA,stu-uuid-0249,1,0,
+EL-0250,Imane,Mahmoud,4e B,class-4b,BADGE-0250-IM,stu-uuid-0250,1,0,
+EL-0251,Karim,El Amrani,4e B,class-4b,BADGE-0251-KE,stu-uuid-0251,1,0,
+EL-0252,Aminata,Diallo,5e A,class-5a,BADGE-0252-AD,,0,1,

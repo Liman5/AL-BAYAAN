@@ -1,13 +1,31 @@
 import React, { useState } from 'react';
 import { Teacher, ClassAssignment } from '@/types/admin';
-import { Edit2, Trash2, Eye, Plus, Check, X } from 'lucide-react';
+import { Edit2, Trash2, Eye, Plus, Check, X, UserCheck, UserX, Clock } from 'lucide-react';
 
 interface TeacherListProps {
   teachers: Teacher[];
   onEdit?: (teacher: Teacher) => void;
   onDelete?: (teacherId: string) => void;
   onView?: (teacher: Teacher) => void;
+  onApprove?: (teacher: Teacher) => void;
+  onSuspend?: (teacher: Teacher) => void;
   searchQuery?: string;
+}
+
+function getStatusBadge(status: Teacher['status']) {
+  switch (status) {
+    case 'active':
+      return { label: 'Approuvé', className: 'bg-green-100 text-green-700', icon: <UserCheck size={12} /> };
+    case 'pending':
+      return { label: 'En attente', className: 'bg-amber-100 text-amber-700', icon: <Clock size={12} /> };
+    case 'suspended':
+      return { label: 'Suspendu', className: 'bg-red-100 text-red-700', icon: <UserX size={12} /> };
+    case 'on_leave':
+      return { label: 'En congé', className: 'bg-blue-100 text-blue-700', icon: <Clock size={12} /> };
+    case 'inactive':
+    default:
+      return { label: 'Inactif', className: 'bg-gray-100 text-gray-700', icon: <X size={12} /> };
+  }
 }
 
 export const TeacherList: React.FC<TeacherListProps> = ({
@@ -15,6 +33,8 @@ export const TeacherList: React.FC<TeacherListProps> = ({
   onEdit,
   onDelete,
   onView,
+  onApprove,
+  onSuspend,
   searchQuery = '',
 }) => {
   const filteredTeachers = teachers.filter(
@@ -45,73 +65,89 @@ export const TeacherList: React.FC<TeacherListProps> = ({
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {filteredTeachers.map((teacher) => (
-            <tr key={teacher.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-3 lg:px-4 py-3 text-sm lg:text-base font-medium text-gray-900">
-                {teacher.firstName} {teacher.lastName}
-              </td>
-              <td className="px-3 lg:px-4 py-3 text-xs lg:text-sm text-gray-600 hidden md:table-cell">{teacher.email}</td>
-              <td className="px-3 lg:px-4 py-3 text-xs lg:text-sm text-gray-600">
-                <div className="flex flex-wrap gap-1">
-                  {teacher.subjects.slice(0, 2).map((subject, idx) => (
-                    <span
-                      key={idx}
-                      className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"
-                    >
-                      {subject}
-                    </span>
-                  ))}
-                  {teacher.subjects.length > 2 && (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
-                      +{teacher.subjects.length - 2}
-                    </span>
-                  )}
-                </div>
-              </td>
-              <td className="px-3 lg:px-4 py-3 text-xs lg:text-sm hidden sm:table-cell">
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                    teacher.status === 'active'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  {teacher.status === 'active' ? 'Actif' : 'Inactif'}
-                </span>
-              </td>
-              <td className="px-3 lg:px-4 py-3 text-sm">
-                <div className="flex items-center justify-center gap-1 lg:gap-2">
-                  {onView && (
-                    <button
-                      onClick={() => onView(teacher)}
-                      className="p-1 lg:p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="Voir détails"
-                    >
-                      <Eye size={16} className="lg:w-[18px] lg:h-[18px]" />
-                    </button>
-                  )}
-                  {onEdit && (
-                    <button
-                      onClick={() => onEdit(teacher)}
-                      className="p-1 lg:p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-                      title="Modifier"
-                    >
-                      <Edit2 size={16} className="lg:w-[18px] lg:h-[18px]" />
-                    </button>
-                  )}
-                  {onDelete && (
-                    <button
-                      onClick={() => onDelete(teacher.id)}
-                      className="p-1 lg:p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Supprimer"
-                    >
-                      <Trash2 size={16} className="lg:w-[18px] lg:h-[18px]" />
-                    </button>
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))}
+          {filteredTeachers.map((teacher) => {
+            const badge = getStatusBadge(teacher.status);
+            return (
+              <tr key={teacher.id} className="hover:bg-gray-50 transition-colors">
+                <td className="px-3 lg:px-4 py-3 text-sm lg:text-base font-medium text-gray-900">
+                  {teacher.firstName} {teacher.lastName}
+                </td>
+                <td className="px-3 lg:px-4 py-3 text-xs lg:text-sm text-gray-600 hidden md:table-cell">{teacher.email}</td>
+                <td className="px-3 lg:px-4 py-3 text-xs lg:text-sm text-gray-600">
+                  <div className="flex flex-wrap gap-1">
+                    {teacher.subjects.slice(0, 2).map((subject, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"
+                      >
+                        {subject}
+                      </span>
+                    ))}
+                    {teacher.subjects.length > 2 && (
+                      <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+                        +{teacher.subjects.length - 2}
+                      </span>
+                    )}
+                  </div>
+                </td>
+                <td className="px-3 lg:px-4 py-3 text-xs lg:text-sm hidden sm:table-cell">
+                  <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${badge.className}`}>
+                    {badge.icon}
+                    {badge.label}
+                  </span>
+                </td>
+                <td className="px-3 lg:px-4 py-3 text-sm">
+                  <div className="flex items-center justify-center gap-1 lg:gap-2">
+                    {onView && (
+                      <button
+                        onClick={() => onView(teacher)}
+                        className="p-1 lg:p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Voir détails"
+                      >
+                        <Eye size={16} className="lg:w-[18px] lg:h-[18px]" />
+                      </button>
+                    )}
+                    {teacher.status === 'pending' && onApprove && (
+                      <button
+                        onClick={() => onApprove(teacher)}
+                        className="p-1 lg:p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        title="Approuver l'enseignant"
+                      >
+                        <UserCheck size={16} className="lg:w-[18px] lg:h-[18px]" />
+                      </button>
+                    )}
+                    {teacher.status === 'active' && onSuspend && (
+                      <button
+                        onClick={() => onSuspend(teacher)}
+                        className="p-1 lg:p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Suspendre l'enseignant"
+                      >
+                        <UserX size={16} className="lg:w-[18px] lg:h-[18px]" />
+                      </button>
+                    )}
+                    {onEdit && (
+                      <button
+                        onClick={() => onEdit(teacher)}
+                        className="p-1 lg:p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                        title="Modifier"
+                      >
+                        <Edit2 size={16} className="lg:w-[18px] lg:h-[18px]" />
+                      </button>
+                    )}
+                    {onDelete && (
+                      <button
+                        onClick={() => onDelete(teacher.id)}
+                        className="p-1 lg:p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Supprimer"
+                      >
+                        <Trash2 size={16} className="lg:w-[18px] lg:h-[18px]" />
+                      </button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -159,8 +195,21 @@ export const TeacherForm: React.FC<TeacherFormProps> = ({ teacher, onSubmit, onC
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSubmit && formData.id) {
-      onSubmit(formData as Teacher);
+    // Création (sans id) OU modification (avec id)
+    if (onSubmit) {
+      const teacherData: Teacher = {
+        id: formData.id || `teacher-${Date.now()}`,
+        firstName: formData.firstName || '',
+        lastName: formData.lastName || '',
+        email: formData.email || '',
+        phone: formData.phone || '',
+        subjects: formData.subjects || [],
+        classAssignments: formData.classAssignments || [],
+        status: formData.status || 'pending',
+        hireDate: formData.hireDate || new Date(),
+        specializations: formData.specializations || [],
+      };
+      onSubmit(teacherData);
     }
   };
 
@@ -262,8 +311,10 @@ export const TeacherForm: React.FC<TeacherFormProps> = ({ teacher, onSubmit, onC
           onChange={handleChange}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="active">Actif</option>
+          <option value="pending">En attente</option>
+          <option value="active">Approuvé (Actif)</option>
           <option value="on_leave">En Congé</option>
+          <option value="suspended">Suspendu</option>
           <option value="inactive">Inactif</option>
         </select>
       </div>

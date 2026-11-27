@@ -15,23 +15,21 @@ export default function TermTabs({ selectedTerm, onTermChange }: TermTabsProps) 
   ];
 
   return (
-    <div className="mb-6 border-b border-gray-200">
-      <div className="flex gap-2">
-        {terms.map((term) => (
-          <button
-            key={term.value}
-            onClick={() => onTermChange(term.value)}
-            className={`px-4 py-3 font-medium transition-all border-b-2 ${
-              selectedTerm === term.value
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <span className="mr-2">{term.icon}</span>
-            {term.label}
-          </button>
-        ))}
-      </div>
+    <div className="mb-8 flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm">
+      {terms.map((term) => (
+        <button
+          key={term.value}
+          onClick={() => onTermChange(term.value)}
+          className={`flex-1 rounded-xl px-5 py-3 text-sm font-semibold transition-all duration-300 ${
+            selectedTerm === term.value
+              ? 'bg-gradient-to-r from-emerald-700 to-emerald-600 text-white shadow-md shadow-emerald-700/20'
+              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+          }`}
+        >
+          <span className="mr-2">{term.icon}</span>
+          {term.label}
+        </button>
+      ))}
     </div>
   );
 }

@@ -1,33 +1,85 @@
-import { ReactNode } from 'react';
+'use client';
+
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { ReactNode, useState, useEffect } from 'react';
+import { LayoutDashboard, BookOpen, FileText, TrendingUp, Calendar } from 'lucide-react';
+import AppHeader from '@/components/ui/app-header';
+import { getAuthUserIdFromCookie } from '@/lib/authClient';
+import { fetchStudentData } from '@/services/db.service';
+
+const navItems = [
+  { label: 'Tableau de bord', href: '/student/dashboard', icon: LayoutDashboard },
+  { label: 'Mes cours', href: '/student/courses', icon: BookOpen },
+  { label: 'Mes devoirs', href: '/student/assignments', icon: FileText },
+  { label: 'Mes notes', href: '/student/grades', icon: TrendingUp },
+  { label: 'Emploi du temps', href: '/student/schedule', icon: Calendar },
+];
 
 export default function StudentLayout({ children }: { children: ReactNode }) {
-  return (
-    <div className="min-h-screen bg-slate-100">
-      <aside className="hidden lg:block lg:fixed lg:left-0 lg:top-0 lg:z-20 lg:h-full lg:w-80 lg:border-r lg:border-slate-200 lg:bg-white lg:px-5 lg:py-8 lg:shadow-sm">
-        <div className="space-y-6">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-900">Espace Élève</p>
-            <p className="mt-1 text-sm text-slate-500">Accédez à vos notes et informations scolaires.</p>
-          </div>
-          <nav className="space-y-2 text-sm text-slate-700">
-            <Link href="/student/dashboard" className="block rounded-2xl px-4 py-3 hover:bg-slate-50">Tableau de bord</Link>
-            <Link href="/auth/login" className="block rounded-2xl px-4 py-3 hover:bg-slate-50">Se déconnecter</Link>
-          </nav>
-        </div>
-      </aside>
+  const pathname = usePathname();
+  const router = useRouter();
+  const [userName, setUserName] = useState('Élève');
+  const [notifications, setNotifications] = useState<Array<{ id: number; message: string; time: string }>>([]);
 
-      <div className="ml-0 min-h-screen lg:ml-80">
-        <header className="border-b border-slate-200 bg-white px-6 py-5 shadow-sm">
-          <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Élève</p>
-              <h1 className="text-2xl font-semibold text-slate-900">Espace Élève</h1>
-            </div>
-          </div>
-        </header>
-        <main className="px-6 py-8">{children}</main>
-      </div>
+  // Charger le nom de l'élève
+  useEffect(() => {
+    const uid = getAuthUserIdFromCookie();
+    if (uid) {
+      (async () => {
+        const data = await fetchStudentData(uid);
+        if (data?.student?.users) {
+          const name = `${data.student.users.first_name || ''} ${data.student.users.last_name || ''}`.trim();
+          if (name) setUserName(name);
+        }
+        // Notifications = annonces de la classe
+        if (data?.announcements && data.announcements.length > 0) {
+          setNotifications(data.announcements.slice(0, 5).map((a: any, i: number) => ({
+            id: i,
+            message: a.message || a.title || 'Nouvelle annonce',
+            time: a.created_at ? new Date(a.created_at).toLocaleDateString('fr-FR') : '',
+          })));
+        }
+      })();
+    }
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
+      {/* App Header en haut : notifications + nom + profil + déconnexion */}
+      <AppHeader
+        userName={userName}
+        userRole="Élève"
+        notifications={notifications}
+        title="Espace Élève"
+        onNotificationClick={() => {}}
+      />
+
+      <main className="min-h-screen">{children}</main>
+
+      {/* Barre de navigation horizontale EN BAS (sans bouton quitter) */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-2 py-2 sm:px-4">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex flex-col items-center gap-1 rounded-xl px-3 py-2 text-[10px] font-semibold transition-all sm:px-5 sm:text-xs ${
+                  isActive
+                    ? 'bg-emerald-50 text-emerald-700'
+                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
+                }`}
+              >
+                <Icon size={20} />
+                <span className="hidden sm:block">{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }

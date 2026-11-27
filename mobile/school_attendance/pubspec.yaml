@@ -1,0 +1,55 @@
+name: school_attendance
+description: >-
+  Terminal Android de présence scolaire par QR code — 100% hors ligne,
+  base SQLite locale (Drift), interface Material 3 premium, préparation
+  à la synchronisation avec la plateforme AL-BAYAAN.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+  flutter: '>=3.22.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # État & navigation
+  flutter_riverpod: ^2.5.1
+  go_router: ^14.2.7
+
+  # Base de données locale (offline-first)
+  drift: ^2.20.2
+  sqlite3_flutter_libs: ^0.5.24
+  path_provider: ^2.1.4
+  path: ^1.9.0
+
+  # Scanner QR
+  mobile_scanner: ^6.0.2
+
+  # Réseau / synchronisation future (désactivée par défaut)
+  dio: ^5.7.0
+  connectivity_plus: ^6.0.5
+
+  # Sécurité
+  flutter_secure_storage: ^9.2.2
+  crypto: ^3.0.5
+
+  # Utilitaires UI
+  intl: ^0.19.0
+  uuid: ^4.5.1
+  wakelock_plus: ^1.2.8
+  file_picker: ^11.0.3
+  image: ^4.2.0
+
+  material_ui: ^0.0.1
+  cupertino_icons: ^2.0.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.12
+  drift_dev: ^2.20.2
+
+flutter:
+  uses-material-design: true

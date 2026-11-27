@@ -1,0 +1,662 @@
+// ============================================================
+// AL-BAYAAN — Schéma Prisma (base de données relationnelle)
+// Plateforme institutionnelle scolaire
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- ENUMÉRATIONS ----------
+
+enum UserStatus {
+  PENDING   @map("pending")
+  ACTIVE    @map("active")
+  SUSPENDED @map("suspended")
+}
+
+enum StudentStatus {
+  PENDING     @map("pending")
+  ACTIVE      @map("active")
+  TRANSFERRED @map("transferred")
+  GRADUATED   @map("graduated")
+  INACTIVE    @map("inactive")
+}
+
+enum TeacherStatus {
+  PENDING  @map("pending")
+  ACTIVE   @map("active")
+  ON_LEAVE @map("on_leave")
+  INACTIVE @map("inactive")
+}
+
+enum AdminLevel {
+  SUPER_ADMIN  @map("super_admin")
+  SCHOOL_ADMIN @map("school_admin")
+}
+
+enum ClassLevel {
+  PRESCHOOL     @map("preschool")
+  PRIMARY       @map("primary")
+  MIDDLE_SCHOOL @map("middle_school")
+  HIGH_SCHOOL   @map("high_school")
+}
+
+enum AcademicYearStatus {
+  PREVIOUS @map("previous")
+  CURRENT  @map("current")
+  UPCOMING @map("upcoming")
+}
+
+enum Term {
+  FIRST  @map("first")
+  SECOND @map("second")
+  THIRD  @map("third")
+}
+
+enum AssessmentType {
+  CLASS_ASSIGNMENTS      @map("class_assignments")
+  HOMEWORK               @map("homework")
+  CONTINUOUS_ASSESSMENT  @map("continuous_assessment")
+  FINAL_EXAM             @map("final_exam")
+}
+
+enum GradeType {
+  DEVOIR         @map("devoir")
+  INTERROGATION  @map("interrogation")
+  EXAMEN         @map("examen")
+}
+
+enum AttendanceStatus {
+  PRESENT @map("present")
+  ABSENT  @map("absent")
+  LATE    @map("late")
+  EXCUSED @map("excused")
+}
+
+enum PaymentStatus {
+  PAID      @map("paid")
+  PARTIAL   @map("partial")
+  UNPAID    @map("unpaid")
+  PENDING   @map("pending")
+}
+
+enum PaymentMethod {
+  CASH       @map("cash")
+  CHECK      @map("check")
+  TRANSFER   @map("transfer")
+  CARD       @map("card")
+}
+
+enum HomeworkStatus {
+  DRAFT      @map("draft")
+  PUBLISHED  @map("published")
+  CLOSED     @map("closed")
+}
+
+enum AnnouncementAudience {
+  ADMIN     @map("admin")
+  TEACHER   @map("teacher")
+  STUDENT   @map("student")
+  PARENT    @map("parent")
+  CLASS     @map("class")
+}
+
+// ---------- MODÈLES ----------
+
+// École (établissement)
+model School {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  address   String?
+  phone     String?
+  email     String?
+  logo_url  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  admins  Admin[]
+  teachers TeacherProfile[]
+  students Student[]
+  users    User[]
+}
+
+// Utilisateur / Compte (table commune — sans rôle)
+// Le rôle est déterminé par la table de profil liée (Admin, Teacher, Student, Parent)
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  status       UserStatus @default(ACTIVE)
+  phone        String?
+  avatarUrl    String?
+
+  schoolId String?
+  school   School? @relation(fields: [schoolId], references: [id])
+
+  // Profils spécifiques (un seul lié)
+  admin         Admin?
+  teacherProfile  TeacherProfile?
+  student       Student?
+  parentProfile Parent?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([schoolId])
+}
+
+// ——— PROFIL ADMINISTRATEUR ———
+model Admin {
+  id          String     @id @default(cuid())
+  matricule   String     @unique
+  adminLevel  AdminLevel @default(SCHOOL_ADMIN)
+  permissions String[]   @default(["dashboard", "students", "teachers", "classes", "reports", "payments"])
+  notes       String?
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  schoolId String?
+  school   School? @relation(fields: [schoolId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Année scolaire
+model AcademicYear {
+  id        String             @id @default(cuid())
+  name      String             @unique // "2024-2025", "2025-2026"
+  startDate DateTime
+  endDate   DateTime
+  status    AcademicYearStatus @default(CURRENT)
+  isActive  Boolean            @default(false)
+
+  classes     Class[]
+  assignments ClassAssignment[]
+  homeworks   Homework[]
+  attendance  AttendanceRecord[]
+  grades      StudentGrade[]
+  studentEnrollments StudentEnrollment[]
+  studentPayments StudentPayment[]
+  teacherPayments   TeacherPayment[]
+  reports     Report[]
+}
+
+// Classe
+model Class {
+  id             String     @id @default(cuid())
+  name           String
+  level          ClassLevel
+  roomNumber     String?
+  description    String?
+
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
+  classTeacherId String?
+  classTeacher   TeacherProfile? @relation("ClassTeacher", fields: [classTeacherId], references: [id])
+
+  assignments ClassAssignment[]
+  enrollments StudentEnrollment[]
+
+  homeworks    Homework[]
+  attendance   AttendanceRecord[]
+  grades       StudentGrade[]
+  announcements Announcement[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, academicYearId])
+  @@index([academicYearId])
+}
+
+// Affectation Enseignant → Classe → Matière
+model ClassAssignment {
+  id             String   @id @default(cuid())
+  subject        String
+
+  teacherId String
+  teacher   TeacherProfile @relation(fields: [teacherId], references: [id])
+
+  classId String
+  class   Class @relation(fields: [classId], references: [id])
+
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
+  startDate DateTime @default(now())
+  endDate   DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@unique([teacherId, classId, subject, academicYearId])
+}
+
+// ——— PROFIL ENSEIGNANT ———
+model TeacherProfile {
+  id          String   @id @default(cuid())
+  matricule   String   @unique
+  hireDate    DateTime @default(now())
+  status      TeacherStatus @default(ACTIVE)
+  gender      String?
+  subjects    String[]
+  specializations String[]
+  notes       String?
+
+  userId String  @unique
+  user   User    @relation(fields: [userId], references: [id])
+
+  schoolId String?
+  school   School? @relation(fields: [schoolId], references: [id])
+
+  classesAsTeacher Class[]          @relation("ClassTeacher")
+  assignments      ClassAssignment[]
+  attendance       AttendanceRecord[]
+  homeworks        Homework[]
+  grades           StudentGrade[]
+  payments         TeacherPayment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ——— PROFIL ÉLÈVE ———
+model Student {
+  id            String        @id @default(cuid())
+  matricule     String        @unique
+  dateOfBirth   DateTime?
+  gender        String?
+  address       String?
+  photoUrl      String?
+  status        StudentStatus @default(ACTIVE)
+  registrationDate DateTime  @default(now())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  schoolId String?
+  school   School? @relation(fields: [schoolId], references: [id])
+
+  parentId String?
+  parent   Parent? @relation(fields: [parentId], references: [id])
+
+  enrollments     StudentEnrollment[]
+  attendance      AttendanceRecord[]
+  grades          StudentGrade[]
+  payments        StudentPayment[]
+  reports         Report[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Inscription élève → Classe → Année scolaire
+model StudentEnrollment {
+  id             String   @id @default(cuid())
+  enrollmentDate DateTime @default(now())
+  status         StudentStatus @default(ACTIVE)
+
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id])
+
+  classId String
+  class   Class @relation(fields: [classId], references: [id])
+
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, classId, academicYearId])
+  @@index([classId])
+}
+
+// ——— PROFIL PARENT ———
+model Parent {
+  id       String   @id @default(cuid())
+  fullName String
+  phone    String?
+  email    String?
+
+  userId String  @unique
+  user   User    @relation(fields: [userId], references: [id])
+
+  children Student[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Devoir (Homework)
+model Homework {
+  id           String         @id @default(cuid())
+  title        String
+  description  String?
+  subject      String
+  status       HomeworkStatus @default(PUBLISHED)
+  publishedDate DateTime      @default(now())
+  dueDate      DateTime
+
+  classId String
+  class   Class @relation(fields: [classId], references: [id])
+
+  teacherId String
+  teacher   TeacherProfile @relation(fields: [teacherId], references: [id])
+
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
+  attachmentUrl String?
+  grades        StudentGrade[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([classId, dueDate])
+}
+
+// Enregistrement de présence (Appel)
+model AttendanceRecord {
+  id        String           @id @default(cuid())
+  status    AttendanceStatus
+  date      DateTime         @db.Date
+  comment   String?
+
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id])
+
+  classId String
+  class   Class @relation(fields: [classId], references: [id])
+
+  teacherId String
+  teacher   TeacherProfile @relation(fields: [teacherId], references: [id])
+
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, classId, date, academicYearId]) // Anti-doublon
+  @@index([classId, date])
+}
+
+// Note d'élève
+model StudentGrade {
+  id             String     @id @default(cuid())
+  grade          Float      // Note /20
+  coefficient    Float      @default(1)
+  gradeType      GradeType  @default(DEVOIR)
+  gradeDate      DateTime   @default(now())
+
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id])
+
+  classId String
+  class   Class @relation(fields: [classId], references: [id])
+
+  teacherId String
+  teacher   TeacherProfile @relation(fields: [teacherId], references: [id])
+
+  subject       String
+  academicYearId String
+  academicYear  AcademicYear @relation(fields: [academicYearId], references: [id])
+
+  homeworkId String?
+  homework   Homework? @relation(fields: [homeworkId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([studentId, subject, academicYearId])
+  @@index([classId, subject])
+}
+
+// Rapport / Bulletin (par trimestre)
+model Report {
+  id             String @id @default(cuid())
+  term           Term
+  generalAverage Float?
+  generalRemark  String?
+  principalSignature String?
+  teacherSignature  String?
+  printedAt      DateTime?
+
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id])
+
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
+  lines ReportLine[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, term, academicYearId])
+}
+
+model ReportLine {
+  id          String   @id @default(cuid())
+  subject     String
+  teacherName String
+  classAssignments     Float?
+  homework             Float?
+  continuousAssessment Float?
+  finalExam            Float?
+  average     Float
+  coefficient Float
+  remark      String?
+
+  reportId String
+  report   Report @relation(fields: [reportId], references: [id])
+}
+
+// Paiement élève
+model StudentPayment {
+  id             String        @id @default(cuid())
+  totalAmount    Float
+  paidAmount     Float         @default(0)
+  status         PaymentStatus @default(UNPAID)
+
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id])
+
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
+  transactions PaymentTransaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, academicYearId])
+}
+
+// Paiement enseignant (rémunération)
+model TeacherPayment {
+  id             String        @id @default(cuid())
+  expectedSalary Float
+  paidAmount     Float         @default(0)
+  status         PaymentStatus @default(UNPAID)
+
+  teacherId String
+  teacher   TeacherProfile @relation(fields: [teacherId], references: [id])
+
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
+  transactions PaymentTransaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([teacherId, academicYearId])
+}
+
+// Transaction de paiement
+model PaymentTransaction {
+  id        String        @id @default(cuid())
+  amount    Float
+  date      DateTime      @default(now())
+  reference String        @unique
+  method    PaymentMethod @default(CASH)
+  period    String? // ex: "Janvier 2026"
+
+  studentPaymentId String?
+  studentPayment   StudentPayment? @relation(fields: [studentPaymentId], references: [id])
+
+  teacherPaymentId String?
+  teacherPayment   TeacherPayment? @relation(fields: [teacherPaymentId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([studentPaymentId])
+  @@index([teacherPaymentId])
+}
+
+// Annonce
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  audience  AnnouncementAudience
+  classId   String?
+  class     Class?   @relation(fields: [classId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================================
+// AL-BAYAAN — Badges QR, terminaux de présence et notifications
+//
+// ⚠️ Ce schéma sert de DOCUMENTATION du modèle relationnel :
+//    les tables réelles sont créées par `prisma/sql/30-badges-terminaux.sql`
+//    et manipulées via le client Supabase (service role).
+//    Les modèles ci-dessous n'utilisent volontairement que des
+//    champs scalaires (aucune relation Prisma) pour rester
+//    strictement alignés avec les colonnes SQL existantes.
+// ============================================================
+
+// Badge QR d'un élève — token opaque, aucune donnée personnelle.
+model StudentBadge {
+  id             String    @id
+  student_id     String
+  school_id      String?
+  academic_year_id String?
+  token          String    @unique
+  token_sha256   String
+  token_prefix   String
+  status         String    @default("active")
+  issued_at      DateTime  @default(now())
+  issued_by      String?
+  revoked_at     DateTime?
+  revoked_reason String?
+  replaced_by    String?
+  printed_count  Int       @default(0)
+  last_printed_at DateTime?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @default(now())
+
+  @@index([student_id])
+  @@index([status])
+  @@map("student_badges")
+}
+
+// Terminal Android autorisé à enregistrer des présences.
+model ScannerTerminal {
+  id                String    @id
+  school_id         String?
+  name              String
+  token_hash        String    @unique
+  pairing_code_hash String?
+  pairing_expires_at DateTime?
+  paired_at         DateTime?
+  status            String    @default("pending")
+  app_version       String?
+  device_model      String?
+  pending_events    Int       @default(0)
+  last_seen_at      DateTime?
+  last_sync_at      DateTime?
+  revoked_at        DateTime?
+  revoked_reason    String?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @default(now())
+
+  @@index([school_id])
+  @@index([status])
+  @@map("scanner_terminals")
+}
+
+// Événement de présence synchronisé depuis un terminal.
+model TerminalAttendanceEvent {
+  id              String   @id
+  student_id      String
+  student_code    String
+  class_id        String?
+  school_id       String?
+  terminal_id     String?
+  local_date      DateTime @db.Date
+  scanned_at      DateTime
+  session         String   @default("morning")
+  status          String
+  source          String   @default("qr")
+  payload_version Int      @default(1)
+  idempotency_key String   @unique
+  received_at     DateTime @default(now())
+
+  @@index([local_date])
+  @@index([student_id, local_date])
+  @@index([school_id, local_date])
+  @@map("terminal_attendance_events")
+}
+
+// File d'attente des notifications parentales (outbox serveur).
+model ParentNotification {
+  id         String    @id
+  event_id   String
+  student_id String
+  parent_id  String?
+  channel    String
+  status     String    @default("pending")
+  provider   String    @default("none")
+  attempts   Int       @default(0)
+  last_error String?
+  payload    Json      @default("{}")
+  created_at DateTime  @default(now())
+  sent_at    DateTime?
+
+  @@unique([event_id, parent_id, channel])
+  @@index([status])
+  @@map("parent_notifications")
+}
+
+// Paramètres centralisés du scanner, par établissement.
+model ScannerSetting {
+  school_id             String   @id
+  show_photo            Boolean  @default(true)
+  show_matricule        Boolean  @default(true)
+  show_class_name       Boolean  @default(true)
+  show_school_name      Boolean  @default(true)
+  show_time             Boolean  @default(true)
+  attendance_start_time String   @default("07:00")
+  late_after_time       String   @default("07:30")
+  session               String   @default("morning")
+  timezone              String   @default("Africa/Lome")
+  notify_parents        Boolean  @default(false)
+  sync_photos           Boolean  @default(false)
+  offline_grace_days    Int      @default(30)
+  config_version        Int      @default(1)
+  updated_at            DateTime @default(now())
+
+  @@map("scanner_settings")
+}

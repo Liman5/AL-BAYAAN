@@ -1,8 +1,38 @@
+# Dépendances et build
 node_modules
 .next
 out
+*.tsbuildinfo
+
+# Secrets locaux
 .env*
+!.env.example
+ADMIN_ACCESS.txt
+
+# Système / logs
 .DS_Store
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Vidéos sources (fichiers lourds, non versionnés)
+/videos-source/*
+!/videos-source/LISEZ-MOI.txt
+
+# Terminal Android (Flutter) — artefacts de build et secrets locaux
+mobile/school_attendance/build/
+mobile/school_attendance/.dart_tool/
+mobile/school_attendance/.flutter-plugins
+mobile/school_attendance/.flutter-plugins-dependencies
+mobile/school_attendance/android/local.properties
+mobile/school_attendance/android/key.properties
+mobile/school_attendance/android/.gradle/
+mobile/school_attendance/**/*.jks
+mobile/school_attendance/**/*.keystore
+mobile/school_attendance/**/*.sqlite
+mobile/school_attendance/**/*.sqlite-wal
+mobile/school_attendance/**/*.sqlite-shm
+
+# IDE
+.idea/
+*.iml

@@ -1,7 +1,7 @@
-export type ClassLevel = 'primary' | 'middle_school' | 'high_school';
+export type ClassLevel = 'preschool' | 'primary' | 'middle_school' | 'high_school';
 export type AcademicYear = string; // Format: "2024-2025"
-export type StudentStatus = 'active' | 'transferred' | 'graduated' | 'inactive';
-export type TeacherStatus = 'active' | 'on_leave' | 'inactive';
+export type StudentStatus = 'active' | 'transferred' | 'graduated' | 'inactive' | 'pending';
+export type TeacherStatus = 'pending' | 'active' | 'on_leave' | 'inactive' | 'suspended';
 
 export interface Class {
   id: string;
@@ -12,6 +12,13 @@ export interface Class {
   totalStudents: number;
   createdAt: Date;
   updatedAt: Date;
+  // Données relationnelles enrichies (depuis Supabase)
+  academic_year_id?: string;
+  room_number?: string;
+  description?: string;
+  teacher_profiles?: any;
+  class_assignments?: ClassAssignment[] | any[];
+  student_enrollments?: any[];
 }
 
 export interface Student {
@@ -43,6 +50,7 @@ export interface Teacher {
   classAssignments: ClassAssignment[];
   status: TeacherStatus;
   hireDate: Date;
+  gender?: 'M' | 'F' | string;
   specializations?: string[];
   notes?: string;
 }

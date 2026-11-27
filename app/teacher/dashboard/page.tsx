@@ -1,297 +1,427 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/card';
-import AppHeader from '@/components/ui/app-header';
-
-const teacherData = {
-  name: 'Mme Hana Mansour',
-  school: 'AL-BAYAAN',
-  classes: [
-    { id: 1, name: '3ème A', subject: 'Mathématiques', students: 28, nextClass: 'Aujourd\'hui 10:00' },
-    { id: 2, name: '2nde B', subject: 'Physique', students: 24, nextClass: 'Aujourd\'hui 14:00' },
-    { id: 3, name: '1ère C', subject: 'Chimie', students: 22, nextClass: 'Demain 09:00' }
-  ],
-  recentStudents: [
-    { name: 'Sara Ben Ali', class: '3ème A', lastGrade: 15.5, status: 'Excellent' },
-    { name: 'Youssef Haddad', class: '2nde B', lastGrade: 13.2, status: 'Bien' },
-    { name: 'Lina Mansour', class: '1ère C', lastGrade: 16.8, status: 'Excellent' },
-    { name: 'Adam Khelil', class: '3ème A', lastGrade: 12.5, status: 'Passable' }
-  ],
-  upcomingTasks: [
-    { title: 'Correction devoirs 3ème A', dueDate: 'Aujourd\'hui', priority: 'Haute' },
-    { title: 'Préparer contrôle physique', dueDate: 'Demain', priority: 'Moyenne' },
-    { title: 'Rencontre parent Sara', dueDate: '02 juin', priority: 'Normale' }
-  ],
-  stats: {
-    totalStudents: 74,
-    classesThisWeek: 12,
-    averageGrade: 14.2,
-    attendanceRate: '95%'
-  },
-  notifications: [
-    { id: 1, message: 'Sara a remis son devoir', time: 'Il y a 2h' },
-    { id: 2, message: '5 absences en 3ème A', time: 'Il y a 4h' },
-    { id: 3, message: 'Réunion parents demain', time: 'Il y a 1j' }
-  ]
-};
+import AppShell from '@/components/ui/app-shell';
+import AcademicYearSelector from '@/components/ui/academic-year-selector';
+import { ClassSelector } from '@/components/teacher/class-selector';
+import { Home, Users, FileText, BarChart3, Calendar, Plus, CheckCircle2, TrendingUp, BookOpen } from 'lucide-react';
+import { getAuthUserIdFromCookie } from '@/lib/authClient';
+import { fetchTeacherDashboardSummary, computeStudentAverage, computeAttendanceSummary } from '@/services/db.service';
+import { getTeacherRoleLabel } from '@/lib/teacher';
+import { useEffect, useState } from 'react';
 
 const navItems = [
-  { label: 'Accueil', icon: '🏠', href: '/teacher/dashboard' },
-  { label: 'Élèves', icon: '👥', href: '/teacher/students' },
-  { label: 'Exercices', icon: '📝', href: '/teacher/exercises' },
-  { label: 'Notes', icon: '📊', href: '/teacher/grades' },
-  { label: 'Plan', icon: '📅', href: '/teacher/planning' }
+  { label: 'Accueil', href: '/teacher/dashboard', icon: <Home size={20} /> },
+  { label: 'Élèves', href: '/teacher/students', icon: <Users size={20} /> },
+  { label: 'Exercices', href: '/teacher/exercises', icon: <FileText size={20} /> },
+  { label: 'Notes', href: '/teacher/grades', icon: <BarChart3 size={20} /> },
+  { label: 'Plan', href: '/teacher/planning', icon: <Calendar size={20} /> }
 ];
 
 export default function TeacherDashboardPage() {
-  const router = useRouter();
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
+  // Données réelles Supabase UNIQUEMENT
+  const [dbData, setDbData] = useState<any>(null);
+  const [loadedFromDb, setLoadedFromDb] = useState(false);
+  const [selectedClassId, setSelectedClassId] = useState('');
+
+  useEffect(() => {
+    async function loadFromDb() {
+      const userId = getAuthUserIdFromCookie();
+      if (!userId) return;
+
+      try {
+        const result = await fetchTeacherDashboardSummary(userId);
+        if (result) {
+          setDbData(result);
+          setLoadedFromDb(true);
+        }
+      } catch (e) {
+        console.error('Erreur chargement tableau de bord:', e);
+      }
+    }
+    loadFromDb();
+  }, []);
+
+  // ---------- Données AFFICHÉES = données réelles de la DB ----------
+  const dbClasses = dbData?.classes ?? [];
+  const dbAssignments = dbData?.assignments ?? [];
+
+  // Filtrer par classe sélectionnée si une classe est choisie
+  const dbStudents = (dbData?.students ?? []).filter(
+    (s: any) => !selectedClassId || s.classId === selectedClassId
+  );
+  const dbHomeworks = (dbData?.homeworks ?? []).filter(
+    (hw: any) => !selectedClassId || hw.class_id === selectedClassId
+  );
+  const dbGrades = (dbData?.grades ?? []).filter(
+    (g: any) => !selectedClassId || g.class_id === selectedClassId
+  );
+  const dbAttendance = (dbData?.attendance ?? []).filter(
+    (a: any) => !selectedClassId || a.class_id === selectedClassId
+  );
+
+  // Classes réelles (id persistent du DB)
+  const displayClasses = dbClasses.map((c: any) => ({
+    id: c.id,                     // ← le vrai id DB
+    name: c.name,
+    subject: dbAssignments.find((a: any) => a.class_id === c.id)?.subject || 'Titulaire',
+    students: (dbData?.students ?? []).filter((s: any) => s.classId === c.id).length,
+    nextClass: '',
+  }));
+
+  // Nom enseignant réel
+  const displayName = loadedFromDb && dbData?.teacher
+    ? `${dbData.teacher.users?.first_name || ''} ${dbData.teacher.users?.last_name || ''}`.trim()
+    : '';
+  const teacherRoleLabel = getTeacherRoleLabel(dbData?.teacher?.gender);
+
+  // Moyenne générale réelle
+  const allAverages = dbStudents.map((s: any) => {
+    const grades = dbGrades.filter((g: any) => g.student_id === s.id);
+    return computeStudentAverage(grades);
+  }).filter((a: number | null): a is number => a !== null);
+  const avgGrade = allAverages.length > 0
+    ? Math.round((allAverages.reduce((acc: number, a: number) => acc + a, 0) / allAverages.length) * 10) / 10
+    : null;
+
+  // Taux de présence réel
+  const attendanceSummary = computeAttendanceSummary(dbAttendance);
+  const attendanceRate = attendanceSummary.total > 0
+    ? Math.round((attendanceSummary.present / attendanceSummary.total) * 100)
+    : null;
+
+  // Stats réelles (0 si aucune donnée)
+  const displayStats = [
+    { label: 'Total Élèves', value: dbStudents.length, icon: <Users size={24} />, gradient: 'from-emerald-500 to-teal-600', bg: 'bg-emerald-50' },
+    { label: 'Classes', value: dbClasses.length, icon: <Calendar size={24} />, gradient: 'from-amber-400 to-orange-500', bg: 'bg-amber-50' },
+    { label: 'Moyenne générale', value: avgGrade !== null ? `${avgGrade}/20` : '—', icon: <TrendingUp size={24} />, gradient: 'from-blue-500 to-indigo-600', bg: 'bg-blue-50' },
+    { label: 'Taux de présence', value: attendanceRate !== null ? `${attendanceRate}%` : '—', icon: <CheckCircle2 size={24} />, gradient: 'from-purple-500 to-fuchsia-600', bg: 'bg-purple-50' },
+  ];
+
+  // Activité récente des élèves (vraies données)
+  const recentStudents = dbStudents.slice(0, 4).map((s: any) => {
+    const grades = dbGrades.filter((g: any) => g.student_id === s.id);
+    const avg = computeStudentAverage(grades);
+    return {
+      name: `${s.users?.first_name || ''} ${s.users?.last_name || ''}`.trim() || s.matricule || 'Inconnu',
+      class: s.className || '',
+      lastGrade: avg ?? 0,
+      status: avg === null ? 'Pas de note' : avg >= 15 ? 'Excellent' : avg >= 13 ? 'Bien' : avg >= 10 ? 'Passable' : 'À améliorer',
+    };
+  });
+
+  // Tâches = devoirs réels à venir
+  const upcomingTasks = dbHomeworks.slice(0, 4).map((hw: any) => ({
+    title: hw.title || 'Devoir',
+    class: hw.classes?.name || '',
+    dueDate: hw.due_date ? new Date(hw.due_date).toLocaleDateString('fr-FR') : '',
+    priority: hw.due_date && new Date(hw.due_date) < new Date() ? 'Haute' : 'Moyenne',
+  }));
+
+  // Performance par matière (réelle)
+  const subjectList = dbAssignments
+    .map((a: any) => a.subject)
+    .filter((v: string, i: number, arr: string[]) => arr.indexOf(v) === i)
+    .slice(0, 3)
+    .map((subject: string) => {
+      const classIds = dbAssignments.filter((a: any) => a.subject === subject).map((a: any) => a.class_id);
+      const subjectGrades = dbGrades.filter((g: any) => classIds.includes(g.class_id) && g.subject === subject);
+      const subjectAverages = dbStudents
+        .map((s: any) => computeStudentAverage(subjectGrades.filter((g: any) => g.student_id === s.id)))
+        .filter((a: number | null): a is number => a !== null);
+      const subjectAvg = subjectAverages.length > 0
+        ? Math.round((subjectAverages.reduce((acc: number, a: number) => acc + a, 0) / subjectAverages.length) * 10) / 10
+        : null;
+      return {
+        name: subject,
+        students: classIds.reduce((acc: number, cid: string) => acc + (dbData?.students ?? []).filter((s: any) => s.classId === cid).length, 0),
+        average: subjectAvg ?? 0,
+        trend: '',
+      };
+    });
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24">
-      <AppHeader
-        showNotifications={showNotifications}
-        notifications={teacherData.notifications}
-        onNotificationClick={() => setShowNotifications(!showNotifications)}
-      />
-
-      {/* Main Content */}
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* En-tête */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-slate-900">
-            Bienvenue, {teacherData.name}
-          </h2>
-          <p className="mt-2 text-slate-600">
-            Voici un aperçu de vos activités d'enseignement
-          </p>
+    <AppShell
+      navItems={navItems}
+      title="Espace Enseignant"
+      subtitle="AL-BAYAAN"
+      userName={displayName || 'Enseignant'}
+      userRole={teacherRoleLabel}
+      notifications={dbData?.notifications || []}
+      headerTitle="Tableau de Bord"
+      variant="topbar"
+    >
+      <div className="space-y-8">
+        {/* Header avec sélecteur année scolaire + sélecteur classe */}
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
+              Bienvenue, <span className="bg-gradient-to-r from-emerald-700 to-emerald-500 bg-clip-text text-transparent">{displayName || 'Enseignant'}</span>
+            </h2>
+            <p className="mt-2 text-slate-600">
+              {dbClasses.length > 0
+                ? `${dbClasses.length} classe(s) — ${dbStudents.length} élève(s)`
+                : loadedFromDb ? 'Aucune classe assignée pour le moment' : 'Chargement...'}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            {loadedFromDb && dbClasses.length > 1 && (
+              <ClassSelector
+                classes={dbClasses.map((c: any) => ({
+                  id: c.id,
+                  name: c.name,
+                  subject: dbAssignments.find((a: any) => a.class_id === c.id)?.subject,
+                  students: (dbData?.students ?? []).filter((s: any) => s.classId === c.id).length,
+                }))}
+                selectedClassId={selectedClassId}
+                onSelectClass={setSelectedClassId}
+                label="Filtrer"
+              />
+            )}
+            <AcademicYearSelector compact />
+          </div>
         </div>
 
-        {/* Statistiques rapides */}
-        <div className="mb-8 grid gap-6 grid-cols-1 sm:grid-cols-2">
-          <Card className="bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">Total Élèves</p>
-                <p className="mt-2 text-3xl font-bold text-blue-600">
-                  {teacherData.stats.totalStudents}
-                </p>
-              </div>
-              <div className="rounded-full bg-blue-100 p-3">
-                <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">Classes cette semaine</p>
-                <p className="mt-2 text-3xl font-bold text-green-600">
-                  {teacherData.stats.classesThisWeek}
-                </p>
-              </div>
-              <div className="rounded-full bg-green-100 p-3">
-                <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+        {/* Stats grid */}
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
+          {displayStats.map((stat) => (
+            <div
+              key={stat.label}
+              className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+            >
+              <div className={`absolute right-0 top-0 h-24 w-24 translate-x-8 -translate-y-8 rounded-full bg-gradient-to-br ${stat.gradient} opacity-10 transition-transform duration-500 group-hover:scale-150`} />
+              <div className="relative flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-600">{stat.label}</p>
+                  <p className="mt-2 text-3xl font-bold text-slate-900">{stat.value}</p>
+                </div>
+                <div className={`rounded-2xl ${stat.bg} p-3 text-slate-700 shadow-sm`}>
+                  {stat.icon}
+                </div>
               </div>
             </div>
-          </Card>
-
-          <Card className="bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">Moyenne générale</p>
-                <p className="mt-2 text-3xl font-bold text-purple-600">
-                  {teacherData.stats.averageGrade}/20
-                </p>
-              </div>
-              <div className="rounded-full bg-purple-100 p-3">
-                <svg className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">Taux de présence</p>
-                <p className="mt-2 text-3xl font-bold text-orange-600">
-                  {teacherData.stats.attendanceRate}
-                </p>
-              </div>
-              <div className="rounded-full bg-orange-100 p-3">
-                <svg className="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-          </Card>
+          ))}
         </div>
 
-        {/* Contenu principal en 2 colonnes */}
+        {/* Main content 2 columns */}
         <div className="grid gap-8 lg:grid-cols-3">
-          {/* Colonne gauche - 2/3 */}
+          {/* Left column - 2/3 */}
           <div className="space-y-8 lg:col-span-2">
-            {/* Mes classes */}
-            <Card className="bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-xl font-semibold text-slate-900">Mes Classes</h2>
-              <div className="space-y-4">
-                {teacherData.classes.map((classe) => (
-                  <div
-                    key={classe.id}
-                    className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all hover:border-blue-300 hover:shadow-md cursor-pointer"
-                  >
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-slate-900">{classe.name}</h3>
-                      <p className="text-sm text-slate-600">{classe.subject}</p>
-                    </div>
-                    <div className="text-center px-4">
-                      <p className="text-2xl font-bold text-blue-600">{classe.students}</p>
-                      <p className="text-xs text-slate-500">élèves</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-slate-900">Prochain cours</p>
-                      <p className="text-sm text-slate-600">{classe.nextClass}</p>
-                    </div>
-                  </div>
-                ))}
+            {/* Classes réelles */}
+            <Card className="border-slate-200 shadow-sm">
+              <div className="mb-5 flex items-center justify-between">
+                <h3 className="text-lg font-bold text-slate-900">Mes Classes</h3>
+                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                  {displayClasses.length} classes actives
+                </span>
               </div>
+              {displayClasses.length > 0 ? (
+                <div className="space-y-3">
+                  {displayClasses.map((classe: any) => (
+                    <div
+                      key={classe.id}
+                      className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/50 p-4 transition-all duration-300 hover:border-emerald-200 hover:bg-white hover:shadow-md cursor-pointer"
+                    >
+                      <div className="flex flex-1 items-center gap-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-50 text-emerald-700 font-bold">
+                          {classe.name.split(' ')[0]}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-slate-900">{classe.name}</h4>
+                          <p className="text-sm text-slate-600">{classe.subject}</p>
+                        </div>
+                      </div>
+                      <div className="hidden sm:block text-center px-4">
+                        <p className="text-2xl font-bold text-emerald-700">{classe.students}</p>
+                        <p className="text-xs text-slate-500">élèves</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-slate-500">Prochain cours</p>
+                        <p className="text-sm font-medium text-slate-900">À planifier</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-10 text-center">
+                  <BookOpen className="mx-auto text-slate-300 mb-3" size={40} />
+                  <p className="text-slate-500 font-medium">Aucune classe assignée</p>
+                  <p className="text-sm text-slate-400 mt-1">Contactez l'administration pour vous assigner des classes.</p>
+                </div>
+              )}
             </Card>
 
-            {/* Élèves récents */}
-            <Card className="bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-xl font-semibold text-slate-900">Activité récente des élèves</h2>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-200">
-                  <thead>
-                    <tr className="bg-slate-50">
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-600">
-                        Nom
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-600">
-                        Classe
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-600">
-                        Dernière note
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-600">
-                        Statut
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200 bg-white">
-                    {teacherData.recentStudents.map((student, index) => (
-                      <tr key={index} className="hover:bg-slate-50">
-                        <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-slate-900">
-                          {student.name}
-                        </td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-600">
-                          {student.class}
-                        </td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm">
-                          <span className="font-semibold text-blue-600">{student.lastGrade}/20</span>
-                        </td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm">
-                          <span
-                            className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                              student.status === 'Excellent'
-                                ? 'bg-green-100 text-green-800'
-                                : student.status === 'Bien'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-yellow-100 text-yellow-800'
-                            }`}
-                          >
-                            {student.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            {/* Recent students */}
+            <Card className="border-slate-200 shadow-sm">
+              <div className="mb-5 flex items-center justify-between">
+                <h3 className="text-lg font-bold text-slate-900">Activité récente des élèves</h3>
+                <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+                  {recentStudents.length} élèves
+                </span>
               </div>
+              {recentStudents.length > 0 ? (
+                <div className="overflow-x-auto -mx-2">
+                  <table className="min-w-full divide-y divide-slate-100">
+                    <thead>
+                      <tr className="bg-slate-50">
+                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 rounded-l-xl">Nom</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Classe</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Dernière note</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 rounded-r-xl">Statut</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50 bg-white">
+                      {recentStudents.map((student: any, index: number) => (
+                        <tr key={index} className="transition-colors hover:bg-slate-50/70">
+                          <td className="whitespace-nowrap px-4 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-slate-500 to-slate-700 text-xs font-bold text-white">
+                                {student.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
+                              </div>
+                              <span className="text-sm font-semibold text-slate-900">{student.name}</span>
+                            </div>
+                          </td>
+                          <td className="whitespace-nowrap px-4 py-4 text-sm text-slate-600">{student.class}</td>
+                          <td className="whitespace-nowrap px-4 py-4 text-sm">
+                            <span className="font-bold text-emerald-700">{student.lastGrade}/20</span>
+                          </td>
+                          <td className="whitespace-nowrap px-4 py-4">
+                            <span
+                              className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                                student.status === 'Excellent' ? 'bg-emerald-100 text-emerald-800'
+                                : student.status === 'Bien' ? 'bg-blue-100 text-blue-800'
+                                : student.status === 'Passable' ? 'bg-amber-100 text-amber-800'
+                                : student.status === 'À améliorer' ? 'bg-red-100 text-red-800'
+                                : 'bg-slate-100 text-slate-600'
+                              }`}
+                            >
+                              {student.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-center py-8 text-slate-400 text-sm">Aucun élève dans vos classes.</p>
+              )}
+            </Card>
+
+            {/* Subject performance */}
+            <Card className="border-slate-200 shadow-sm">
+              <div className="mb-5 flex items-center justify-between">
+                <h3 className="text-lg font-bold text-slate-900">Performance par matière</h3>
+              </div>
+              {subjectList.length > 0 ? (
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {subjectList.map((subject: any) => (
+                    <div key={subject.name} className="rounded-2xl border border-slate-100 bg-slate-50/50 p-4 transition-all hover:border-emerald-200 hover:bg-white hover:shadow-md">
+                      <p className="text-sm font-semibold text-slate-900">{subject.name}</p>
+                      <div className="mt-3 flex items-end justify-between">
+                        <div>
+                          <p className="text-2xl font-bold text-slate-900">{subject.average}<span className="text-sm text-slate-500">/20</span></p>
+                          <p className="mt-1 text-xs text-slate-500">{subject.students} élèves</p>
+                        </div>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                          {subject.average > 0 ? 'En ligne' : 'Pas de note'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center py-8 text-slate-400 text-sm">Aucune matière assignée pour le moment.</p>
+              )}
             </Card>
           </div>
 
-          {/* Colonne droite - 1/3 */}
+          {/* Right column - 1/3 */}
           <div className="space-y-8">
-            {/* Tâches à venir */}
-            <Card className="bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-xl font-semibold text-slate-900">Tâches à venir</h2>
-              <div className="space-y-3">
-                {teacherData.upcomingTasks.map((task, index) => (
-                  <div
-                    key={index}
-                    className="rounded-lg border border-slate-200 p-3 transition-all hover:border-blue-300 hover:shadow-sm"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-slate-900">{task.title}</h4>
-                        <p className="mt-1 text-sm text-slate-600">{task.dueDate}</p>
+            {/* Tasks */}
+            <Card className="border-slate-200 shadow-sm">
+              <div className="mb-5 flex items-center justify-between">
+                <h3 className="text-lg font-bold text-slate-900">Devoirs à venir</h3>
+                <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600">
+                  {upcomingTasks.length} devoir(s)
+                </span>
+              </div>
+              {upcomingTasks.length > 0 ? (
+                <div className="space-y-3">
+                  {upcomingTasks.map((task: any, index: number) => (
+                    <div key={index} className="flex items-start justify-between rounded-2xl border border-slate-100 p-3.5 transition-all hover:border-amber-200 hover:bg-amber-50/30 hover:shadow-sm">
+                      <div className="flex flex-1 items-start gap-3">
+                        <div className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${task.priority === 'Haute' ? 'bg-red-500' : 'bg-amber-500'}`} />
+                        <div className="flex-1">
+                          <h4 className="font-medium text-slate-900">{task.title}</h4>
+                          <p className="mt-1 text-sm text-slate-500">{task.class} — {task.dueDate || 'Sans date'}</p>
+                        </div>
                       </div>
-                      <span
-                        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold whitespace-nowrap ml-2 ${
-                          task.priority === 'Haute'
-                            ? 'bg-red-100 text-red-800'
-                            : task.priority === 'Moyenne'
-                            ? 'bg-orange-100 text-orange-800'
-                            : 'bg-slate-100 text-slate-800'
-                        }`}
-                      >
+                      <span className={`ml-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${task.priority === 'Haute' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
                         {task.priority}
                       </span>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center py-8 text-slate-400 text-sm">Aucun devoir à venir.</p>
+              )}
+            </Card>
+
+            {/* Quick actions */}
+            <Card className="border-slate-200 shadow-sm">
+              <h3 className="mb-5 text-lg font-bold text-slate-900">Actions rapides</h3>
+              <div className="space-y-2.5">
+                <a href="/teacher/exercises" className="group flex w-full items-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 px-4 py-3 text-left font-medium text-white shadow-md shadow-emerald-600/20 transition-all hover:shadow-lg hover:shadow-emerald-600/30 hover:-translate-y-0.5">
+                  <FileText size={18} className="transition-transform group-hover:scale-110" />
+                  Créer un nouveau devoir
+                </a>
+                <a href="/teacher/students" className="group flex w-full items-center gap-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-3 text-left font-medium text-white shadow-md shadow-amber-500/20 transition-all hover:shadow-lg hover:shadow-amber-500/30 hover:-translate-y-0.5">
+                  <CheckCircle2 size={18} className="transition-transform group-hover:scale-110" />
+                  Prendre les présences
+                </a>
+                <a href="/teacher/grades" className="group flex w-full items-center gap-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3 text-left font-medium text-white shadow-md shadow-blue-600/20 transition-all hover:shadow-lg hover:shadow-blue-600/30 hover:-translate-y-0.5">
+                  <BarChart3 size={18} className="transition-transform group-hover:scale-110" />
+                  Saisir des notes
+                </a>
               </div>
             </Card>
 
-            {/* Actions rapides */}
-            <Card className="bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-xl font-semibold text-slate-900">Actions rapides</h2>
-              <div className="space-y-2">
-                <button className="w-full rounded-lg bg-blue-600 px-4 py-3 text-left font-medium text-white transition-colors hover:bg-blue-700">
-                  📝 Créer un nouveau devoir
-                </button>
-                <button className="w-full rounded-lg bg-green-600 px-4 py-3 text-left font-medium text-white transition-colors hover:bg-green-700">
-                  ✅ Prendre les présences
-                </button>
-                <button className="w-full rounded-lg bg-purple-600 px-4 py-3 text-left font-medium text-white transition-colors hover:bg-purple-700">
-                  📊 Saisir des notes
-                </button>
-                <button className="w-full rounded-lg bg-orange-600 px-4 py-3 text-left font-medium text-white transition-colors hover:bg-orange-700">
-                  📄 Générer un rapport
-                </button>
-              </div>
+            {/* Class average mini chart */}
+            <Card className="border-slate-200 shadow-sm">
+              <h3 className="mb-5 text-lg font-bold text-slate-900">Moyennes par classe</h3>
+              {displayClasses.length > 0 ? (
+                <div className="space-y-4">
+                  {displayClasses.map((classe: any) => {
+                    const classStudents = (dbData?.students ?? []).filter((s: any) => s.classId === classe.id);
+                    const classAverages = classStudents
+                      .map((s: any) => computeStudentAverage(dbGrades.filter((g: any) => g.student_id === s.id)))
+                      .filter((a: number | null): a is number => a !== null);
+                    const classAvg = classAverages.length > 0
+                      ? Math.round((classAverages.reduce((acc: number, a: number) => acc + a, 0) / classAverages.length) * 10) / 10
+                      : null;
+                    const rounded = classAvg ?? 0;
+                    const pct = Math.min(100, Math.max(5, rounded * 5));
+                    return (
+                      <div key={classe.id}>
+                        <div className="mb-1.5 flex items-center justify-between text-sm">
+                          <span className="font-medium text-slate-700">{classe.name}</span>
+                          <span className="font-semibold text-emerald-700">{classAvg !== null ? `${rounded}/20` : '—'}</span>
+                        </div>
+                        <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                          <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-center py-8 text-slate-400 text-sm">Aucune classe pour le moment.</p>
+              )}
             </Card>
           </div>
         </div>
-      </main>
-
-      {/* Navigation Bar en bas - Mobile Friendly */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white shadow-lg">
-        <div className="mx-auto grid grid-cols-5 gap-1 px-2 py-2 sm:px-4">
-          {navItems.map((item) => (
-            <button
-              key={item.href}
-              onClick={() => router.push(item.href)}
-              className="flex flex-col items-center gap-1 rounded-lg px-2 py-3 text-xs sm:text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900"
-            >
-              <span className="text-xl sm:text-2xl">{item.icon}</span>
-              <span className="hidden sm:inline">{item.label}</span>
-              <span className="sm:hidden text-xs">{item.label.split(' ')[0]}</span>
-            </button>
-          ))}
-        </div>
-      </nav>
-    </div>
+      </div>
+    </AppShell>
   );
 }

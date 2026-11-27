@@ -1,0 +1,44 @@
+-- ============================================================
+-- AL-BAYAAN — 11. Désactiver la confirmation d'email
+--
+-- ⚠️ Deux méthodes (choisir celle qui fonctionne pour votre version)
+-- ============================================================
+
+-- ============================================================
+-- MÉTHODE 1 : Dashboard Supabase (RECOMMANDÉE) ✅
+-- ============================================================
+-- Allez dans : Supabase Dashboard → Authentication → Providers → Email
+-- Désactivez l'option "Confirm email" (ou "Enable email confirmations")
+-- Puis cliquez "Save"
+--
+-- Après cela, les comptes créés via signUp() sont IMMÉDIATEMENT
+-- actifs et aucun email de confirmation n'est envoyé.
+-- Le "email rate limit exceeded" cesse car Supabase n'envoie plus d'emails.
+-- ============================================================
+
+-- ============================================================
+-- MÉTHODE 2 : SQL (si votre version a la table auth.config)
+-- ============================================================
+-- ⚠️ À exécuter depuis le SQL Editor de Supabase SEULEMENT
+-- Si la table auth.config existe, exécutez :
+-- UPDATE auth.config SET confirm_email = false;
+
+-- ============================================================
+-- MÉTHODE 3 : Confirmer les emails existants via SQL
+-- ============================================================
+-- Confirme immédiatement un email qui est déjà enregistré,
+-- permettant la connexion sans cliquer le lien de confirmation :
+--
+-- UPDATE auth.users
+-- SET email_confirmed_at = COALESCE(email_confirmed_at, now())
+-- WHERE email = 'VOTRE_EMAIL@EXAMPLE.COM';
+--
+-- ⚠️ Remplacez VOTRE_EMAIL par l'adresse utilisée lors de l'inscription.
+
+-- ============================================================
+-- VÉRIFICATION
+-- ============================================================
+-- Vérifier les comptes non confirmés :
+-- SELECT id, email, email_confirmed_at IS NOT NULL AS confirmed
+-- FROM auth.users
+-- ORDER BY created_at DESC;

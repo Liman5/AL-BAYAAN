@@ -1,0 +1,20 @@
+AL-BAYAAN — dossier des photos du site
+======================================
+
+Déposez ici les photos de l'établissement (JPEG, PNG ou WebP).
+
+Deux façons de les utiliser :
+
+1. Depuis l'administration (recommandé)
+   Espace admin → module « Images du site » → bouton « Téléverser ».
+   Les fichiers sont enregistrés dans data/site-uploads/ et affichés
+   immédiatement sur la page d'accueil.
+
+2. Depuis le code
+   Placez vos fichiers dans public/image/, puis indiquez leur chemin
+   dans l'administration (champ « Lien de l'image ») :
+   public/image/photo.jpg  →  /image/photo.jpg
+
+Emplacements disponibles : logo, hero, about, aboutSmall, admissions,
+cycle-1, cycle-2, cycle-3, gallery-1 … gallery-5
+(voir lib/siteImages.ts).

@@ -69,7 +69,7 @@ export const StatCard: React.FC<StatCardProps> = ({
             </p>
           )}
         </div>
-        <div className="p-2 sm:p-3 bg-white rounded-lg flex-shrink-0">{React.cloneElement(icon as React.ReactElement, { size: 20 })}</div>
+        <div className="p-2 sm:p-3 bg-white rounded-lg flex-shrink-0">{icon}</div>
       </div>
     </div>
   );

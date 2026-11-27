@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, HTMLAttributes } from 'react';
 import { AssessmentType, GradeEntry, GradingConfig } from '@/types/grades';
 import GradeGridTable from './grade-grid-table';
+import { ChevronDown, GraduationCap } from 'lucide-react';
 
-interface CollapsibleTermSectionProps {
+interface CollapsibleTermSectionProps extends HTMLAttributes<HTMLDivElement> {
   termLabel: string;
   assessmentTypes: { type: AssessmentType; label: string; icon: string }[];
   selectedAssessmentType: AssessmentType | null;
@@ -28,40 +29,50 @@ export default function CollapsibleTermSection({
   onToggleExpand,
 }: CollapsibleTermSectionProps) {
   return (
-    <div className="mb-4 border border-gray-200 rounded-lg overflow-hidden bg-white">
+    <div className="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md">
       {/* Header */}
       <button
         onClick={onToggleExpand}
-        className="w-full px-6 py-4 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors"
+        className="flex w-full items-center justify-between bg-gradient-to-r from-slate-50 to-white px-6 py-4 transition-colors hover:from-emerald-50 hover:to-white"
       >
         <div className="flex items-center gap-3">
-          <span className="text-lg">{isExpanded ? '▼' : '▶'}</span>
-          <span className="font-semibold text-gray-900">{termLabel}</span>
+          <span className={`transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+            <ChevronDown size={20} className="text-slate-400" />
+          </span>
+          <span className="font-semibold text-slate-900">{termLabel}</span>
         </div>
-        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-          {grades.length} students
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+            <GraduationCap size={13} />
+            {grades.length} élèves
+          </span>
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
+            isExpanded ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+          }`}>
+            {isExpanded ? 'Ouvert' : 'Fermé'}
+          </span>
+        </div>
       </button>
 
       {/* Content */}
       {isExpanded && (
-        <div className="border-t border-gray-200 p-6">
+        <div className="border-t border-slate-100 p-6">
           {/* Assessment Type Selector */}
           <div className="mb-6">
-            <p className="text-sm font-medium text-gray-700 mb-3">Sélectionner le Type d'Évaluation</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <p className="mb-3 text-sm font-semibold text-slate-700">Sélectionner le Type d'Évaluation</p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {assessmentTypes.map((assessment) => (
                 <button
                   key={assessment.type}
                   onClick={() => onAssessmentTypeSelect(assessment.type)}
-                  className={`p-4 rounded-lg border-2 transition-all text-center ${
+                  className={`rounded-2xl border-2 p-4 text-center transition-all duration-300 ${
                     selectedAssessmentType === assessment.type
-                      ? 'border-blue-600 bg-blue-50 text-blue-900'
-                      : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-blue-300'
+                      ? 'border-emerald-500 bg-emerald-50 text-emerald-900 shadow-md shadow-emerald-500/10'
+                      : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-300 hover:bg-emerald-50/30'
                   }`}
                 >
-                  <div className="text-2xl mb-2">{assessment.icon}</div>
-                  <div className="font-medium text-sm">{assessment.label}</div>
+                  <div className="mb-2 text-2xl">{assessment.icon}</div>
+                  <div className="text-sm font-semibold">{assessment.label}</div>
                 </button>
               ))}
             </div>

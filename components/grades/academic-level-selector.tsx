@@ -17,17 +17,17 @@ export default function AcademicLevelSelector({
   ];
 
   return (
-    <div className="mb-6">
-      <p className="text-sm font-medium text-gray-700 mb-3">Sélectionner le Niveau Académique</p>
-      <div className="flex gap-3">
+    <div className="mb-8">
+      <p className="mb-3 text-sm font-semibold text-slate-700">Sélectionner le Niveau Académique</p>
+      <div className="flex flex-wrap gap-3">
         {levels.map((level) => (
           <button
             key={level.value}
             onClick={() => onLevelChange(level.value)}
-            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            className={`rounded-2xl px-5 py-3 text-sm font-semibold transition-all duration-300 ${
               academicLevel === level.value
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-gradient-to-r from-emerald-700 to-emerald-600 text-white shadow-lg shadow-emerald-700/20 scale-[1.02]'
+                : 'border border-slate-200 bg-white text-slate-600 hover:border-emerald-300 hover:text-emerald-700 hover:shadow-md'
             }`}
           >
             <span className="mr-2">{level.icon}</span>

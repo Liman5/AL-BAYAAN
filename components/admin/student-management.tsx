@@ -129,22 +129,40 @@ export const StudentForm: React.FC<StudentFormProps> = ({
       phone: '',
       parentName: '',
       parentPhone: '',
+      parentEmail: '',
       matricule: '',
       classId: '',
       className: '',
       status: 'active',
+      dateOfBirth: undefined,
+      address: '',
     }
   );
+  const [isLoading, setIsLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSubmit && formData.id) {
-      onSubmit(formData as Student);
+    setFormError(null);
+
+    if (!formData.firstName || !formData.lastName) {
+      setFormError('Prénom et nom sont obligatoires.');
+      return;
+    }
+
+    if (onSubmit) {
+      if (student?.id) {
+        // Mode édition : conserver l'id existant
+        onSubmit({ ...formData, id: student.id } as Student);
+      } else {
+        // Mode ajout : sans id → l'API va le créer + générer le matricule
+        onSubmit(formData as Student);
+      }
     }
   };
 
@@ -250,6 +268,17 @@ export const StudentForm: React.FC<StudentFormProps> = ({
             value={formData.parentPhone || ''}
             onChange={handleChange}
             placeholder="+213 555 111 111"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Email parent</label>
+          <input
+            type="email"
+            name="parentEmail"
+            value={formData.parentEmail || ''}
+            onChange={handleChange}
+            placeholder="parent@example.com"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
