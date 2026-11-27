@@ -192,7 +192,7 @@ export async function loadStudentsForTerminal(
     let query = supabase
       .from('students')
       .select(STUDENT_SELECT)
-      .eq('school_id', schoolId)
+      .or(`school_id.eq.${schoolId},school_id.is.null`)
       .order('updated_at', { ascending: true })
       .range(from, from + pageSize - 1);
 
@@ -297,7 +297,7 @@ async function loadRemovedStudentCodes(
   let query = supabase
     .from('students')
     .select('matricule, status, updated_at')
-    .eq('school_id', schoolId)
+    .or(`school_id.eq.${schoolId},school_id.is.null`)
     .neq('status', 'active');
 
   if (since) query = query.gte('updated_at', since);

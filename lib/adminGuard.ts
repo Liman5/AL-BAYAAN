@@ -38,17 +38,32 @@ export async function requireAdmin(): Promise<AdminGuardResult> {
 
   const cookieStore = await cookies();
   const userId = cookieStore.get('userId')?.value;
-  const role = cookieStore.get('userRole')?.value;
+  const role = (cookieStore.get('userRole')?.value || '').trim().toLowerCase();
 
-  if (!userId || role !== 'admin') {
+  if (!userId) {
     return {
       ok: false,
       response: NextResponse.json(
-        { success: false, message: 'Accès administrateur requis.' },
+        { success: false, message: 'Session administrateur introuvable. Reconnectez-vous.' },
         { status: 401 },
       ),
     };
   }
+
+  // Le rôle renvoyé par /api/auth/get-role correspond à `admins.admin_level`
+  // (« super_admin » ou « school_admin »), et non au littéral « admin ».
+  // On accepte donc toutes les variantes connues ; la vérification qui fait
+  // foi reste la présence du profil dans la table `admins` (ci-dessous).
+  const adminRoles = new Set([
+    'admin',
+    'administrateur',
+    'super_admin',
+    'super-admin',
+    'school_admin',
+    'school-admin',
+    'superadmin',
+    'schooladmin',
+  ]);
 
   const supabase = getAdminClient();
   const { data, error } = await supabase
@@ -57,7 +72,33 @@ export async function requireAdmin(): Promise<AdminGuardResult> {
     .eq('user_id', userId)
     .maybeSingle();
 
-  if (error || !data) {
+  if (error) {
+    return {
+      ok: false,
+      response: NextResponse.json(
+        { success: false, message: `Vérification impossible : ${error.message}` },
+        { status: 500 },
+      ),
+    };
+  }
+
+  if (!data) {
+    return {
+      ok: false,
+      response: NextResponse.json(
+        {
+          success: false,
+          message:
+            'Accès administrateur requis. Ce compte n’a pas de profil administrateur.',
+        },
+        { status: 403 },
+      ),
+    };
+  }
+
+  // Cookie de rôle incohérent (ou absent) : on le signale sans bloquer,
+  // la base restant la source de vérité.
+  if (role && !adminRoles.has(role)) {
     return {
       ok: false,
       response: NextResponse.json(

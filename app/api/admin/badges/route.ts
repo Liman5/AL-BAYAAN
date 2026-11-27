@@ -68,7 +68,15 @@ export async function GET(request: Request) {
       .order('matricule', { ascending: true })
       .limit(3000);
 
-    if (guard.admin.schoolId) query = query.eq('school_id', guard.admin.schoolId);
+    // Les élèves créés avant l'intégration n'ont pas de `school_id`
+    // (la colonne est nullable). On inclut donc explicitement les fiches
+    // non rattachées : sinon un administrateur rattaché à une école ne
+    // verrait aucun de ses élèves déjà inscrits.
+    if (guard.admin.schoolId && /^[A-Za-z0-9_-]+$/.test(guard.admin.schoolId)) {
+      query = query.or(
+        `school_id.eq.${guard.admin.schoolId},school_id.is.null`,
+      );
+    }
 
     const { data: rawStudents, error } = await query;
     if (error) {
@@ -176,6 +184,16 @@ export async function GET(request: Request) {
       academicYearName = year?.name || null;
     }
 
+    // Toutes les classes de l'établissement (et non seulement celles
+    // déduites des élèves affichés) : le filtre reste utilisable même
+    // si une classe n'a encore aucun élève badgé.
+    let classesQuery = supabase
+      .from('classes')
+      .select('id, name, level, academic_year_id')
+      .order('name', { ascending: true });
+    if (academicYearId) classesQuery = classesQuery.eq('academic_year_id', academicYearId);
+    const { data: classRows } = await classesQuery;
+
     return NextResponse.json({
       success: true,
       data: {
@@ -185,6 +203,11 @@ export async function GET(request: Request) {
         academicYearId,
         academicYearName,
         schoolName,
+        classes: (classRows || []).map((row: any) => ({
+          id: row.id,
+          name: row.name,
+          level: row.level || null,
+        })),
       },
     });
   } catch (err: any) {

@@ -328,7 +328,7 @@ test automatisé).
 | Risque | Protection |
 |---|---|
 | Lecture directe des tables | RLS activée + aucune politique + `REVOKE` |
-| Accès admin par API | `requireAdmin()` : cookie + vérification en base de `admins` |
+| Accès admin par API | `requireAdmin()` : cookie `userId` **et** profil réel dans `admins` |
 | Terminal anonyme | appairage à usage unique + token de 256 bits haché |
 | Terminal d'une autre école | `school_id` lu en base, jamais accepté du client |
 | Brute force du code d'appairage | code 8 caractères, 15 min, rate limit IP |
@@ -338,7 +338,29 @@ test automatisé).
 
 ---
 
-## 12. Ce qui reste volontairement hors périmètre
+## 12. Comptes administrateurs et visibilité des élèves
+
+Deux points ont été corrigés après les premiers tests terrain :
+
+1. **Reconnaissance du rôle** — la connexion pose dans le cookie `userRole` la
+   valeur de `admins.admin_level` (`super_admin` ou `school_admin`), et non le
+   littéral `admin`. La garde serveur accepte désormais
+   `admin`, `super_admin`, `school_admin` (et variantes `super-admin`,
+   `school-admin`), la **vérification qui fait foi** restant la présence du
+   profil dans la table `admins` (via `user_id`).
+2. **Élèves sans établissement** — les élèves créés avant l'intégration ont
+   `students.school_id = NULL`. Toutes les lectures (module Badges, bootstrap
+   du terminal, validation des présences) incluent désormais
+   `school_id IS NULL` en plus de l'école du terminal : aucun élève existant
+   n'est masqué. La génération d'un badge rattache l'élève à l'établissement
+   lorsqu'il ne l'était pas.
+
+Diagnostic intégré : `GET /api/admin/whoami` renvoie (sans donnée d'élève)
+l'état de la session, le rôle stocké, la présence du profil `admins`, et des
+compteurs (élèves, élèves sans école, classes, badges actifs, terminaux).
+Le module Badges l'affiche automatiquement en cas de refus d'accès.
+
+## 13. Ce qui reste volontairement hors périmètre
 
 * Envoi effectif des notifications (fournisseur SMS/WhatsApp/push non choisi).
 * Téléchargement automatique des photos vers le terminal (`sync_photos`

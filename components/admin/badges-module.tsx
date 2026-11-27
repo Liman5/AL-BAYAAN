@@ -58,6 +58,7 @@ interface BadgesResponse {
   academicYearId: string | null;
   academicYearName: string | null;
   schoolName: string;
+  classes?: Array<{ id: string; name: string; level: string | null }>;
 }
 
 interface ClassOption {
@@ -90,6 +91,7 @@ export default function BadgesModule() {
   });
   const [schoolName, setSchoolName] = useState('AL-BAYAAN');
   const [academicYearName, setAcademicYearName] = useState<string | null>(null);
+  const [apiClasses, setApiClasses] = useState<ClassOption[]>([]);
 
   const [search, setSearch] = useState('');
   const [classFilter, setClassFilter] = useState('');
@@ -101,9 +103,19 @@ export default function BadgesModule() {
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<Notice>(null);
   const [includePhotos, setIncludePhotos] = useState(false);
-  const [preview, setPreview] = useState<Array<{ token: string; dataUrl: string; entry: BadgePdfEntry }>>(
-    [],
-  );
+  const [preview, setPreview] = useState<
+    Array<{ token: string; dataUrl: string; entry: BadgePdfEntry }>
+  >([]);
+  const [diagnostic, setDiagnostic] = useState<{
+    authenticated?: boolean;
+    isAdmin?: boolean;
+    userId?: string;
+    email?: string | null;
+    cookieRole?: string | null;
+    adminLevel?: string;
+    schoolId?: string | null;
+    message?: string;
+  } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -124,8 +136,18 @@ export default function BadgesModule() {
       if (!response.ok || !payload?.success) {
         setNotice({ type: 'error', text: payload?.message || 'Chargement impossible.' });
         setRows([]);
+        // Diagnostic automatique : évite un écran vide sans explication.
+        try {
+          const diagnostic = await fetch('/api/admin/whoami', { cache: 'no-store' }).then((r) =>
+            r.json(),
+          );
+          setDiagnostic(diagnostic?.data ?? null);
+        } catch {
+          setDiagnostic(null);
+        }
         return;
       }
+      setDiagnostic(null);
 
       const data = payload.data as BadgesResponse;
       setRows(data.students);
@@ -133,6 +155,11 @@ export default function BadgesModule() {
       setPagination(data.pagination);
       setSchoolName(data.schoolName || 'AL-BAYAAN');
       setAcademicYearName(data.academicYearName);
+      setApiClasses(
+        (data.classes || [])
+          .filter((row) => row.id && row.name)
+          .map((row) => ({ id: row.id, name: row.name })),
+      );
     } catch (error) {
       setNotice({
         type: 'error',
@@ -149,13 +176,18 @@ export default function BadgesModule() {
 
   const classOptions = useMemo<ClassOption[]>(() => {
     const map = new Map<string, string>();
+    // Classes réelles de l'établissement (source serveur)…
+    for (const option of apiClasses) {
+      map.set(option.id, option.name);
+    }
+    // …complétées par celles rencontrées dans les élèves affichés.
     for (const row of rows) {
       if (row.classId && row.className) map.set(row.classId, row.className);
     }
     return Array.from(map.entries())
       .map(([id, name]) => ({ id, name }))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [rows]);
+  }, [apiClasses, rows]);
 
   const printableRows = useMemo(
     () => rows.filter((row) => row.badge?.status === 'active' && row.badge.token),
@@ -562,6 +594,29 @@ export default function BadgesModule() {
           <button type="button" onClick={() => setNotice(null)} aria-label="Fermer">
             <X className="h-4 w-4" />
           </button>
+        </div>
+      )}
+
+      {/* Diagnostic d'accès administrateur */}
+      {diagnostic && diagnostic.isAdmin !== true && (
+        <div className="rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          <p className="font-semibold">Accès administrateur non reconnu</p>
+          <p className="mt-1 text-amber-900/90">
+            {diagnostic.message ||
+              'Ce compte n’est pas reconnu comme administrateur par la base de données.'}
+          </p>
+          <ul className="mt-2 space-y-1 text-[11.5px] text-amber-900/80">
+            <li>Session : {diagnostic.authenticated ? 'oui' : 'non (cookie absent)'}</li>
+            <li>Rôle stocké : {diagnostic.cookieRole || '—'}</li>
+            <li>Utilisateur : {diagnostic.email || diagnostic.userId || '—'}</li>
+            <li>Profil « admins » : {diagnostic.isAdmin ? 'présent' : 'absent'}</li>
+          </ul>
+          <p className="mt-2 text-[11px] text-amber-800">
+            Vérification SQL :{' '}
+            <code className="rounded bg-white/70 px-1 py-0.5 font-mono">
+              select id, user_id, admin_level from admins where user_id = &apos;{diagnostic.userId || '…'}&apos;;
+            </code>
+          </p>
         </div>
       )}
 

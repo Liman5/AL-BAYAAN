@@ -154,7 +154,7 @@ export async function POST(request: Request) {
           .from('students')
           .select('id, status, school_id, users (first_name)')
           .eq('matricule', studentCode)
-          .eq('school_id', schoolId)
+          .or(`school_id.eq.${schoolId},school_id.is.null`)
           .maybeSingle();
 
         student = data
