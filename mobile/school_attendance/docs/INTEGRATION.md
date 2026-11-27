@@ -360,7 +360,63 @@ l'état de la session, le rôle stocké, la présence du profil `admins`, et des
 compteurs (élèves, élèves sans école, classes, badges actifs, terminaux).
 Le module Badges l'affiche automatiquement en cas de refus d'accès.
 
-## 13. Ce qui reste volontairement hors périmètre
+## 13. Synchronisation automatique, retour vocal et mise à jour
+
+### 13.1 Synchronisation automatique (aucune action manuelle)
+
+`SyncEngine` (Flutter) déclenche un cycle : au **démarrage**, au **retour du
+réseau**, toutes les **45 s** s'il reste des présences en attente, et toutes
+les **10 min** pour récupérer élèves/configuration. Un verrou empêche deux
+exécutions simultanées et le scanner n'attend jamais le réseau.
+
+Chaque tentative est tracée : `settings.lastSyncAttempt` + `settings.lastSyncError`,
+affichés dans **Paramètres → Connexion à AL-BAYAAN** (avec le nombre de
+présences en attente et d'élèves disponibles hors ligne). Les causes possibles
+d'un non-envoi sont désormais explicites : terminal non appairé, synchronisation
+désactivée, mode hors ligne volontaire, terminal révoqué, erreur réseau.
+
+### 13.2 Retour vocal (TTS, hors ligne)
+
+L'administrateur définit les phrases dans **Paramètres → Retour vocal** :
+
+| Situation | Réglage | Défaut |
+|---|---|---|
+| Scan accepté à l'heure | `voiceSuccess` | « Présence enregistrée » |
+| Scan accepté en retard | `voiceLate` | « En retard » |
+| Déjà scanné aujourd'hui | `voiceDuplicate` | « Déjà enregistré » |
+| Badge inconnu/révoqué, élève inactif, QR invalide | `voiceRefused` | « Accès refusé » |
+
+Technique : `flutter_tts` (synthèse vocale Android, **aucun fichier audio à
+héberger**, fonctionne hors ligne). Si l'appareil n'a pas de moteur TTS, le
+retour visuel reste seul — le scan n'est jamais bloqué.
+
+### 13.3 Mise à jour de l'application (OTA)
+
+Trois options, par ordre de simplicité :
+
+1. **Mise à jour intégrée (implémentée)** — l'application interroge
+   `GET /api/terminal/app-version` ; si la version publiée est supérieure
+   **et** qu'une URL d'APK est configurée, un bandeau « Télécharger la vX »
+   ouvre le lien dans le navigateur. L'installation par-dessus conserve
+   **toutes** les données locales (SQLite, file d'attente).
+2. **Play Store / test interne** — mises à jour gérées par Android, aucune
+   action de l'école. Recommandé pour le long terme (APK signé requis).
+3. **Shorebird** — correctifs Dart livrés sans APK, service tiers payant.
+
+Configuration côté serveur (variables d'environnement) :
+
+```env
+TERMINAL_APP_VERSION="1.1.0"
+TERMINAL_APP_APK_URL="https://github.com/Liman5/AL-BAYAAN/releases/download/v1.1.0/app-arm64-v8a-release.apk"
+TERMINAL_APP_NOTES="Corrections de synchronisation"
+```
+
+⚠️ Une mise à jour doit être **signée avec la même clé** que l'application
+installée (ici la clé de debug tant qu'aucun keystore de production n'est
+fourni), sinon Android refuse l'installation. Si `TERMINAL_APP_APK_URL` est
+vide, aucune proposition n'est affichée : rien n'est simulé.
+
+## 14. Ce qui reste volontairement hors périmètre
 
 * Envoi effectif des notifications (fournisseur SMS/WhatsApp/push non choisi).
 * Téléchargement automatique des photos vers le terminal (`sync_photos`

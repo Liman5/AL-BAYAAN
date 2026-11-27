@@ -58,8 +58,22 @@ un fonctionnement **100 % hors ligne** : aucun scan ne dépend d'Internet.
 - Descente : élèves, classes, configuration scanner (mode confidentialité).
 - Montée : présences validées par événement (`accepted` / `duplicate` /
   `rejected`), lots de 25, reprise après interruption.
+- **Envoi 100 % automatique** (`SyncEngine`) : au démarrage, au retour du
+  réseau, toutes les 45 s s'il reste des scans, et récupération complète
+  toutes les 10 min. Aucune action de l'opérateur.
+- **Diagnostic lisible** : dernier essai + dernière erreur affichés dans
+  Paramètres → Connexion à AL-BAYAAN.
 - **Sans appairage, rien n'est envoyé** : le terminal reste pleinement
   fonctionnel hors ligne (voir `docs/SYNC.md` et `docs/INTEGRATION.md`).
+
+### Retour vocal (TTS) et mise à jour
+- 4 phrases configurables par l'administrateur (accepté, retard, doublon,
+  refus), prononcées via la synthèse vocale Android — hors ligne, sans
+  fichier audio à héberger. Désactivable.
+- **Mise à jour OTA** : l'app interroge `/api/terminal/app-version` et propose
+  le téléchargement de l'APK si une version plus récente est publiée
+  (aucune proposition si l'URL n'est pas configurée).
+
 
 ---
 
@@ -253,7 +267,7 @@ QR → QrPayloadParser → ScanService (transaction)
 flutter test
 ```
 
-**80 tests — 100 % réussis** (dernière exécution : 20 s) :
+**89 tests — 100 % réussis** (dernière exécution : 13 s) :
 
 | Fichier | Couverture |
 |---|---|
@@ -267,6 +281,8 @@ flutter test
 | `camera_preference_test.dart` | **objectif caméra** : défaut avant, restauration `back`/`front`, valeurs absentes/invalides, sérialisation, opposition, **flash uniquement sur l'arrière si matériel** |
 | `remote_sync_api_test.dart` | **client HTTP réel** (adaptateur factice) : réponses par événement (`accepted`/`duplicate`/`rejected`), terminal révoqué non retenté, erreur réseau réessayable, analyse du bootstrap, erreur 401, valeurs par défaut de la configuration |
 | `sync_apply_test.dart` | **SQLite réel** : élève synchronisé scannable, pas de doublon au 2e passage (id local conservé), badge révoqué → scan refusé sans suppression, élève retiré désactivé, configuration serveur appliquée, configuration partielle non destructive |
+| `sync_service_state_test.dart` | **diagnostic de synchronisation** : non appairé, synchronisation désactivée, mode hors ligne volontaire, cycle réussi — et persistance de `lastSyncAttempt`/`lastSyncError` |
+| `voice_feedback_test.dart` | **retour vocal** : voix désactivée, succès, retard, doublon, tous les cas de refus (badge inconnu/révoqué, élève inactif, QR invalide, erreur base) |
 
 
 

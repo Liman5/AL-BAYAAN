@@ -11,6 +11,7 @@ import '../../../app/theme/app_colors.dart';
 import '../../../core/database/app_database.dart';
 import '../../../shared/models/view_models.dart';
 import '../domain/camera_preference.dart';
+import 'scanner_controller.dart';
 import 'widgets/scan_window.dart';
 import 'widgets/scanner_controls.dart';
 import 'widgets/scanner_header.dart';
@@ -185,6 +186,17 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
       } else {
         unawaited(WakelockPlus.disable());
       }
+    });
+
+    // Retour vocal : une phrase par résultat, définie par l'administrateur.
+    // Déclenché à chaque nouvel outcome (jamais sur un simple rebuild).
+    ref.listen<ScannerState>(scannerControllerProvider, (previous, next) {
+      final outcome = next.outcome;
+      if (outcome == null) return;
+      if (identical(previous?.outcome, outcome)) return;
+      final current = ref.read(settingsProvider).valueOrNull;
+      if (current == null) return;
+      unawaited(ref.read(voiceFeedbackProvider).announce(outcome, current));
     });
 
     // Les paramètres locaux arrivent en quelques millisecondes (SQLite) :

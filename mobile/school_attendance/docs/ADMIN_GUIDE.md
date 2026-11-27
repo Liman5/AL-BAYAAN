@@ -100,6 +100,29 @@ Aucun bouton à presser, aucune confirmation manuelle.
 Le bouton en forme d'appareil photo inversé bascule entre la caméra avant et
 la caméra arrière. Le choix est mémorisé pour les fois suivantes.
 
+### Activer la voix
+
+**Paramètres → Retour vocal** :
+
+1. activer « Activer la voix » ;
+2. personnaliser les 4 phrases (scan accepté, retard, déjà enregistré, refus) ;
+3. appuyer sur **Tester la voix**.
+
+Le terminal prononce la phrase correspondante à chaque scan. La voix fonctionne
+**sans Internet** et ne dépend d'aucun fichier à télécharger.
+
+### Mettre à jour l'application
+
+Lorsqu'une nouvelle version est publiée, un encart **« Mise à jour
+disponible »** apparaît dans **Paramètres → Connexion à AL-BAYAAN**. Appuyer
+sur le bouton : l'APK se télécharge dans le navigateur, puis l'installer
+par-dessus l'ancienne version — **les présences et les élèves déjà
+enregistrés sont conservés**.
+
+> Une mise à jour ne doit jamais être installée si Android affiche
+> « Application non installée » : cela signifie que la nouvelle version n'a
+> pas été signée avec la même clé.
+
 ---
 
 ## 4. Gérer les cas particuliers

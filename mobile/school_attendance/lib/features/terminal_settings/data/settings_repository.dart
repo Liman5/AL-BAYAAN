@@ -86,4 +86,25 @@ class SettingsRepository {
       SettingsCompanion(lastAttendanceSync: Value(at)),
     );
   }
+
+  /// Trace la dernière tentative de synchronisation (diagnostic terrain).
+  /// `error == null` signifie « tentative réussie ».
+  Future<void> markSyncAttempt({String? error}) async {
+    await (_db.update(_db.settings)..where((t) => t.id.equals(1))).write(
+      SettingsCompanion(
+        lastSyncAttempt: Value(DateTime.now().toUtc()),
+        lastSyncError: Value(error),
+      ),
+    );
+  }
+
+  /// Active/désactive la synchronisation automatique après appairage.
+  Future<void> setSyncEnabled(bool enabled) async {
+    await (_db.update(_db.settings)..where((t) => t.id.equals(1))).write(
+      SettingsCompanion(
+        apiEnabled: Value(enabled),
+        offlineMode: Value(!enabled),
+      ),
+    );
+  }
 }

@@ -2192,6 +2192,60 @@ class $SettingsTable extends Settings
   late final GeneratedColumn<String> apiBaseUrl = GeneratedColumn<String>(
       'api_base_url', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _lastSyncAttemptMeta =
+      const VerificationMeta('lastSyncAttempt');
+  @override
+  late final GeneratedColumn<DateTime> lastSyncAttempt =
+      GeneratedColumn<DateTime>('last_sync_attempt', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _lastSyncErrorMeta =
+      const VerificationMeta('lastSyncError');
+  @override
+  late final GeneratedColumn<String> lastSyncError = GeneratedColumn<String>(
+      'last_sync_error', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _voiceEnabledMeta =
+      const VerificationMeta('voiceEnabled');
+  @override
+  late final GeneratedColumn<bool> voiceEnabled = GeneratedColumn<bool>(
+      'voice_enabled', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("voice_enabled" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _voiceSuccessMeta =
+      const VerificationMeta('voiceSuccess');
+  @override
+  late final GeneratedColumn<String> voiceSuccess = GeneratedColumn<String>(
+      'voice_success', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('Présence enregistrée'));
+  static const VerificationMeta _voiceLateMeta =
+      const VerificationMeta('voiceLate');
+  @override
+  late final GeneratedColumn<String> voiceLate = GeneratedColumn<String>(
+      'voice_late', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('En retard'));
+  static const VerificationMeta _voiceDuplicateMeta =
+      const VerificationMeta('voiceDuplicate');
+  @override
+  late final GeneratedColumn<String> voiceDuplicate = GeneratedColumn<String>(
+      'voice_duplicate', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('Déjà enregistré'));
+  static const VerificationMeta _voiceRefusedMeta =
+      const VerificationMeta('voiceRefused');
+  @override
+  late final GeneratedColumn<String> voiceRefused = GeneratedColumn<String>(
+      'voice_refused', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('Accès refusé'));
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -2218,7 +2272,14 @@ class $SettingsTable extends Settings
         lastStudentSync,
         lastAttendanceSync,
         apiEnabled,
-        apiBaseUrl
+        apiBaseUrl,
+        lastSyncAttempt,
+        lastSyncError,
+        voiceEnabled,
+        voiceSuccess,
+        voiceLate,
+        voiceDuplicate,
+        voiceRefused
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2371,6 +2432,46 @@ class $SettingsTable extends Settings
           apiBaseUrl.isAcceptableOrUnknown(
               data['api_base_url']!, _apiBaseUrlMeta));
     }
+    if (data.containsKey('last_sync_attempt')) {
+      context.handle(
+          _lastSyncAttemptMeta,
+          lastSyncAttempt.isAcceptableOrUnknown(
+              data['last_sync_attempt']!, _lastSyncAttemptMeta));
+    }
+    if (data.containsKey('last_sync_error')) {
+      context.handle(
+          _lastSyncErrorMeta,
+          lastSyncError.isAcceptableOrUnknown(
+              data['last_sync_error']!, _lastSyncErrorMeta));
+    }
+    if (data.containsKey('voice_enabled')) {
+      context.handle(
+          _voiceEnabledMeta,
+          voiceEnabled.isAcceptableOrUnknown(
+              data['voice_enabled']!, _voiceEnabledMeta));
+    }
+    if (data.containsKey('voice_success')) {
+      context.handle(
+          _voiceSuccessMeta,
+          voiceSuccess.isAcceptableOrUnknown(
+              data['voice_success']!, _voiceSuccessMeta));
+    }
+    if (data.containsKey('voice_late')) {
+      context.handle(_voiceLateMeta,
+          voiceLate.isAcceptableOrUnknown(data['voice_late']!, _voiceLateMeta));
+    }
+    if (data.containsKey('voice_duplicate')) {
+      context.handle(
+          _voiceDuplicateMeta,
+          voiceDuplicate.isAcceptableOrUnknown(
+              data['voice_duplicate']!, _voiceDuplicateMeta));
+    }
+    if (data.containsKey('voice_refused')) {
+      context.handle(
+          _voiceRefusedMeta,
+          voiceRefused.isAcceptableOrUnknown(
+              data['voice_refused']!, _voiceRefusedMeta));
+    }
     return context;
   }
 
@@ -2434,6 +2535,20 @@ class $SettingsTable extends Settings
           .read(DriftSqlType.bool, data['${effectivePrefix}api_enabled'])!,
       apiBaseUrl: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}api_base_url']),
+      lastSyncAttempt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}last_sync_attempt']),
+      lastSyncError: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}last_sync_error']),
+      voiceEnabled: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}voice_enabled'])!,
+      voiceSuccess: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}voice_success'])!,
+      voiceLate: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}voice_late'])!,
+      voiceDuplicate: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}voice_duplicate'])!,
+      voiceRefused: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}voice_refused'])!,
     );
   }
 
@@ -2482,6 +2597,17 @@ class TerminalSettings extends DataClass
   /// Synchronisation vers la plateforme centrale : désactivée par défaut.
   final bool apiEnabled;
   final String? apiBaseUrl;
+
+  /// Diagnostic de la dernière tentative de synchronisation.
+  final DateTime? lastSyncAttempt;
+  final String? lastSyncError;
+
+  /// Retour vocal (Text-to-Speech) — messages définis par l'administrateur.
+  final bool voiceEnabled;
+  final String voiceSuccess;
+  final String voiceLate;
+  final String voiceDuplicate;
+  final String voiceRefused;
   const TerminalSettings(
       {required this.id,
       required this.terminalId,
@@ -2507,7 +2633,14 @@ class TerminalSettings extends DataClass
       this.lastStudentSync,
       this.lastAttendanceSync,
       required this.apiEnabled,
-      this.apiBaseUrl});
+      this.apiBaseUrl,
+      this.lastSyncAttempt,
+      this.lastSyncError,
+      required this.voiceEnabled,
+      required this.voiceSuccess,
+      required this.voiceLate,
+      required this.voiceDuplicate,
+      required this.voiceRefused});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2546,6 +2679,17 @@ class TerminalSettings extends DataClass
     if (!nullToAbsent || apiBaseUrl != null) {
       map['api_base_url'] = Variable<String>(apiBaseUrl);
     }
+    if (!nullToAbsent || lastSyncAttempt != null) {
+      map['last_sync_attempt'] = Variable<DateTime>(lastSyncAttempt);
+    }
+    if (!nullToAbsent || lastSyncError != null) {
+      map['last_sync_error'] = Variable<String>(lastSyncError);
+    }
+    map['voice_enabled'] = Variable<bool>(voiceEnabled);
+    map['voice_success'] = Variable<String>(voiceSuccess);
+    map['voice_late'] = Variable<String>(voiceLate);
+    map['voice_duplicate'] = Variable<String>(voiceDuplicate);
+    map['voice_refused'] = Variable<String>(voiceRefused);
     return map;
   }
 
@@ -2586,6 +2730,17 @@ class TerminalSettings extends DataClass
       apiBaseUrl: apiBaseUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(apiBaseUrl),
+      lastSyncAttempt: lastSyncAttempt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncAttempt),
+      lastSyncError: lastSyncError == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncError),
+      voiceEnabled: Value(voiceEnabled),
+      voiceSuccess: Value(voiceSuccess),
+      voiceLate: Value(voiceLate),
+      voiceDuplicate: Value(voiceDuplicate),
+      voiceRefused: Value(voiceRefused),
     );
   }
 
@@ -2622,6 +2777,13 @@ class TerminalSettings extends DataClass
           serializer.fromJson<DateTime?>(json['lastAttendanceSync']),
       apiEnabled: serializer.fromJson<bool>(json['apiEnabled']),
       apiBaseUrl: serializer.fromJson<String?>(json['apiBaseUrl']),
+      lastSyncAttempt: serializer.fromJson<DateTime?>(json['lastSyncAttempt']),
+      lastSyncError: serializer.fromJson<String?>(json['lastSyncError']),
+      voiceEnabled: serializer.fromJson<bool>(json['voiceEnabled']),
+      voiceSuccess: serializer.fromJson<String>(json['voiceSuccess']),
+      voiceLate: serializer.fromJson<String>(json['voiceLate']),
+      voiceDuplicate: serializer.fromJson<String>(json['voiceDuplicate']),
+      voiceRefused: serializer.fromJson<String>(json['voiceRefused']),
     );
   }
   @override
@@ -2653,6 +2815,13 @@ class TerminalSettings extends DataClass
       'lastAttendanceSync': serializer.toJson<DateTime?>(lastAttendanceSync),
       'apiEnabled': serializer.toJson<bool>(apiEnabled),
       'apiBaseUrl': serializer.toJson<String?>(apiBaseUrl),
+      'lastSyncAttempt': serializer.toJson<DateTime?>(lastSyncAttempt),
+      'lastSyncError': serializer.toJson<String?>(lastSyncError),
+      'voiceEnabled': serializer.toJson<bool>(voiceEnabled),
+      'voiceSuccess': serializer.toJson<String>(voiceSuccess),
+      'voiceLate': serializer.toJson<String>(voiceLate),
+      'voiceDuplicate': serializer.toJson<String>(voiceDuplicate),
+      'voiceRefused': serializer.toJson<String>(voiceRefused),
     };
   }
 
@@ -2681,7 +2850,14 @@ class TerminalSettings extends DataClass
           Value<DateTime?> lastStudentSync = const Value.absent(),
           Value<DateTime?> lastAttendanceSync = const Value.absent(),
           bool? apiEnabled,
-          Value<String?> apiBaseUrl = const Value.absent()}) =>
+          Value<String?> apiBaseUrl = const Value.absent(),
+          Value<DateTime?> lastSyncAttempt = const Value.absent(),
+          Value<String?> lastSyncError = const Value.absent(),
+          bool? voiceEnabled,
+          String? voiceSuccess,
+          String? voiceLate,
+          String? voiceDuplicate,
+          String? voiceRefused}) =>
       TerminalSettings(
         id: id ?? this.id,
         terminalId: terminalId ?? this.terminalId,
@@ -2714,6 +2890,16 @@ class TerminalSettings extends DataClass
             : this.lastAttendanceSync,
         apiEnabled: apiEnabled ?? this.apiEnabled,
         apiBaseUrl: apiBaseUrl.present ? apiBaseUrl.value : this.apiBaseUrl,
+        lastSyncAttempt: lastSyncAttempt.present
+            ? lastSyncAttempt.value
+            : this.lastSyncAttempt,
+        lastSyncError:
+            lastSyncError.present ? lastSyncError.value : this.lastSyncError,
+        voiceEnabled: voiceEnabled ?? this.voiceEnabled,
+        voiceSuccess: voiceSuccess ?? this.voiceSuccess,
+        voiceLate: voiceLate ?? this.voiceLate,
+        voiceDuplicate: voiceDuplicate ?? this.voiceDuplicate,
+        voiceRefused: voiceRefused ?? this.voiceRefused,
       );
   TerminalSettings copyWithCompanion(SettingsCompanion data) {
     return TerminalSettings(
@@ -2777,6 +2963,25 @@ class TerminalSettings extends DataClass
           data.apiEnabled.present ? data.apiEnabled.value : this.apiEnabled,
       apiBaseUrl:
           data.apiBaseUrl.present ? data.apiBaseUrl.value : this.apiBaseUrl,
+      lastSyncAttempt: data.lastSyncAttempt.present
+          ? data.lastSyncAttempt.value
+          : this.lastSyncAttempt,
+      lastSyncError: data.lastSyncError.present
+          ? data.lastSyncError.value
+          : this.lastSyncError,
+      voiceEnabled: data.voiceEnabled.present
+          ? data.voiceEnabled.value
+          : this.voiceEnabled,
+      voiceSuccess: data.voiceSuccess.present
+          ? data.voiceSuccess.value
+          : this.voiceSuccess,
+      voiceLate: data.voiceLate.present ? data.voiceLate.value : this.voiceLate,
+      voiceDuplicate: data.voiceDuplicate.present
+          ? data.voiceDuplicate.value
+          : this.voiceDuplicate,
+      voiceRefused: data.voiceRefused.present
+          ? data.voiceRefused.value
+          : this.voiceRefused,
     );
   }
 
@@ -2807,7 +3012,14 @@ class TerminalSettings extends DataClass
           ..write('lastStudentSync: $lastStudentSync, ')
           ..write('lastAttendanceSync: $lastAttendanceSync, ')
           ..write('apiEnabled: $apiEnabled, ')
-          ..write('apiBaseUrl: $apiBaseUrl')
+          ..write('apiBaseUrl: $apiBaseUrl, ')
+          ..write('lastSyncAttempt: $lastSyncAttempt, ')
+          ..write('lastSyncError: $lastSyncError, ')
+          ..write('voiceEnabled: $voiceEnabled, ')
+          ..write('voiceSuccess: $voiceSuccess, ')
+          ..write('voiceLate: $voiceLate, ')
+          ..write('voiceDuplicate: $voiceDuplicate, ')
+          ..write('voiceRefused: $voiceRefused')
           ..write(')'))
         .toString();
   }
@@ -2838,7 +3050,14 @@ class TerminalSettings extends DataClass
         lastStudentSync,
         lastAttendanceSync,
         apiEnabled,
-        apiBaseUrl
+        apiBaseUrl,
+        lastSyncAttempt,
+        lastSyncError,
+        voiceEnabled,
+        voiceSuccess,
+        voiceLate,
+        voiceDuplicate,
+        voiceRefused
       ]);
   @override
   bool operator ==(Object other) =>
@@ -2868,7 +3087,14 @@ class TerminalSettings extends DataClass
           other.lastStudentSync == this.lastStudentSync &&
           other.lastAttendanceSync == this.lastAttendanceSync &&
           other.apiEnabled == this.apiEnabled &&
-          other.apiBaseUrl == this.apiBaseUrl);
+          other.apiBaseUrl == this.apiBaseUrl &&
+          other.lastSyncAttempt == this.lastSyncAttempt &&
+          other.lastSyncError == this.lastSyncError &&
+          other.voiceEnabled == this.voiceEnabled &&
+          other.voiceSuccess == this.voiceSuccess &&
+          other.voiceLate == this.voiceLate &&
+          other.voiceDuplicate == this.voiceDuplicate &&
+          other.voiceRefused == this.voiceRefused);
 }
 
 class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
@@ -2897,6 +3123,13 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
   final Value<DateTime?> lastAttendanceSync;
   final Value<bool> apiEnabled;
   final Value<String?> apiBaseUrl;
+  final Value<DateTime?> lastSyncAttempt;
+  final Value<String?> lastSyncError;
+  final Value<bool> voiceEnabled;
+  final Value<String> voiceSuccess;
+  final Value<String> voiceLate;
+  final Value<String> voiceDuplicate;
+  final Value<String> voiceRefused;
   const SettingsCompanion({
     this.id = const Value.absent(),
     this.terminalId = const Value.absent(),
@@ -2923,6 +3156,13 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
     this.lastAttendanceSync = const Value.absent(),
     this.apiEnabled = const Value.absent(),
     this.apiBaseUrl = const Value.absent(),
+    this.lastSyncAttempt = const Value.absent(),
+    this.lastSyncError = const Value.absent(),
+    this.voiceEnabled = const Value.absent(),
+    this.voiceSuccess = const Value.absent(),
+    this.voiceLate = const Value.absent(),
+    this.voiceDuplicate = const Value.absent(),
+    this.voiceRefused = const Value.absent(),
   });
   SettingsCompanion.insert({
     this.id = const Value.absent(),
@@ -2950,6 +3190,13 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
     this.lastAttendanceSync = const Value.absent(),
     this.apiEnabled = const Value.absent(),
     this.apiBaseUrl = const Value.absent(),
+    this.lastSyncAttempt = const Value.absent(),
+    this.lastSyncError = const Value.absent(),
+    this.voiceEnabled = const Value.absent(),
+    this.voiceSuccess = const Value.absent(),
+    this.voiceLate = const Value.absent(),
+    this.voiceDuplicate = const Value.absent(),
+    this.voiceRefused = const Value.absent(),
   }) : terminalId = Value(terminalId);
   static Insertable<TerminalSettings> custom({
     Expression<int>? id,
@@ -2977,6 +3224,13 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
     Expression<DateTime>? lastAttendanceSync,
     Expression<bool>? apiEnabled,
     Expression<String>? apiBaseUrl,
+    Expression<DateTime>? lastSyncAttempt,
+    Expression<String>? lastSyncError,
+    Expression<bool>? voiceEnabled,
+    Expression<String>? voiceSuccess,
+    Expression<String>? voiceLate,
+    Expression<String>? voiceDuplicate,
+    Expression<String>? voiceRefused,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3008,6 +3262,13 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
         'last_attendance_sync': lastAttendanceSync,
       if (apiEnabled != null) 'api_enabled': apiEnabled,
       if (apiBaseUrl != null) 'api_base_url': apiBaseUrl,
+      if (lastSyncAttempt != null) 'last_sync_attempt': lastSyncAttempt,
+      if (lastSyncError != null) 'last_sync_error': lastSyncError,
+      if (voiceEnabled != null) 'voice_enabled': voiceEnabled,
+      if (voiceSuccess != null) 'voice_success': voiceSuccess,
+      if (voiceLate != null) 'voice_late': voiceLate,
+      if (voiceDuplicate != null) 'voice_duplicate': voiceDuplicate,
+      if (voiceRefused != null) 'voice_refused': voiceRefused,
     });
   }
 
@@ -3036,7 +3297,14 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
       Value<DateTime?>? lastStudentSync,
       Value<DateTime?>? lastAttendanceSync,
       Value<bool>? apiEnabled,
-      Value<String?>? apiBaseUrl}) {
+      Value<String?>? apiBaseUrl,
+      Value<DateTime?>? lastSyncAttempt,
+      Value<String?>? lastSyncError,
+      Value<bool>? voiceEnabled,
+      Value<String>? voiceSuccess,
+      Value<String>? voiceLate,
+      Value<String>? voiceDuplicate,
+      Value<String>? voiceRefused}) {
     return SettingsCompanion(
       id: id ?? this.id,
       terminalId: terminalId ?? this.terminalId,
@@ -3063,6 +3331,13 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
       lastAttendanceSync: lastAttendanceSync ?? this.lastAttendanceSync,
       apiEnabled: apiEnabled ?? this.apiEnabled,
       apiBaseUrl: apiBaseUrl ?? this.apiBaseUrl,
+      lastSyncAttempt: lastSyncAttempt ?? this.lastSyncAttempt,
+      lastSyncError: lastSyncError ?? this.lastSyncError,
+      voiceEnabled: voiceEnabled ?? this.voiceEnabled,
+      voiceSuccess: voiceSuccess ?? this.voiceSuccess,
+      voiceLate: voiceLate ?? this.voiceLate,
+      voiceDuplicate: voiceDuplicate ?? this.voiceDuplicate,
+      voiceRefused: voiceRefused ?? this.voiceRefused,
     );
   }
 
@@ -3148,6 +3423,27 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
     if (apiBaseUrl.present) {
       map['api_base_url'] = Variable<String>(apiBaseUrl.value);
     }
+    if (lastSyncAttempt.present) {
+      map['last_sync_attempt'] = Variable<DateTime>(lastSyncAttempt.value);
+    }
+    if (lastSyncError.present) {
+      map['last_sync_error'] = Variable<String>(lastSyncError.value);
+    }
+    if (voiceEnabled.present) {
+      map['voice_enabled'] = Variable<bool>(voiceEnabled.value);
+    }
+    if (voiceSuccess.present) {
+      map['voice_success'] = Variable<String>(voiceSuccess.value);
+    }
+    if (voiceLate.present) {
+      map['voice_late'] = Variable<String>(voiceLate.value);
+    }
+    if (voiceDuplicate.present) {
+      map['voice_duplicate'] = Variable<String>(voiceDuplicate.value);
+    }
+    if (voiceRefused.present) {
+      map['voice_refused'] = Variable<String>(voiceRefused.value);
+    }
     return map;
   }
 
@@ -3178,7 +3474,14 @@ class SettingsCompanion extends UpdateCompanion<TerminalSettings> {
           ..write('lastStudentSync: $lastStudentSync, ')
           ..write('lastAttendanceSync: $lastAttendanceSync, ')
           ..write('apiEnabled: $apiEnabled, ')
-          ..write('apiBaseUrl: $apiBaseUrl')
+          ..write('apiBaseUrl: $apiBaseUrl, ')
+          ..write('lastSyncAttempt: $lastSyncAttempt, ')
+          ..write('lastSyncError: $lastSyncError, ')
+          ..write('voiceEnabled: $voiceEnabled, ')
+          ..write('voiceSuccess: $voiceSuccess, ')
+          ..write('voiceLate: $voiceLate, ')
+          ..write('voiceDuplicate: $voiceDuplicate, ')
+          ..write('voiceRefused: $voiceRefused')
           ..write(')'))
         .toString();
   }
@@ -4947,6 +5250,13 @@ typedef $$SettingsTableCreateCompanionBuilder = SettingsCompanion Function({
   Value<DateTime?> lastAttendanceSync,
   Value<bool> apiEnabled,
   Value<String?> apiBaseUrl,
+  Value<DateTime?> lastSyncAttempt,
+  Value<String?> lastSyncError,
+  Value<bool> voiceEnabled,
+  Value<String> voiceSuccess,
+  Value<String> voiceLate,
+  Value<String> voiceDuplicate,
+  Value<String> voiceRefused,
 });
 typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
   Value<int> id,
@@ -4974,6 +5284,13 @@ typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
   Value<DateTime?> lastAttendanceSync,
   Value<bool> apiEnabled,
   Value<String?> apiBaseUrl,
+  Value<DateTime?> lastSyncAttempt,
+  Value<String?> lastSyncError,
+  Value<bool> voiceEnabled,
+  Value<String> voiceSuccess,
+  Value<String> voiceLate,
+  Value<String> voiceDuplicate,
+  Value<String> voiceRefused,
 });
 
 class $$SettingsTableFilterComposer
@@ -5067,6 +5384,29 @@ class $$SettingsTableFilterComposer
 
   ColumnFilters<String> get apiBaseUrl => $composableBuilder(
       column: $table.apiBaseUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastSyncAttempt => $composableBuilder(
+      column: $table.lastSyncAttempt,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get lastSyncError => $composableBuilder(
+      column: $table.lastSyncError, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get voiceEnabled => $composableBuilder(
+      column: $table.voiceEnabled, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get voiceSuccess => $composableBuilder(
+      column: $table.voiceSuccess, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get voiceLate => $composableBuilder(
+      column: $table.voiceLate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get voiceDuplicate => $composableBuilder(
+      column: $table.voiceDuplicate,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get voiceRefused => $composableBuilder(
+      column: $table.voiceRefused, builder: (column) => ColumnFilters(column));
 }
 
 class $$SettingsTableOrderingComposer
@@ -5167,6 +5507,33 @@ class $$SettingsTableOrderingComposer
 
   ColumnOrderings<String> get apiBaseUrl => $composableBuilder(
       column: $table.apiBaseUrl, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastSyncAttempt => $composableBuilder(
+      column: $table.lastSyncAttempt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get lastSyncError => $composableBuilder(
+      column: $table.lastSyncError,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get voiceEnabled => $composableBuilder(
+      column: $table.voiceEnabled,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get voiceSuccess => $composableBuilder(
+      column: $table.voiceSuccess,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get voiceLate => $composableBuilder(
+      column: $table.voiceLate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get voiceDuplicate => $composableBuilder(
+      column: $table.voiceDuplicate,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get voiceRefused => $composableBuilder(
+      column: $table.voiceRefused,
+      builder: (column) => ColumnOrderings(column));
 }
 
 class $$SettingsTableAnnotationComposer
@@ -5252,6 +5619,27 @@ class $$SettingsTableAnnotationComposer
 
   GeneratedColumn<String> get apiBaseUrl => $composableBuilder(
       column: $table.apiBaseUrl, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSyncAttempt => $composableBuilder(
+      column: $table.lastSyncAttempt, builder: (column) => column);
+
+  GeneratedColumn<String> get lastSyncError => $composableBuilder(
+      column: $table.lastSyncError, builder: (column) => column);
+
+  GeneratedColumn<bool> get voiceEnabled => $composableBuilder(
+      column: $table.voiceEnabled, builder: (column) => column);
+
+  GeneratedColumn<String> get voiceSuccess => $composableBuilder(
+      column: $table.voiceSuccess, builder: (column) => column);
+
+  GeneratedColumn<String> get voiceLate =>
+      $composableBuilder(column: $table.voiceLate, builder: (column) => column);
+
+  GeneratedColumn<String> get voiceDuplicate => $composableBuilder(
+      column: $table.voiceDuplicate, builder: (column) => column);
+
+  GeneratedColumn<String> get voiceRefused => $composableBuilder(
+      column: $table.voiceRefused, builder: (column) => column);
 }
 
 class $$SettingsTableTableManager extends RootTableManager<
@@ -5305,6 +5693,13 @@ class $$SettingsTableTableManager extends RootTableManager<
             Value<DateTime?> lastAttendanceSync = const Value.absent(),
             Value<bool> apiEnabled = const Value.absent(),
             Value<String?> apiBaseUrl = const Value.absent(),
+            Value<DateTime?> lastSyncAttempt = const Value.absent(),
+            Value<String?> lastSyncError = const Value.absent(),
+            Value<bool> voiceEnabled = const Value.absent(),
+            Value<String> voiceSuccess = const Value.absent(),
+            Value<String> voiceLate = const Value.absent(),
+            Value<String> voiceDuplicate = const Value.absent(),
+            Value<String> voiceRefused = const Value.absent(),
           }) =>
               SettingsCompanion(
             id: id,
@@ -5332,6 +5727,13 @@ class $$SettingsTableTableManager extends RootTableManager<
             lastAttendanceSync: lastAttendanceSync,
             apiEnabled: apiEnabled,
             apiBaseUrl: apiBaseUrl,
+            lastSyncAttempt: lastSyncAttempt,
+            lastSyncError: lastSyncError,
+            voiceEnabled: voiceEnabled,
+            voiceSuccess: voiceSuccess,
+            voiceLate: voiceLate,
+            voiceDuplicate: voiceDuplicate,
+            voiceRefused: voiceRefused,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -5359,6 +5761,13 @@ class $$SettingsTableTableManager extends RootTableManager<
             Value<DateTime?> lastAttendanceSync = const Value.absent(),
             Value<bool> apiEnabled = const Value.absent(),
             Value<String?> apiBaseUrl = const Value.absent(),
+            Value<DateTime?> lastSyncAttempt = const Value.absent(),
+            Value<String?> lastSyncError = const Value.absent(),
+            Value<bool> voiceEnabled = const Value.absent(),
+            Value<String> voiceSuccess = const Value.absent(),
+            Value<String> voiceLate = const Value.absent(),
+            Value<String> voiceDuplicate = const Value.absent(),
+            Value<String> voiceRefused = const Value.absent(),
           }) =>
               SettingsCompanion.insert(
             id: id,
@@ -5386,6 +5795,13 @@ class $$SettingsTableTableManager extends RootTableManager<
             lastAttendanceSync: lastAttendanceSync,
             apiEnabled: apiEnabled,
             apiBaseUrl: apiBaseUrl,
+            lastSyncAttempt: lastSyncAttempt,
+            lastSyncError: lastSyncError,
+            voiceEnabled: voiceEnabled,
+            voiceSuccess: voiceSuccess,
+            voiceLate: voiceLate,
+            voiceDuplicate: voiceDuplicate,
+            voiceRefused: voiceRefused,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (

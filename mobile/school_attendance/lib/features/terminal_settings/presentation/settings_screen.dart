@@ -215,6 +215,85 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SectionTitle(
+                  title: 'Retour vocal',
+                  subtitle:
+                      'Phrases prononcées par le terminal (synthèse vocale, hors ligne)',
+                ),
+                const SizedBox(height: 8),
+                SwitchRow(
+                  label: 'Activer la voix',
+                  value: settings.voiceEnabled,
+                  onChanged: (value) =>
+                      _update(settings.copyWith(voiceEnabled: value)),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  key: const ValueKey('voice-success'),
+                  enabled: settings.voiceEnabled,
+                  decoration: const InputDecoration(
+                    labelText: 'Scan accepté (à l’heure)',
+                    helperText: 'Ex. « Présence enregistrée »',
+                  ),
+                  initialValue: settings.voiceSuccess,
+                  onChanged: (value) =>
+                      _update(settings.copyWith(voiceSuccess: value)),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  key: const ValueKey('voice-late'),
+                  enabled: settings.voiceEnabled,
+                  decoration: const InputDecoration(
+                    labelText: 'Scan accepté en retard',
+                    helperText: 'Ex. « En retard »',
+                  ),
+                  initialValue: settings.voiceLate,
+                  onChanged: (value) =>
+                      _update(settings.copyWith(voiceLate: value)),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  key: const ValueKey('voice-duplicate'),
+                  enabled: settings.voiceEnabled,
+                  decoration: const InputDecoration(
+                    labelText: 'Déjà scanné aujourd’hui',
+                    helperText: 'Ex. « Déjà enregistré »',
+                  ),
+                  initialValue: settings.voiceDuplicate,
+                  onChanged: (value) =>
+                      _update(settings.copyWith(voiceDuplicate: value)),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  key: const ValueKey('voice-refused'),
+                  enabled: settings.voiceEnabled,
+                  decoration: const InputDecoration(
+                    labelText: 'Scan refusé',
+                    helperText: 'Ex. « Accès refusé »',
+                  ),
+                  initialValue: settings.voiceRefused,
+                  onChanged: (value) =>
+                      _update(settings.copyWith(voiceRefused: value)),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.volume_up_rounded, size: 18),
+                    label: const Text('Tester la voix'),
+                    onPressed: () => ref
+                        .read(voiceFeedbackProvider)
+                        .speakText(settings.voiceSuccess),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SectionTitle(
                   title: 'Données & rétention',
                   subtitle: 'Les scans non synchronisés ne sont jamais purgés',
                 ),

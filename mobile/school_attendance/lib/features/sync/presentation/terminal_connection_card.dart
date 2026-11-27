@@ -1,10 +1,13 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../app/config/app_config.dart';
 import '../../../app/providers/app_providers.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../core/sync/sync_models.dart';
+import '../../../core/update/update_service.dart';
 import '../../../core/widgets/app_widgets.dart';
 import '../../../core/widgets/list_tiles.dart';
 
@@ -35,6 +38,10 @@ class _TerminalConnectionCardState
   bool _syncing = false;
   String? _message;
   bool _messageIsError = false;
+
+  UpdateInfo? _update;
+  bool _updateChecked = false;
+  bool _checkingUpdate = false;
 
   @override
   void dispose() {
@@ -75,12 +82,10 @@ class _TerminalConnectionCardState
       final settingsRepository = ref.read(settingsRepositoryProvider);
       final current = await settingsRepository.current();
 
-      // Le terminal appairé autorise la synchronisation ; le scan reste
+      // L'appairage autorise la synchronisation automatique ; le scan reste
       // évidemment possible sans réseau.
       await settingsRepository.save(
         current.copyWith(
-          apiEnabled: true,
-          offlineMode: false,
           apiBaseUrl: Value(credentials.baseUrl),
           schoolName: credentials.schoolName ?? current.schoolName,
           schoolId: Value(credentials.schoolId),
@@ -88,6 +93,7 @@ class _TerminalConnectionCardState
               credentials.terminalName ?? current.terminalDisplayName,
         ),
       );
+      await settingsRepository.setSyncEnabled(true);
 
       ref.read(terminalCredentialsProvider.notifier).state = credentials;
       _pairingCode.clear();
@@ -109,10 +115,10 @@ class _TerminalConnectionCardState
     });
 
     try {
-      final service = ref.read(syncServiceProvider);
-      final result = await service.run();
+      final result = await ref.read(syncEngineProvider).syncNow();
       _notify(
-        result.message,
+        '${result.message}\n'
+        'Envoyés : ${result.pushed} · Reçus : ${result.pulled}',
         isError: result.state == SyncState.failure,
       );
     } catch (error) {
@@ -158,6 +164,43 @@ class _TerminalConnectionCardState
     _notify('Terminal dissocié. Le scan continue de fonctionner hors ligne.');
   }
 
+  /// Vérifie si une version plus récente est publiée sur la plateforme.
+  /// Silencieux en cas d'échec : aucune mise à jour n'est inventée.
+  Future<void> _checkUpdate() async {
+    final credentials = ref.read(terminalCredentialsProvider);
+    if (credentials == null || _checkingUpdate || _updateChecked) return;
+
+    setState(() {
+      _checkingUpdate = true;
+      _updateChecked = true;
+    });
+
+    final info = await UpdateService().check(
+      baseUrl: credentials.baseUrl,
+      currentVersion: AppConfig.appVersion,
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _update = info;
+      _checkingUpdate = false;
+    });
+  }
+
+  Future<void> _openUpdate() async {
+    final info = _update;
+    if (info == null) return;
+    try {
+      final uri = Uri.parse(info.apkUrl);
+      final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!opened) {
+        _notify('Lien de mise à jour indisponible : ${info.apkUrl}', isError: true);
+      }
+    } catch (error) {
+      _notify('Ouverture du lien impossible : $error', isError: true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final credentials = ref.watch(terminalCredentialsProvider);
@@ -174,6 +217,10 @@ class _TerminalConnectionCardState
     }
 
     final paired = credentials != null && credentials.isComplete;
+
+    if (paired && !_updateChecked) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _checkUpdate());
+    }
 
     return AppCard(
       child: Column(
@@ -243,6 +290,96 @@ class _TerminalConnectionCardState
                   ? 'Jamais'
                   : _formatDateTime(settings!.lastStudentSync!),
             ),
+            InfoLine(
+              label: 'Dernier essai',
+              value: settings?.lastSyncAttempt == null
+                  ? 'Jamais'
+                  : _formatDateTime(settings!.lastSyncAttempt!),
+            ),
+            if ((settings?.lastSyncError ?? '').isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.danger.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Dernière erreur de synchronisation',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.danger,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      settings!.lastSyncError!,
+                      style: const TextStyle(fontSize: 11.5, color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            const SizedBox(height: 6),
+            Text(
+              settings?.offlineMode == true
+                  ? 'Mode « hors ligne » activé : aucun envoi automatique.'
+                  : 'Envoi automatique actif (démarrage, retour du réseau, toutes les 45 s).',
+              style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+            ),
+            if (_update != null) ...[
+              const SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.blue.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Mise à jour disponible : v${_update!.version}',
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.blue,
+                      ),
+                    ),
+                    if (_update!.notes.isNotEmpty) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        _update!.notes,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: _openUpdate,
+                        icon: const Icon(Icons.system_update_rounded, size: 18),
+                        label: Text('Télécharger la v${_update!.version}'),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Les présences déjà enregistrées sont conservées.',
+                      style: TextStyle(fontSize: 10.5, color: AppColors.textMuted),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,

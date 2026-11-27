@@ -8,7 +8,9 @@ import '../../core/scanner/qr_payload_parser.dart';
 import '../../core/security/pin_service.dart';
 import '../../core/sync/remote_sync_api.dart';
 import '../../core/sync/sync_api.dart';
+import '../../core/sync/sync_engine.dart';
 import '../../core/sync/sync_service.dart';
+import '../../core/voice/voice_feedback.dart';
 import '../../core/utils/app_time.dart';
 import '../../features/attendance_scanner/data/attendance_repository.dart';
 import '../../features/attendance_scanner/domain/scan_service.dart';
@@ -131,6 +133,20 @@ final syncServiceProvider = Provider<SyncService>((ref) {
     clock: ref.watch(clockProvider),
   );
 });
+
+/// Moteur de synchronisation automatique (démarrage, réseau, périodique).
+final syncEngineProvider = Provider<SyncEngine>((ref) {
+  final engine = SyncEngine(
+    service: ref.watch(syncServiceProvider),
+    settings: ref.watch(settingsRepositoryProvider),
+    queue: ref.watch(syncRepositoryProvider),
+  );
+  ref.onDispose(engine.stop);
+  return engine;
+});
+
+/// Retour vocal configurable (TTS Android, hors ligne).
+final voiceFeedbackProvider = Provider<VoiceFeedback>((ref) => VoiceFeedback());
 
 /// Clé de la journée courante, rafraîchie automatiquement (changement de jour).
 final todayKeyProvider = StreamProvider<String>((ref) async* {

@@ -175,6 +175,19 @@ class Settings extends Table {
   BoolColumn get apiEnabled => boolean().withDefault(const Constant(false))();
   TextColumn get apiBaseUrl => text().nullable()();
 
+  /// Diagnostic de la dernière tentative de synchronisation.
+  DateTimeColumn get lastSyncAttempt => dateTime().nullable()();
+  TextColumn get lastSyncError => text().nullable()();
+
+  /// Retour vocal (Text-to-Speech) — messages définis par l'administrateur.
+  BoolColumn get voiceEnabled => boolean().withDefault(const Constant(false))();
+  TextColumn get voiceSuccess =>
+      text().withDefault(const Constant('Présence enregistrée'))();
+  TextColumn get voiceLate => text().withDefault(const Constant('En retard'))();
+  TextColumn get voiceDuplicate =>
+      text().withDefault(const Constant('Déjà enregistré'))();
+  TextColumn get voiceRefused => text().withDefault(const Constant('Accès refusé'))();
+
   @override
   Set<Column> get primaryKey => {id};
 }

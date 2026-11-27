@@ -46,17 +46,30 @@ class SyncService {
   Future<SyncResult> run() async {
     final settings = await _settings.current();
 
-    if (!settings.apiEnabled || !_api.isConfigured) {
-      return const SyncResult.notConfigured();
+    if (!_api.isConfigured) {
+      const message =
+          'Terminal non appairé : aucun envoi possible. '
+          'Allez dans Paramètres → Connexion à AL-BAYAAN.';
+      await _settings.markSyncAttempt(error: message);
+      return const SyncResult(state: SyncState.notConfigured, message: message);
     }
+
+    if (!settings.apiEnabled) {
+      const message =
+          'Synchronisation désactivée dans les paramètres du terminal.';
+      await _settings.markSyncAttempt(error: message);
+      return const SyncResult(state: SyncState.notConfigured, message: message);
+    }
+
     if (settings.offlineMode) {
-      return const SyncResult(
-        state: SyncState.notConfigured,
-        message:
-            'Le terminal est en mode hors ligne volontaire : la '
-            'synchronisation est ignorée.',
-      );
+      const message =
+          'Mode « hors ligne » activé dans les paramètres : la synchronisation '
+          'est ignorée. Désactivez-le pour envoyer les présences.';
+      await _settings.markSyncAttempt(error: message);
+      return const SyncResult(state: SyncState.notConfigured, message: message);
     }
+
+    await _settings.markSyncAttempt();
 
     var pushed = 0;
 
@@ -119,6 +132,7 @@ class SyncService {
       }
     } catch (error) {
       await _logs.error('sync.push_error', details: error.toString());
+      await _settings.markSyncAttempt(error: 'Envoi : $error');
       return SyncResult(
         state: SyncState.failure,
         message: 'Synchronisation impossible : $error',
@@ -191,6 +205,8 @@ class SyncService {
 
       await _logs.info('sync.run', details: 'pushed=$pushed pulled=$pulled');
 
+      await _settings.markSyncAttempt();
+
       return SyncResult(
         state: SyncState.success,
         message: 'Synchronisation terminée.',
@@ -199,6 +215,7 @@ class SyncService {
       );
     } catch (error) {
       await _logs.error('sync.error', details: error.toString());
+      await _settings.markSyncAttempt(error: 'Réception : $error');
       return SyncResult(
         state: SyncState.failure,
         message: 'Synchronisation impossible : $error',

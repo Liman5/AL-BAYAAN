@@ -53,6 +53,34 @@ Aucune route d'administration n'est appelée par le terminal.
    configuration ;
 4. mise à jour du curseur (`lastStudentSync`) et de `lastAttendanceSync`.
 
+### Déclenchement automatique (`SyncEngine`)
+
+Aucune action de l'opérateur n'est nécessaire :
+
+| Déclencheur | Fréquence |
+|---|---|
+| Démarrage de l'application | immédiat |
+| Retour du réseau (`connectivity_plus`) | immédiat |
+| Présences en attente | toutes les **45 s** |
+| Récupération complète (élèves/config) | toutes les **10 min** |
+
+Garde-fous : une seule exécution à la fois, 20 s minimum entre deux tentatives
+automatiques, aucun envoi si le terminal n'est pas appairé ou si le mode
+« hors ligne volontaire » est actif. Chaque tentative est horodatée
+(`lastSyncAttempt`) et l'éventuelle erreur est conservée (`lastSyncError`),
+puis affichée dans **Paramètres → Connexion à AL-BAYAAN**.
+
+### Codes d'erreur lisibles
+
+| Situation | Message affiché |
+|---|---|
+| Token absent/incomplet | « Terminal non appairé : aucun envoi possible. » |
+| `apiEnabled = false` | « Synchronisation désactivée dans les paramètres. » |
+| `offlineMode = true` | « Mode hors ligne activé : la synchronisation est ignorée. » |
+| 401/403 | message serveur (terminal révoqué/suspendu), non retenté en boucle |
+| Réseau | « Synchronisation impossible (réseau) », réessayé avec backoff |
+
+
 ## 5. Mise en service
 
 1. Dans AL-BAYAAN : **Terminaux scanners** → créer un terminal → noter le code.

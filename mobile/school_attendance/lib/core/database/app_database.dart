@@ -29,7 +29,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -48,6 +48,16 @@ class AppDatabase extends _$AppDatabase {
           await m.addColumn(settings, settings.showMatricule);
           await m.addColumn(settings, settings.showClassName);
           await m.addColumn(settings, settings.showTime);
+        }
+        // v4 : diagnostic de synchronisation + retour vocal (TTS).
+        if (from < 4) {
+          await m.addColumn(settings, settings.lastSyncAttempt);
+          await m.addColumn(settings, settings.lastSyncError);
+          await m.addColumn(settings, settings.voiceEnabled);
+          await m.addColumn(settings, settings.voiceSuccess);
+          await m.addColumn(settings, settings.voiceLate);
+          await m.addColumn(settings, settings.voiceDuplicate);
+          await m.addColumn(settings, settings.voiceRefused);
         }
       },
       beforeOpen: (OpeningDetails details) async {
