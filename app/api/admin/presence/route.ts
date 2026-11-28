@@ -36,6 +36,7 @@ export async function GET(request: Request) {
         .from('terminal_attendance_events')
         .select(
           'id, student_id, student_code, class_id, terminal_id, local_date, scanned_at, session, status, ' +
+            'person_type, staff_user_id, ' +
             'students (id, users (first_name, last_name)), classes (id, name)',
         )
         .eq('local_date', date)
@@ -53,6 +54,7 @@ export async function GET(request: Request) {
       .from('terminal_attendance_events')
       .select(
         'id, student_id, student_code, class_id, terminal_id, local_date, scanned_at, session, status, ' +
+          'person_type, staff_user_id, ' +
           'students (id, users (first_name, last_name)), classes (id, name)',
       )
       .eq('school_id', schoolId)
@@ -109,7 +111,34 @@ async function buildPresenceResponse(
     scannedAt: row.scanned_at,
     session: row.session,
     status: row.status,
+    personType: row.person_type || 'student',
   }));
+
+  // Personnel : les noms viennent de `users` (pas de `students`).
+  const staffIds = events
+    .filter((row: any) => (row.person_type || 'student') === 'staff' && row.staff_user_id)
+    .map((row: any) => row.staff_user_id);
+
+  if (staffIds.length > 0) {
+    const { data: staffUsers } = await supabase
+      .from('users')
+      .select('id, first_name, last_name')
+      .in('id', Array.from(new Set(staffIds)));
+
+    const byId = new Map<string, any>();
+    for (const user of (staffUsers || []) as any[]) byId.set(user.id, user);
+
+    for (const row of rows) {
+      if (row.personType !== 'staff') continue;
+      const event: any = events.find((candidate: any) => candidate.id === row.id);
+      const user = byId.get(event?.staff_user_id);
+      if (user) {
+        row.firstName = user.first_name || '';
+        row.lastName = user.last_name || '';
+      }
+      row.className = 'Personnel';
+    }
+  }
 
   return NextResponse.json({
     success: true,

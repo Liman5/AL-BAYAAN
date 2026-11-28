@@ -17,6 +17,7 @@ class ScanOutcome {
   const ScanOutcome(
     this.type, {
     this.student,
+    this.staff,
     this.record,
     this.existingRecord,
     this.message,
@@ -28,17 +29,20 @@ class ScanOutcome {
   const ScanOutcome.studentNotFound()
       : this(ScanResultType.studentNotFound);
 
-  const ScanOutcome.inactiveStudent({Student? student})
-      : this(ScanResultType.inactiveStudent, student: student);
+  const ScanOutcome.inactiveStudent({Student? student, StaffMember? staff})
+      : this(ScanResultType.inactiveStudent, student: student, staff: staff);
 
-  const ScanOutcome.badgeRevoked({Student? student})
-      : this(ScanResultType.badgeRevoked, student: student);
+  const ScanOutcome.badgeRevoked({Student? student, StaffMember? staff})
+      : this(ScanResultType.badgeRevoked, student: student, staff: staff);
 
   const ScanOutcome.databaseError([String? message])
       : this(ScanResultType.databaseError, message: message);
 
   final ScanResultType type;
   final Student? student;
+
+  /// Membre du personnel identifié (enseignant ou administration).
+  final StaffMember? staff;
 
   /// Présence créée (uniquement pour [ScanResultType.success]).
   final AttendanceRecord? record;

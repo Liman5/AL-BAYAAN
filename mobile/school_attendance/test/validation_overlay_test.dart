@@ -24,6 +24,7 @@ AttendanceRecord buildRecord({String status = 'present'}) {
   return AttendanceRecord(
     id: 'event-1',
     studentId: 'student-1',
+    personType: 'student',
     studentCode: 'EL-0248',
     className: '3e A',
     scannedAtUtc: DateTime.utc(2026, 11, 26, 7, 14, 32),

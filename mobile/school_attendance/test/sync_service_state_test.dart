@@ -4,6 +4,7 @@ import 'package:school_attendance/core/database/app_database.dart';
 import 'package:school_attendance/core/sync/sync_api.dart';
 import 'package:school_attendance/core/sync/sync_models.dart';
 import 'package:school_attendance/core/sync/sync_service.dart';
+import 'package:school_attendance/features/staff/data/staff_repository.dart';
 import 'package:school_attendance/features/students/data/student_repository.dart';
 import 'package:school_attendance/features/sync/data/log_repository.dart';
 import 'package:school_attendance/features/sync/data/sync_repository.dart';
@@ -51,6 +52,7 @@ void main() {
       syncRepository: queue,
       settingsRepository: settings,
       studentRepository: StudentRepository(db),
+      staffRepository: StaffRepository(db),
       logs: LogRepository(db),
     );
   }

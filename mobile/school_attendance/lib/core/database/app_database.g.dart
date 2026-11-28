@@ -757,6 +757,706 @@ class StudentsCompanion extends UpdateCompanion<Student> {
   }
 }
 
+class $StaffMembersTable extends StaffMembers
+    with TableInfo<$StaffMembersTable, StaffMember> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StaffMembersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _staffUuidMeta =
+      const VerificationMeta('staffUuid');
+  @override
+  late final GeneratedColumn<String> staffUuid = GeneratedColumn<String>(
+      'staff_uuid', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _staffCodeMeta =
+      const VerificationMeta('staffCode');
+  @override
+  late final GeneratedColumn<String> staffCode = GeneratedColumn<String>(
+      'staff_code', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _firstNameMeta =
+      const VerificationMeta('firstName');
+  @override
+  late final GeneratedColumn<String> firstName = GeneratedColumn<String>(
+      'first_name', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _lastNameMeta =
+      const VerificationMeta('lastName');
+  @override
+  late final GeneratedColumn<String> lastName = GeneratedColumn<String>(
+      'last_name', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _staffTypeMeta =
+      const VerificationMeta('staffType');
+  @override
+  late final GeneratedColumn<String> staffType = GeneratedColumn<String>(
+      'staff_type', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('teacher'));
+  static const VerificationMeta _roleLabelMeta =
+      const VerificationMeta('roleLabel');
+  @override
+  late final GeneratedColumn<String> roleLabel = GeneratedColumn<String>(
+      'role_label', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('Personnel'));
+  static const VerificationMeta _photoLocalPathMeta =
+      const VerificationMeta('photoLocalPath');
+  @override
+  late final GeneratedColumn<String> photoLocalPath = GeneratedColumn<String>(
+      'photo_local_path', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _photoRemoteUrlMeta =
+      const VerificationMeta('photoRemoteUrl');
+  @override
+  late final GeneratedColumn<String> photoRemoteUrl = GeneratedColumn<String>(
+      'photo_remote_url', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _qrTokenMeta =
+      const VerificationMeta('qrToken');
+  @override
+  late final GeneratedColumn<String> qrToken = GeneratedColumn<String>(
+      'qr_token', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _isActiveMeta =
+      const VerificationMeta('isActive');
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+      'is_active', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_active" IN (0, 1))'),
+      defaultValue: const Constant(true));
+  static const VerificationMeta _badgeRevokedMeta =
+      const VerificationMeta('badgeRevoked');
+  @override
+  late final GeneratedColumn<bool> badgeRevoked = GeneratedColumn<bool>(
+      'badge_revoked', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("badge_revoked" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _lastSyncedAtMeta =
+      const VerificationMeta('lastSyncedAt');
+  @override
+  late final GeneratedColumn<DateTime> lastSyncedAt = GeneratedColumn<DateTime>(
+      'last_synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        staffUuid,
+        staffCode,
+        firstName,
+        lastName,
+        staffType,
+        roleLabel,
+        photoLocalPath,
+        photoRemoteUrl,
+        qrToken,
+        isActive,
+        badgeRevoked,
+        updatedAt,
+        lastSyncedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'staff_members';
+  @override
+  VerificationContext validateIntegrity(Insertable<StaffMember> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('staff_uuid')) {
+      context.handle(_staffUuidMeta,
+          staffUuid.isAcceptableOrUnknown(data['staff_uuid']!, _staffUuidMeta));
+    }
+    if (data.containsKey('staff_code')) {
+      context.handle(_staffCodeMeta,
+          staffCode.isAcceptableOrUnknown(data['staff_code']!, _staffCodeMeta));
+    } else if (isInserting) {
+      context.missing(_staffCodeMeta);
+    }
+    if (data.containsKey('first_name')) {
+      context.handle(_firstNameMeta,
+          firstName.isAcceptableOrUnknown(data['first_name']!, _firstNameMeta));
+    }
+    if (data.containsKey('last_name')) {
+      context.handle(_lastNameMeta,
+          lastName.isAcceptableOrUnknown(data['last_name']!, _lastNameMeta));
+    }
+    if (data.containsKey('staff_type')) {
+      context.handle(_staffTypeMeta,
+          staffType.isAcceptableOrUnknown(data['staff_type']!, _staffTypeMeta));
+    }
+    if (data.containsKey('role_label')) {
+      context.handle(_roleLabelMeta,
+          roleLabel.isAcceptableOrUnknown(data['role_label']!, _roleLabelMeta));
+    }
+    if (data.containsKey('photo_local_path')) {
+      context.handle(
+          _photoLocalPathMeta,
+          photoLocalPath.isAcceptableOrUnknown(
+              data['photo_local_path']!, _photoLocalPathMeta));
+    }
+    if (data.containsKey('photo_remote_url')) {
+      context.handle(
+          _photoRemoteUrlMeta,
+          photoRemoteUrl.isAcceptableOrUnknown(
+              data['photo_remote_url']!, _photoRemoteUrlMeta));
+    }
+    if (data.containsKey('qr_token')) {
+      context.handle(_qrTokenMeta,
+          qrToken.isAcceptableOrUnknown(data['qr_token']!, _qrTokenMeta));
+    } else if (isInserting) {
+      context.missing(_qrTokenMeta);
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(_isActiveMeta,
+          isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta));
+    }
+    if (data.containsKey('badge_revoked')) {
+      context.handle(
+          _badgeRevokedMeta,
+          badgeRevoked.isAcceptableOrUnknown(
+              data['badge_revoked']!, _badgeRevokedMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+          _lastSyncedAtMeta,
+          lastSyncedAt.isAcceptableOrUnknown(
+              data['last_synced_at']!, _lastSyncedAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  StaffMember map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StaffMember(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      staffUuid: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}staff_uuid']),
+      staffCode: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}staff_code'])!,
+      firstName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}first_name'])!,
+      lastName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}last_name'])!,
+      staffType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}staff_type'])!,
+      roleLabel: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}role_label'])!,
+      photoLocalPath: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}photo_local_path']),
+      photoRemoteUrl: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}photo_remote_url']),
+      qrToken: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}qr_token'])!,
+      isActive: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_active'])!,
+      badgeRevoked: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}badge_revoked'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
+    );
+  }
+
+  @override
+  $StaffMembersTable createAlias(String alias) {
+    return $StaffMembersTable(attachedDatabase, alias);
+  }
+}
+
+class StaffMember extends DataClass implements Insertable<StaffMember> {
+  /// Identifiant local stable (`staff-<matricule>`).
+  final String id;
+
+  /// `users.id` côté plateforme.
+  final String? staffUuid;
+
+  /// Matricule du personnel (teacher_profiles.matricule ou admins.matricule).
+  final String staffCode;
+  final String firstName;
+  final String lastName;
+
+  /// `teacher` ou `admin`.
+  final String staffType;
+
+  /// Libellé affiché (« Enseignant · Mathématiques », « Administration »…).
+  final String roleLabel;
+  final String? photoLocalPath;
+  final String? photoRemoteUrl;
+  final String qrToken;
+  final bool isActive;
+  final bool badgeRevoked;
+  final DateTime updatedAt;
+  final DateTime? lastSyncedAt;
+  const StaffMember(
+      {required this.id,
+      this.staffUuid,
+      required this.staffCode,
+      required this.firstName,
+      required this.lastName,
+      required this.staffType,
+      required this.roleLabel,
+      this.photoLocalPath,
+      this.photoRemoteUrl,
+      required this.qrToken,
+      required this.isActive,
+      required this.badgeRevoked,
+      required this.updatedAt,
+      this.lastSyncedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || staffUuid != null) {
+      map['staff_uuid'] = Variable<String>(staffUuid);
+    }
+    map['staff_code'] = Variable<String>(staffCode);
+    map['first_name'] = Variable<String>(firstName);
+    map['last_name'] = Variable<String>(lastName);
+    map['staff_type'] = Variable<String>(staffType);
+    map['role_label'] = Variable<String>(roleLabel);
+    if (!nullToAbsent || photoLocalPath != null) {
+      map['photo_local_path'] = Variable<String>(photoLocalPath);
+    }
+    if (!nullToAbsent || photoRemoteUrl != null) {
+      map['photo_remote_url'] = Variable<String>(photoRemoteUrl);
+    }
+    map['qr_token'] = Variable<String>(qrToken);
+    map['is_active'] = Variable<bool>(isActive);
+    map['badge_revoked'] = Variable<bool>(badgeRevoked);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    }
+    return map;
+  }
+
+  StaffMembersCompanion toCompanion(bool nullToAbsent) {
+    return StaffMembersCompanion(
+      id: Value(id),
+      staffUuid: staffUuid == null && nullToAbsent
+          ? const Value.absent()
+          : Value(staffUuid),
+      staffCode: Value(staffCode),
+      firstName: Value(firstName),
+      lastName: Value(lastName),
+      staffType: Value(staffType),
+      roleLabel: Value(roleLabel),
+      photoLocalPath: photoLocalPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(photoLocalPath),
+      photoRemoteUrl: photoRemoteUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(photoRemoteUrl),
+      qrToken: Value(qrToken),
+      isActive: Value(isActive),
+      badgeRevoked: Value(badgeRevoked),
+      updatedAt: Value(updatedAt),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+    );
+  }
+
+  factory StaffMember.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StaffMember(
+      id: serializer.fromJson<String>(json['id']),
+      staffUuid: serializer.fromJson<String?>(json['staffUuid']),
+      staffCode: serializer.fromJson<String>(json['staffCode']),
+      firstName: serializer.fromJson<String>(json['firstName']),
+      lastName: serializer.fromJson<String>(json['lastName']),
+      staffType: serializer.fromJson<String>(json['staffType']),
+      roleLabel: serializer.fromJson<String>(json['roleLabel']),
+      photoLocalPath: serializer.fromJson<String?>(json['photoLocalPath']),
+      photoRemoteUrl: serializer.fromJson<String?>(json['photoRemoteUrl']),
+      qrToken: serializer.fromJson<String>(json['qrToken']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+      badgeRevoked: serializer.fromJson<bool>(json['badgeRevoked']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'staffUuid': serializer.toJson<String?>(staffUuid),
+      'staffCode': serializer.toJson<String>(staffCode),
+      'firstName': serializer.toJson<String>(firstName),
+      'lastName': serializer.toJson<String>(lastName),
+      'staffType': serializer.toJson<String>(staffType),
+      'roleLabel': serializer.toJson<String>(roleLabel),
+      'photoLocalPath': serializer.toJson<String?>(photoLocalPath),
+      'photoRemoteUrl': serializer.toJson<String?>(photoRemoteUrl),
+      'qrToken': serializer.toJson<String>(qrToken),
+      'isActive': serializer.toJson<bool>(isActive),
+      'badgeRevoked': serializer.toJson<bool>(badgeRevoked),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
+    };
+  }
+
+  StaffMember copyWith(
+          {String? id,
+          Value<String?> staffUuid = const Value.absent(),
+          String? staffCode,
+          String? firstName,
+          String? lastName,
+          String? staffType,
+          String? roleLabel,
+          Value<String?> photoLocalPath = const Value.absent(),
+          Value<String?> photoRemoteUrl = const Value.absent(),
+          String? qrToken,
+          bool? isActive,
+          bool? badgeRevoked,
+          DateTime? updatedAt,
+          Value<DateTime?> lastSyncedAt = const Value.absent()}) =>
+      StaffMember(
+        id: id ?? this.id,
+        staffUuid: staffUuid.present ? staffUuid.value : this.staffUuid,
+        staffCode: staffCode ?? this.staffCode,
+        firstName: firstName ?? this.firstName,
+        lastName: lastName ?? this.lastName,
+        staffType: staffType ?? this.staffType,
+        roleLabel: roleLabel ?? this.roleLabel,
+        photoLocalPath:
+            photoLocalPath.present ? photoLocalPath.value : this.photoLocalPath,
+        photoRemoteUrl:
+            photoRemoteUrl.present ? photoRemoteUrl.value : this.photoRemoteUrl,
+        qrToken: qrToken ?? this.qrToken,
+        isActive: isActive ?? this.isActive,
+        badgeRevoked: badgeRevoked ?? this.badgeRevoked,
+        updatedAt: updatedAt ?? this.updatedAt,
+        lastSyncedAt:
+            lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+      );
+  StaffMember copyWithCompanion(StaffMembersCompanion data) {
+    return StaffMember(
+      id: data.id.present ? data.id.value : this.id,
+      staffUuid: data.staffUuid.present ? data.staffUuid.value : this.staffUuid,
+      staffCode: data.staffCode.present ? data.staffCode.value : this.staffCode,
+      firstName: data.firstName.present ? data.firstName.value : this.firstName,
+      lastName: data.lastName.present ? data.lastName.value : this.lastName,
+      staffType: data.staffType.present ? data.staffType.value : this.staffType,
+      roleLabel: data.roleLabel.present ? data.roleLabel.value : this.roleLabel,
+      photoLocalPath: data.photoLocalPath.present
+          ? data.photoLocalPath.value
+          : this.photoLocalPath,
+      photoRemoteUrl: data.photoRemoteUrl.present
+          ? data.photoRemoteUrl.value
+          : this.photoRemoteUrl,
+      qrToken: data.qrToken.present ? data.qrToken.value : this.qrToken,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      badgeRevoked: data.badgeRevoked.present
+          ? data.badgeRevoked.value
+          : this.badgeRevoked,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StaffMember(')
+          ..write('id: $id, ')
+          ..write('staffUuid: $staffUuid, ')
+          ..write('staffCode: $staffCode, ')
+          ..write('firstName: $firstName, ')
+          ..write('lastName: $lastName, ')
+          ..write('staffType: $staffType, ')
+          ..write('roleLabel: $roleLabel, ')
+          ..write('photoLocalPath: $photoLocalPath, ')
+          ..write('photoRemoteUrl: $photoRemoteUrl, ')
+          ..write('qrToken: $qrToken, ')
+          ..write('isActive: $isActive, ')
+          ..write('badgeRevoked: $badgeRevoked, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('lastSyncedAt: $lastSyncedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      staffUuid,
+      staffCode,
+      firstName,
+      lastName,
+      staffType,
+      roleLabel,
+      photoLocalPath,
+      photoRemoteUrl,
+      qrToken,
+      isActive,
+      badgeRevoked,
+      updatedAt,
+      lastSyncedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StaffMember &&
+          other.id == this.id &&
+          other.staffUuid == this.staffUuid &&
+          other.staffCode == this.staffCode &&
+          other.firstName == this.firstName &&
+          other.lastName == this.lastName &&
+          other.staffType == this.staffType &&
+          other.roleLabel == this.roleLabel &&
+          other.photoLocalPath == this.photoLocalPath &&
+          other.photoRemoteUrl == this.photoRemoteUrl &&
+          other.qrToken == this.qrToken &&
+          other.isActive == this.isActive &&
+          other.badgeRevoked == this.badgeRevoked &&
+          other.updatedAt == this.updatedAt &&
+          other.lastSyncedAt == this.lastSyncedAt);
+}
+
+class StaffMembersCompanion extends UpdateCompanion<StaffMember> {
+  final Value<String> id;
+  final Value<String?> staffUuid;
+  final Value<String> staffCode;
+  final Value<String> firstName;
+  final Value<String> lastName;
+  final Value<String> staffType;
+  final Value<String> roleLabel;
+  final Value<String?> photoLocalPath;
+  final Value<String?> photoRemoteUrl;
+  final Value<String> qrToken;
+  final Value<bool> isActive;
+  final Value<bool> badgeRevoked;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> lastSyncedAt;
+  final Value<int> rowid;
+  const StaffMembersCompanion({
+    this.id = const Value.absent(),
+    this.staffUuid = const Value.absent(),
+    this.staffCode = const Value.absent(),
+    this.firstName = const Value.absent(),
+    this.lastName = const Value.absent(),
+    this.staffType = const Value.absent(),
+    this.roleLabel = const Value.absent(),
+    this.photoLocalPath = const Value.absent(),
+    this.photoRemoteUrl = const Value.absent(),
+    this.qrToken = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.badgeRevoked = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  StaffMembersCompanion.insert({
+    required String id,
+    this.staffUuid = const Value.absent(),
+    required String staffCode,
+    this.firstName = const Value.absent(),
+    this.lastName = const Value.absent(),
+    this.staffType = const Value.absent(),
+    this.roleLabel = const Value.absent(),
+    this.photoLocalPath = const Value.absent(),
+    this.photoRemoteUrl = const Value.absent(),
+    required String qrToken,
+    this.isActive = const Value.absent(),
+    this.badgeRevoked = const Value.absent(),
+    required DateTime updatedAt,
+    this.lastSyncedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        staffCode = Value(staffCode),
+        qrToken = Value(qrToken),
+        updatedAt = Value(updatedAt);
+  static Insertable<StaffMember> custom({
+    Expression<String>? id,
+    Expression<String>? staffUuid,
+    Expression<String>? staffCode,
+    Expression<String>? firstName,
+    Expression<String>? lastName,
+    Expression<String>? staffType,
+    Expression<String>? roleLabel,
+    Expression<String>? photoLocalPath,
+    Expression<String>? photoRemoteUrl,
+    Expression<String>? qrToken,
+    Expression<bool>? isActive,
+    Expression<bool>? badgeRevoked,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? lastSyncedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (staffUuid != null) 'staff_uuid': staffUuid,
+      if (staffCode != null) 'staff_code': staffCode,
+      if (firstName != null) 'first_name': firstName,
+      if (lastName != null) 'last_name': lastName,
+      if (staffType != null) 'staff_type': staffType,
+      if (roleLabel != null) 'role_label': roleLabel,
+      if (photoLocalPath != null) 'photo_local_path': photoLocalPath,
+      if (photoRemoteUrl != null) 'photo_remote_url': photoRemoteUrl,
+      if (qrToken != null) 'qr_token': qrToken,
+      if (isActive != null) 'is_active': isActive,
+      if (badgeRevoked != null) 'badge_revoked': badgeRevoked,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  StaffMembersCompanion copyWith(
+      {Value<String>? id,
+      Value<String?>? staffUuid,
+      Value<String>? staffCode,
+      Value<String>? firstName,
+      Value<String>? lastName,
+      Value<String>? staffType,
+      Value<String>? roleLabel,
+      Value<String?>? photoLocalPath,
+      Value<String?>? photoRemoteUrl,
+      Value<String>? qrToken,
+      Value<bool>? isActive,
+      Value<bool>? badgeRevoked,
+      Value<DateTime>? updatedAt,
+      Value<DateTime?>? lastSyncedAt,
+      Value<int>? rowid}) {
+    return StaffMembersCompanion(
+      id: id ?? this.id,
+      staffUuid: staffUuid ?? this.staffUuid,
+      staffCode: staffCode ?? this.staffCode,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      staffType: staffType ?? this.staffType,
+      roleLabel: roleLabel ?? this.roleLabel,
+      photoLocalPath: photoLocalPath ?? this.photoLocalPath,
+      photoRemoteUrl: photoRemoteUrl ?? this.photoRemoteUrl,
+      qrToken: qrToken ?? this.qrToken,
+      isActive: isActive ?? this.isActive,
+      badgeRevoked: badgeRevoked ?? this.badgeRevoked,
+      updatedAt: updatedAt ?? this.updatedAt,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (staffUuid.present) {
+      map['staff_uuid'] = Variable<String>(staffUuid.value);
+    }
+    if (staffCode.present) {
+      map['staff_code'] = Variable<String>(staffCode.value);
+    }
+    if (firstName.present) {
+      map['first_name'] = Variable<String>(firstName.value);
+    }
+    if (lastName.present) {
+      map['last_name'] = Variable<String>(lastName.value);
+    }
+    if (staffType.present) {
+      map['staff_type'] = Variable<String>(staffType.value);
+    }
+    if (roleLabel.present) {
+      map['role_label'] = Variable<String>(roleLabel.value);
+    }
+    if (photoLocalPath.present) {
+      map['photo_local_path'] = Variable<String>(photoLocalPath.value);
+    }
+    if (photoRemoteUrl.present) {
+      map['photo_remote_url'] = Variable<String>(photoRemoteUrl.value);
+    }
+    if (qrToken.present) {
+      map['qr_token'] = Variable<String>(qrToken.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    if (badgeRevoked.present) {
+      map['badge_revoked'] = Variable<bool>(badgeRevoked.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StaffMembersCompanion(')
+          ..write('id: $id, ')
+          ..write('staffUuid: $staffUuid, ')
+          ..write('staffCode: $staffCode, ')
+          ..write('firstName: $firstName, ')
+          ..write('lastName: $lastName, ')
+          ..write('staffType: $staffType, ')
+          ..write('roleLabel: $roleLabel, ')
+          ..write('photoLocalPath: $photoLocalPath, ')
+          ..write('photoRemoteUrl: $photoRemoteUrl, ')
+          ..write('qrToken: $qrToken, ')
+          ..write('isActive: $isActive, ')
+          ..write('badgeRevoked: $badgeRevoked, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $SchoolClassesTable extends SchoolClasses
     with TableInfo<$SchoolClassesTable, SchoolClass> {
   @override
@@ -1081,6 +1781,14 @@ class $AttendanceRecordsTable extends AttendanceRecords
   late final GeneratedColumn<String> studentId = GeneratedColumn<String>(
       'student_id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _personTypeMeta =
+      const VerificationMeta('personType');
+  @override
+  late final GeneratedColumn<String> personType = GeneratedColumn<String>(
+      'person_type', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('student'));
   static const VerificationMeta _studentUuidMeta =
       const VerificationMeta('studentUuid');
   @override
@@ -1196,6 +1904,7 @@ class $AttendanceRecordsTable extends AttendanceRecords
   List<GeneratedColumn> get $columns => [
         id,
         studentId,
+        personType,
         studentUuid,
         studentCode,
         classId,
@@ -1234,6 +1943,12 @@ class $AttendanceRecordsTable extends AttendanceRecords
           studentId.isAcceptableOrUnknown(data['student_id']!, _studentIdMeta));
     } else if (isInserting) {
       context.missing(_studentIdMeta);
+    }
+    if (data.containsKey('person_type')) {
+      context.handle(
+          _personTypeMeta,
+          personType.isAcceptableOrUnknown(
+              data['person_type']!, _personTypeMeta));
     }
     if (data.containsKey('student_uuid')) {
       context.handle(
@@ -1350,6 +2065,8 @@ class $AttendanceRecordsTable extends AttendanceRecords
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       studentId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}student_id'])!,
+      personType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}person_type'])!,
       studentUuid: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}student_uuid']),
       studentCode: attachedDatabase.typeMapping
@@ -1398,6 +2115,10 @@ class AttendanceRecord extends DataClass
   /// UUID de l'événement (idempotence côté serveur lors de la synchro).
   final String id;
   final String studentId;
+
+  /// `student` ou `staff` : distingue un élève d'un membre du personnel.
+  /// Pour le personnel, `studentId` contient le `users.id` correspondant.
+  final String personType;
   final String? studentUuid;
   final String studentCode;
   final String? classId;
@@ -1430,6 +2151,7 @@ class AttendanceRecord extends DataClass
   const AttendanceRecord(
       {required this.id,
       required this.studentId,
+      required this.personType,
       this.studentUuid,
       required this.studentCode,
       this.classId,
@@ -1452,6 +2174,7 @@ class AttendanceRecord extends DataClass
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['student_id'] = Variable<String>(studentId);
+    map['person_type'] = Variable<String>(personType);
     if (!nullToAbsent || studentUuid != null) {
       map['student_uuid'] = Variable<String>(studentUuid);
     }
@@ -1486,6 +2209,7 @@ class AttendanceRecord extends DataClass
     return AttendanceRecordsCompanion(
       id: Value(id),
       studentId: Value(studentId),
+      personType: Value(personType),
       studentUuid: studentUuid == null && nullToAbsent
           ? const Value.absent()
           : Value(studentUuid),
@@ -1522,6 +2246,7 @@ class AttendanceRecord extends DataClass
     return AttendanceRecord(
       id: serializer.fromJson<String>(json['id']),
       studentId: serializer.fromJson<String>(json['studentId']),
+      personType: serializer.fromJson<String>(json['personType']),
       studentUuid: serializer.fromJson<String?>(json['studentUuid']),
       studentCode: serializer.fromJson<String>(json['studentCode']),
       classId: serializer.fromJson<String?>(json['classId']),
@@ -1547,6 +2272,7 @@ class AttendanceRecord extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'studentId': serializer.toJson<String>(studentId),
+      'personType': serializer.toJson<String>(personType),
       'studentUuid': serializer.toJson<String?>(studentUuid),
       'studentCode': serializer.toJson<String>(studentCode),
       'classId': serializer.toJson<String?>(classId),
@@ -1570,6 +2296,7 @@ class AttendanceRecord extends DataClass
   AttendanceRecord copyWith(
           {String? id,
           String? studentId,
+          String? personType,
           Value<String?> studentUuid = const Value.absent(),
           String? studentCode,
           Value<String?> classId = const Value.absent(),
@@ -1590,6 +2317,7 @@ class AttendanceRecord extends DataClass
       AttendanceRecord(
         id: id ?? this.id,
         studentId: studentId ?? this.studentId,
+        personType: personType ?? this.personType,
         studentUuid: studentUuid.present ? studentUuid.value : this.studentUuid,
         studentCode: studentCode ?? this.studentCode,
         classId: classId.present ? classId.value : this.classId,
@@ -1614,6 +2342,8 @@ class AttendanceRecord extends DataClass
     return AttendanceRecord(
       id: data.id.present ? data.id.value : this.id,
       studentId: data.studentId.present ? data.studentId.value : this.studentId,
+      personType:
+          data.personType.present ? data.personType.value : this.personType,
       studentUuid:
           data.studentUuid.present ? data.studentUuid.value : this.studentUuid,
       studentCode:
@@ -1654,6 +2384,7 @@ class AttendanceRecord extends DataClass
     return (StringBuffer('AttendanceRecord(')
           ..write('id: $id, ')
           ..write('studentId: $studentId, ')
+          ..write('personType: $personType, ')
           ..write('studentUuid: $studentUuid, ')
           ..write('studentCode: $studentCode, ')
           ..write('classId: $classId, ')
@@ -1679,6 +2410,7 @@ class AttendanceRecord extends DataClass
   int get hashCode => Object.hash(
       id,
       studentId,
+      personType,
       studentUuid,
       studentCode,
       classId,
@@ -1702,6 +2434,7 @@ class AttendanceRecord extends DataClass
       (other is AttendanceRecord &&
           other.id == this.id &&
           other.studentId == this.studentId &&
+          other.personType == this.personType &&
           other.studentUuid == this.studentUuid &&
           other.studentCode == this.studentCode &&
           other.classId == this.classId &&
@@ -1724,6 +2457,7 @@ class AttendanceRecord extends DataClass
 class AttendanceRecordsCompanion extends UpdateCompanion<AttendanceRecord> {
   final Value<String> id;
   final Value<String> studentId;
+  final Value<String> personType;
   final Value<String?> studentUuid;
   final Value<String> studentCode;
   final Value<String?> classId;
@@ -1745,6 +2479,7 @@ class AttendanceRecordsCompanion extends UpdateCompanion<AttendanceRecord> {
   const AttendanceRecordsCompanion({
     this.id = const Value.absent(),
     this.studentId = const Value.absent(),
+    this.personType = const Value.absent(),
     this.studentUuid = const Value.absent(),
     this.studentCode = const Value.absent(),
     this.classId = const Value.absent(),
@@ -1767,6 +2502,7 @@ class AttendanceRecordsCompanion extends UpdateCompanion<AttendanceRecord> {
   AttendanceRecordsCompanion.insert({
     required String id,
     required String studentId,
+    this.personType = const Value.absent(),
     this.studentUuid = const Value.absent(),
     required String studentCode,
     this.classId = const Value.absent(),
@@ -1797,6 +2533,7 @@ class AttendanceRecordsCompanion extends UpdateCompanion<AttendanceRecord> {
   static Insertable<AttendanceRecord> custom({
     Expression<String>? id,
     Expression<String>? studentId,
+    Expression<String>? personType,
     Expression<String>? studentUuid,
     Expression<String>? studentCode,
     Expression<String>? classId,
@@ -1819,6 +2556,7 @@ class AttendanceRecordsCompanion extends UpdateCompanion<AttendanceRecord> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (studentId != null) 'student_id': studentId,
+      if (personType != null) 'person_type': personType,
       if (studentUuid != null) 'student_uuid': studentUuid,
       if (studentCode != null) 'student_code': studentCode,
       if (classId != null) 'class_id': classId,
@@ -1843,6 +2581,7 @@ class AttendanceRecordsCompanion extends UpdateCompanion<AttendanceRecord> {
   AttendanceRecordsCompanion copyWith(
       {Value<String>? id,
       Value<String>? studentId,
+      Value<String>? personType,
       Value<String?>? studentUuid,
       Value<String>? studentCode,
       Value<String?>? classId,
@@ -1864,6 +2603,7 @@ class AttendanceRecordsCompanion extends UpdateCompanion<AttendanceRecord> {
     return AttendanceRecordsCompanion(
       id: id ?? this.id,
       studentId: studentId ?? this.studentId,
+      personType: personType ?? this.personType,
       studentUuid: studentUuid ?? this.studentUuid,
       studentCode: studentCode ?? this.studentCode,
       classId: classId ?? this.classId,
@@ -1893,6 +2633,9 @@ class AttendanceRecordsCompanion extends UpdateCompanion<AttendanceRecord> {
     }
     if (studentId.present) {
       map['student_id'] = Variable<String>(studentId.value);
+    }
+    if (personType.present) {
+      map['person_type'] = Variable<String>(personType.value);
     }
     if (studentUuid.present) {
       map['student_uuid'] = Variable<String>(studentUuid.value);
@@ -1956,6 +2699,7 @@ class AttendanceRecordsCompanion extends UpdateCompanion<AttendanceRecord> {
     return (StringBuffer('AttendanceRecordsCompanion(')
           ..write('id: $id, ')
           ..write('studentId: $studentId, ')
+          ..write('personType: $personType, ')
           ..write('studentUuid: $studentUuid, ')
           ..write('studentCode: $studentCode, ')
           ..write('classId: $classId, ')
@@ -4400,6 +5144,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $StudentsTable students = $StudentsTable(this);
+  late final $StaffMembersTable staffMembers = $StaffMembersTable(this);
   late final $SchoolClassesTable schoolClasses = $SchoolClassesTable(this);
   late final $AttendanceRecordsTable attendanceRecords =
       $AttendanceRecordsTable(this);
@@ -4414,6 +5159,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       'CREATE INDEX idx_students_class ON students (class_id)');
   late final Index idxStudentsName = Index('idx_students_name',
       'CREATE INDEX idx_students_name ON students (last_name, first_name)');
+  late final Index idxStaffQrToken = Index('idx_staff_qr_token',
+      'CREATE UNIQUE INDEX idx_staff_qr_token ON staff_members (qr_token)');
+  late final Index idxStaffCode = Index('idx_staff_code',
+      'CREATE UNIQUE INDEX idx_staff_code ON staff_members (staff_code)');
+  late final Index idxStaffName = Index('idx_staff_name',
+      'CREATE INDEX idx_staff_name ON staff_members (last_name, first_name)');
   late final Index idxClassesRemote = Index('idx_classes_remote',
       'CREATE INDEX idx_classes_remote ON school_classes (remote_id)');
   late final Index idxAttendanceStudentSession = Index(
@@ -4439,6 +5190,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
         students,
+        staffMembers,
         schoolClasses,
         attendanceRecords,
         settings,
@@ -4448,6 +5200,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         idxStudentsCode,
         idxStudentsClass,
         idxStudentsName,
+        idxStaffQrToken,
+        idxStaffCode,
+        idxStaffName,
         idxClassesRemote,
         idxAttendanceStudentSession,
         idxAttendanceDate,
@@ -4785,6 +5540,324 @@ typedef $$StudentsTableProcessedTableManager = ProcessedTableManager<
     (Student, BaseReferences<_$AppDatabase, $StudentsTable, Student>),
     Student,
     PrefetchHooks Function()>;
+typedef $$StaffMembersTableCreateCompanionBuilder = StaffMembersCompanion
+    Function({
+  required String id,
+  Value<String?> staffUuid,
+  required String staffCode,
+  Value<String> firstName,
+  Value<String> lastName,
+  Value<String> staffType,
+  Value<String> roleLabel,
+  Value<String?> photoLocalPath,
+  Value<String?> photoRemoteUrl,
+  required String qrToken,
+  Value<bool> isActive,
+  Value<bool> badgeRevoked,
+  required DateTime updatedAt,
+  Value<DateTime?> lastSyncedAt,
+  Value<int> rowid,
+});
+typedef $$StaffMembersTableUpdateCompanionBuilder = StaffMembersCompanion
+    Function({
+  Value<String> id,
+  Value<String?> staffUuid,
+  Value<String> staffCode,
+  Value<String> firstName,
+  Value<String> lastName,
+  Value<String> staffType,
+  Value<String> roleLabel,
+  Value<String?> photoLocalPath,
+  Value<String?> photoRemoteUrl,
+  Value<String> qrToken,
+  Value<bool> isActive,
+  Value<bool> badgeRevoked,
+  Value<DateTime> updatedAt,
+  Value<DateTime?> lastSyncedAt,
+  Value<int> rowid,
+});
+
+class $$StaffMembersTableFilterComposer
+    extends Composer<_$AppDatabase, $StaffMembersTable> {
+  $$StaffMembersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get staffUuid => $composableBuilder(
+      column: $table.staffUuid, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get staffCode => $composableBuilder(
+      column: $table.staffCode, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get firstName => $composableBuilder(
+      column: $table.firstName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get lastName => $composableBuilder(
+      column: $table.lastName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get staffType => $composableBuilder(
+      column: $table.staffType, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get roleLabel => $composableBuilder(
+      column: $table.roleLabel, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get photoLocalPath => $composableBuilder(
+      column: $table.photoLocalPath,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get photoRemoteUrl => $composableBuilder(
+      column: $table.photoRemoteUrl,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get qrToken => $composableBuilder(
+      column: $table.qrToken, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+      column: $table.isActive, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get badgeRevoked => $composableBuilder(
+      column: $table.badgeRevoked, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$StaffMembersTableOrderingComposer
+    extends Composer<_$AppDatabase, $StaffMembersTable> {
+  $$StaffMembersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get staffUuid => $composableBuilder(
+      column: $table.staffUuid, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get staffCode => $composableBuilder(
+      column: $table.staffCode, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get firstName => $composableBuilder(
+      column: $table.firstName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get lastName => $composableBuilder(
+      column: $table.lastName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get staffType => $composableBuilder(
+      column: $table.staffType, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get roleLabel => $composableBuilder(
+      column: $table.roleLabel, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get photoLocalPath => $composableBuilder(
+      column: $table.photoLocalPath,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get photoRemoteUrl => $composableBuilder(
+      column: $table.photoRemoteUrl,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get qrToken => $composableBuilder(
+      column: $table.qrToken, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+      column: $table.isActive, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get badgeRevoked => $composableBuilder(
+      column: $table.badgeRevoked,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$StaffMembersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $StaffMembersTable> {
+  $$StaffMembersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get staffUuid =>
+      $composableBuilder(column: $table.staffUuid, builder: (column) => column);
+
+  GeneratedColumn<String> get staffCode =>
+      $composableBuilder(column: $table.staffCode, builder: (column) => column);
+
+  GeneratedColumn<String> get firstName =>
+      $composableBuilder(column: $table.firstName, builder: (column) => column);
+
+  GeneratedColumn<String> get lastName =>
+      $composableBuilder(column: $table.lastName, builder: (column) => column);
+
+  GeneratedColumn<String> get staffType =>
+      $composableBuilder(column: $table.staffType, builder: (column) => column);
+
+  GeneratedColumn<String> get roleLabel =>
+      $composableBuilder(column: $table.roleLabel, builder: (column) => column);
+
+  GeneratedColumn<String> get photoLocalPath => $composableBuilder(
+      column: $table.photoLocalPath, builder: (column) => column);
+
+  GeneratedColumn<String> get photoRemoteUrl => $composableBuilder(
+      column: $table.photoRemoteUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get qrToken =>
+      $composableBuilder(column: $table.qrToken, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  GeneratedColumn<bool> get badgeRevoked => $composableBuilder(
+      column: $table.badgeRevoked, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => column);
+}
+
+class $$StaffMembersTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $StaffMembersTable,
+    StaffMember,
+    $$StaffMembersTableFilterComposer,
+    $$StaffMembersTableOrderingComposer,
+    $$StaffMembersTableAnnotationComposer,
+    $$StaffMembersTableCreateCompanionBuilder,
+    $$StaffMembersTableUpdateCompanionBuilder,
+    (
+      StaffMember,
+      BaseReferences<_$AppDatabase, $StaffMembersTable, StaffMember>
+    ),
+    StaffMember,
+    PrefetchHooks Function()> {
+  $$StaffMembersTableTableManager(_$AppDatabase db, $StaffMembersTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$StaffMembersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$StaffMembersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$StaffMembersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String?> staffUuid = const Value.absent(),
+            Value<String> staffCode = const Value.absent(),
+            Value<String> firstName = const Value.absent(),
+            Value<String> lastName = const Value.absent(),
+            Value<String> staffType = const Value.absent(),
+            Value<String> roleLabel = const Value.absent(),
+            Value<String?> photoLocalPath = const Value.absent(),
+            Value<String?> photoRemoteUrl = const Value.absent(),
+            Value<String> qrToken = const Value.absent(),
+            Value<bool> isActive = const Value.absent(),
+            Value<bool> badgeRevoked = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              StaffMembersCompanion(
+            id: id,
+            staffUuid: staffUuid,
+            staffCode: staffCode,
+            firstName: firstName,
+            lastName: lastName,
+            staffType: staffType,
+            roleLabel: roleLabel,
+            photoLocalPath: photoLocalPath,
+            photoRemoteUrl: photoRemoteUrl,
+            qrToken: qrToken,
+            isActive: isActive,
+            badgeRevoked: badgeRevoked,
+            updatedAt: updatedAt,
+            lastSyncedAt: lastSyncedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            Value<String?> staffUuid = const Value.absent(),
+            required String staffCode,
+            Value<String> firstName = const Value.absent(),
+            Value<String> lastName = const Value.absent(),
+            Value<String> staffType = const Value.absent(),
+            Value<String> roleLabel = const Value.absent(),
+            Value<String?> photoLocalPath = const Value.absent(),
+            Value<String?> photoRemoteUrl = const Value.absent(),
+            required String qrToken,
+            Value<bool> isActive = const Value.absent(),
+            Value<bool> badgeRevoked = const Value.absent(),
+            required DateTime updatedAt,
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              StaffMembersCompanion.insert(
+            id: id,
+            staffUuid: staffUuid,
+            staffCode: staffCode,
+            firstName: firstName,
+            lastName: lastName,
+            staffType: staffType,
+            roleLabel: roleLabel,
+            photoLocalPath: photoLocalPath,
+            photoRemoteUrl: photoRemoteUrl,
+            qrToken: qrToken,
+            isActive: isActive,
+            badgeRevoked: badgeRevoked,
+            updatedAt: updatedAt,
+            lastSyncedAt: lastSyncedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable<$StaffMembersTable, StaffMember>(table),
+                    BaseReferences<_$AppDatabase, $StaffMembersTable,
+                        StaffMember>(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$StaffMembersTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $StaffMembersTable,
+    StaffMember,
+    $$StaffMembersTableFilterComposer,
+    $$StaffMembersTableOrderingComposer,
+    $$StaffMembersTableAnnotationComposer,
+    $$StaffMembersTableCreateCompanionBuilder,
+    $$StaffMembersTableUpdateCompanionBuilder,
+    (
+      StaffMember,
+      BaseReferences<_$AppDatabase, $StaffMembersTable, StaffMember>
+    ),
+    StaffMember,
+    PrefetchHooks Function()>;
 typedef $$SchoolClassesTableCreateCompanionBuilder = SchoolClassesCompanion
     Function({
   required String id,
@@ -4966,6 +6039,7 @@ typedef $$AttendanceRecordsTableCreateCompanionBuilder
     = AttendanceRecordsCompanion Function({
   required String id,
   required String studentId,
+  Value<String> personType,
   Value<String?> studentUuid,
   required String studentCode,
   Value<String?> classId,
@@ -4989,6 +6063,7 @@ typedef $$AttendanceRecordsTableUpdateCompanionBuilder
     = AttendanceRecordsCompanion Function({
   Value<String> id,
   Value<String> studentId,
+  Value<String> personType,
   Value<String?> studentUuid,
   Value<String> studentCode,
   Value<String?> classId,
@@ -5023,6 +6098,9 @@ class $$AttendanceRecordsTableFilterComposer
 
   ColumnFilters<String> get studentId => $composableBuilder(
       column: $table.studentId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get personType => $composableBuilder(
+      column: $table.personType, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get studentUuid => $composableBuilder(
       column: $table.studentUuid, builder: (column) => ColumnFilters(column));
@@ -5092,6 +6170,9 @@ class $$AttendanceRecordsTableOrderingComposer
 
   ColumnOrderings<String> get studentId => $composableBuilder(
       column: $table.studentId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get personType => $composableBuilder(
+      column: $table.personType, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get studentUuid => $composableBuilder(
       column: $table.studentUuid, builder: (column) => ColumnOrderings(column));
@@ -5164,6 +6245,9 @@ class $$AttendanceRecordsTableAnnotationComposer
 
   GeneratedColumn<String> get studentId =>
       $composableBuilder(column: $table.studentId, builder: (column) => column);
+
+  GeneratedColumn<String> get personType => $composableBuilder(
+      column: $table.personType, builder: (column) => column);
 
   GeneratedColumn<String> get studentUuid => $composableBuilder(
       column: $table.studentUuid, builder: (column) => column);
@@ -5247,6 +6331,7 @@ class $$AttendanceRecordsTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<String> id = const Value.absent(),
             Value<String> studentId = const Value.absent(),
+            Value<String> personType = const Value.absent(),
             Value<String?> studentUuid = const Value.absent(),
             Value<String> studentCode = const Value.absent(),
             Value<String?> classId = const Value.absent(),
@@ -5269,6 +6354,7 @@ class $$AttendanceRecordsTableTableManager extends RootTableManager<
               AttendanceRecordsCompanion(
             id: id,
             studentId: studentId,
+            personType: personType,
             studentUuid: studentUuid,
             studentCode: studentCode,
             classId: classId,
@@ -5291,6 +6377,7 @@ class $$AttendanceRecordsTableTableManager extends RootTableManager<
           createCompanionCallback: ({
             required String id,
             required String studentId,
+            Value<String> personType = const Value.absent(),
             Value<String?> studentUuid = const Value.absent(),
             required String studentCode,
             Value<String?> classId = const Value.absent(),
@@ -5313,6 +6400,7 @@ class $$AttendanceRecordsTableTableManager extends RootTableManager<
               AttendanceRecordsCompanion.insert(
             id: id,
             studentId: studentId,
+            personType: personType,
             studentUuid: studentUuid,
             studentCode: studentCode,
             classId: classId,
@@ -6426,6 +7514,8 @@ class $AppDatabaseManager {
   $AppDatabaseManager(this._db);
   $$StudentsTableTableManager get students =>
       $$StudentsTableTableManager(_db, _db.students);
+  $$StaffMembersTableTableManager get staffMembers =>
+      $$StaffMembersTableTableManager(_db, _db.staffMembers);
   $$SchoolClassesTableTableManager get schoolClasses =>
       $$SchoolClassesTableTableManager(_db, _db.schoolClasses);
   $$AttendanceRecordsTableTableManager get attendanceRecords =>

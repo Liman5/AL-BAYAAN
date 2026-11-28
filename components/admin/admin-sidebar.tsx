@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import {
   ArrowUpRight,
+  BadgeCheck,
   BookOpen,
   CalendarDays,
   CreditCard,
@@ -32,6 +33,7 @@ export type AdminPage =
   | 'images'
   | 'academic-years'
   | 'badges'
+  | 'badges-staff'
   | 'terminals';
 
 interface NavItem {
@@ -67,6 +69,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: 'Présence & badges',
     items: [
       { id: 'badges', label: 'Badges QR', icon: QrCode },
+      { id: 'badges-staff', label: 'Badges personnel', icon: BadgeCheck },
       { id: 'terminals', label: 'Terminaux scanners', icon: Smartphone },
     ],
   },

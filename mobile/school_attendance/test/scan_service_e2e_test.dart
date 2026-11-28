@@ -7,6 +7,7 @@ import 'package:school_attendance/features/attendance_scanner/data/attendance_re
 import 'package:school_attendance/features/attendance_scanner/domain/scan_outcome.dart';
 import 'package:school_attendance/features/attendance_scanner/domain/scan_service.dart';
 import 'package:school_attendance/features/attendance_scanner/presentation/scanner_controller.dart';
+import 'package:school_attendance/features/staff/data/staff_repository.dart';
 import 'package:school_attendance/features/students/data/student_repository.dart';
 import 'package:school_attendance/features/sync/data/log_repository.dart';
 import 'package:school_attendance/features/terminal_settings/data/settings_repository.dart';
@@ -41,6 +42,7 @@ void main() {
     service = ScanService(
       database: db,
       students: students,
+      staff: StaffRepository(db),
       attendance: attendance,
       settings: settings,
       logs: LogRepository(db),

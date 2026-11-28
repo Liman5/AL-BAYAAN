@@ -640,6 +640,33 @@ model ParentNotification {
   @@map("parent_notifications")
 }
 
+// Badge QR d'un membre du personnel (enseignant ou administration).
+model StaffBadge {
+  id               String    @id
+  user_id          String
+  staff_type       String
+  staff_profile_id String?
+  school_id        String?
+  academic_year_id String?
+  token            String    @unique
+  token_sha256     String
+  token_prefix     String
+  status           String    @default("active")
+  issued_at        DateTime  @default(now())
+  issued_by        String?
+  revoked_at       DateTime?
+  revoked_reason   String?
+  replaced_by      String?
+  printed_count    Int       @default(0)
+  last_printed_at  DateTime?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @default(now())
+
+  @@index([user_id])
+  @@index([status])
+  @@map("staff_badges")
+}
+
 // Paramètres centralisés du scanner, par établissement.
 model ScannerSetting {
   school_id             String   @id

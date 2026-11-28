@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+import '../../features/staff/data/staff_repository.dart';
 import '../../features/students/data/student_repository.dart';
 import '../../features/sync/data/log_repository.dart';
 import '../../features/sync/data/sync_repository.dart';
@@ -23,12 +24,14 @@ class SyncService {
     required SyncRepository syncRepository,
     required SettingsRepository settingsRepository,
     required StudentRepository studentRepository,
+    required StaffRepository staffRepository,
     required LogRepository logs,
     Clock clock = const SystemClock(),
   })  : _api = api,
         _sync = syncRepository,
         _settings = settingsRepository,
         _students = studentRepository,
+        _staff = staffRepository,
         _logs = logs,
         _clock = clock;
 
@@ -38,6 +41,7 @@ class SyncService {
   final SyncRepository _sync;
   final SettingsRepository _settings;
   final StudentRepository _students;
+  final StaffRepository _staff;
   final LogRepository _logs;
   final Clock _clock;
 
@@ -185,6 +189,14 @@ class SyncService {
 
       if (pull.removedStudentCodes.isNotEmpty) {
         await _students.deactivateStudentsByCodes(pull.removedStudentCodes);
+      }
+
+      // Personnel (enseignants + administration)
+      if (pull.staff.isNotEmpty) {
+        await _staff.applyServerStaff(pull.staff, syncedAt: now);
+      }
+      if (pull.removedStaffCodes.isNotEmpty) {
+        await _staff.deactivateStaffByCodes(pull.removedStaffCodes);
       }
 
       if (pull.config != null) {

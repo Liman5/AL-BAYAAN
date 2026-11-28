@@ -305,3 +305,162 @@ async function loadRemovedStudentCodes(
   const { data } = await query;
   return (data || []).map((row: any) => row.matricule).filter(Boolean);
 }
+
+// ============================================================
+// PERSONNEL (enseignants + administration)
+// ============================================================
+
+export interface TerminalStaffPayload {
+  staffCode: string;
+  staffUuid: string;
+  firstName: string;
+  lastName: string;
+  staffType: 'teacher' | 'admin';
+  roleLabel: string;
+  photoRemoteUrl: string | null;
+  qrToken: string;
+  isActive: boolean;
+  badgeRevoked: boolean;
+  updatedAt: string;
+}
+
+export interface StaffLoadResult {
+  staff: TerminalStaffPayload[];
+  removedStaffCodes: string[];
+}
+
+/**
+ * Charge les membres du personnel disposant d'un badge actif.
+ *
+ * Le matricule (`teacher_profiles.matricule` ou `admins.matricule`) sert
+ * d'identifiant côté terminal ; `staffUuid` est le `users.id`.
+ * Aucune donnée sensible (téléphone, adresse, salaire) n'est transmise.
+ */
+export async function loadStaffForTerminal(
+  supabase: SupabaseClient,
+  schoolId: string,
+): Promise<StaffLoadResult> {
+  const staff: TerminalStaffPayload[] = [];
+  const removedStaffCodes: string[] = [];
+
+  const { data: teachers } = await supabase
+    .from('teacher_profiles')
+    .select('id, matricule, status, subjects, user_id, school_id, users (first_name, last_name)')
+    .or(`school_id.eq.${schoolId},school_id.is.null`);
+
+  const { data: admins } = await supabase
+    .from('admins')
+    .select('id, matricule, admin_level, user_id, school_id, users (first_name, last_name)')
+    .or(`school_id.eq.${schoolId},school_id.is.null`);
+
+  const people: Array<{
+    userId: string;
+    matricule: string;
+    firstName: string;
+    lastName: string;
+    staffType: 'teacher' | 'admin';
+    roleLabel: string;
+    active: boolean;
+  }> = [];
+
+  for (const row of (teachers || []) as any[]) {
+    people.push({
+      userId: row.user_id,
+      matricule: row.matricule || '',
+      firstName: row.users?.first_name || '',
+      lastName: row.users?.last_name || '',
+      staffType: 'teacher',
+      roleLabel:
+        Array.isArray(row.subjects) && row.subjects.length > 0
+          ? `Enseignant · ${row.subjects.slice(0, 2).join(', ')}`
+          : 'Enseignant',
+      active: (row.status || 'active') === 'active',
+    });
+  }
+
+  for (const row of (admins || []) as any[]) {
+    people.push({
+      userId: row.user_id,
+      matricule: row.matricule || '',
+      firstName: row.users?.first_name || '',
+      lastName: row.users?.last_name || '',
+      staffType: 'admin',
+      roleLabel:
+        row.admin_level === 'super_admin' ? 'Direction · Super admin' : 'Administration',
+      active: true,
+    });
+  }
+
+  const userIds = people.map((person) => person.userId).filter(Boolean);
+  const badgeByUser = new Map<string, string>();
+  const revokedUsers = new Set<string>();
+
+  if (userIds.length > 0) {
+    const chunkSize = 150;
+    for (let i = 0; i < userIds.length; i += chunkSize) {
+      const chunk = userIds.slice(i, i + chunkSize);
+
+      const { data: activeBadges } = await supabase
+        .from('staff_badges')
+        .select('user_id, token')
+        .in('user_id', chunk)
+        .eq('status', 'active');
+      for (const badge of (activeBadges || []) as any[]) {
+        if (badge.token) badgeByUser.set(badge.user_id, badge.token);
+      }
+
+      const { data: revokedBadges } = await supabase
+        .from('staff_badges')
+        .select('user_id')
+        .in('user_id', chunk)
+        .eq('status', 'revoked');
+      for (const badge of (revokedBadges || []) as any[]) revokedUsers.add(badge.user_id);
+    }
+  }
+
+  for (const person of people) {
+    if (!person.matricule) continue;
+
+    const token = badgeByUser.get(person.userId) || null;
+    if (token) {
+      staff.push({
+        staffCode: person.matricule,
+        staffUuid: person.userId,
+        firstName: person.firstName,
+        lastName: person.lastName,
+        staffType: person.staffType,
+        roleLabel: person.roleLabel,
+        photoRemoteUrl: null,
+        qrToken: token,
+        isActive: person.active,
+        badgeRevoked: false,
+        updatedAt: new Date().toISOString(),
+      });
+      continue;
+    }
+
+    if (revokedUsers.has(person.userId)) {
+      staff.push({
+        staffCode: person.matricule,
+        staffUuid: person.userId,
+        firstName: person.firstName,
+        lastName: person.lastName,
+        staffType: person.staffType,
+        roleLabel: person.roleLabel,
+        photoRemoteUrl: null,
+        qrToken: '',
+        isActive: false,
+        badgeRevoked: true,
+        updatedAt: new Date().toISOString(),
+      });
+      continue;
+    }
+
+    if (!person.active) {
+      removedStaffCodes.push(person.matricule);
+    }
+  }
+
+  return { staff, removedStaffCodes };
+}
+

@@ -87,6 +87,12 @@ export async function POST(request: Request) {
       { id: string; status: string; firstName: string } | null
     >();
 
+    // Cache des membres du personnel (enseignants / administration).
+    const staffCache = new Map<
+      string,
+      { userId: string; status: string; firstName: string } | null
+    >();
+
     for (const raw of rawEvents) {
       const eventId = typeof raw?.eventId === 'string' ? raw.eventId.trim() : '';
       const studentCode = typeof raw?.studentCode === 'string' ? raw.studentCode.trim() : '';
@@ -109,6 +115,7 @@ export async function POST(request: Request) {
       const localDate = typeof raw?.localDate === 'string' ? raw.localDate : '';
       const session = typeof raw?.session === 'string' ? raw.session : 'morning';
       const status = typeof raw?.attendanceStatus === 'string' ? raw.attendanceStatus : 'present';
+      const personType = raw?.personType === 'staff' ? 'staff' : 'student';
       const scannedAtRaw = typeof raw?.scannedAtUtc === 'string' ? raw.scannedAtUtc : '';
 
       if (!DATE_PATTERN.test(localDate)) {
@@ -144,6 +151,139 @@ export async function POST(request: Request) {
       if (deltaMs > 120 * 24 * 60 * 60 * 1000) {
         rejected++;
         results.push({ eventId, status: 'rejected', reason: 'événement trop ancien' });
+        continue;
+      }
+
+      // ---------- PERSONNEL (enseignants + administration) ----------
+      if (personType === 'staff') {
+        let member = staffCache.get(studentCode);
+        if (member === undefined) {
+          const { data: teacher } = await supabase
+            .from('teacher_profiles')
+            .select('user_id, status, users (first_name)')
+            .eq('matricule', studentCode)
+            .or(`school_id.eq.${schoolId},school_id.is.null`)
+            .maybeSingle();
+
+          let found: { userId: string; status: string; firstName: string } | null = teacher
+            ? {
+                userId: (teacher as any).user_id,
+                status: (teacher as any).status || 'active',
+                firstName: (teacher as any).users?.first_name || '',
+              }
+            : null;
+
+          if (!found) {
+            const { data: adminRow } = await supabase
+              .from('admins')
+              .select('user_id, users (first_name)')
+              .eq('matricule', studentCode)
+              .or(`school_id.eq.${schoolId},school_id.is.null`)
+              .maybeSingle();
+            if (adminRow) {
+              found = {
+                userId: (adminRow as any).user_id,
+                status: 'active',
+                firstName: (adminRow as any).users?.first_name || '',
+              };
+            }
+          }
+
+          member = found;
+          staffCache.set(studentCode, member);
+        }
+
+        if (!member) {
+          rejected++;
+          results.push({
+            eventId,
+            status: 'rejected',
+            reason: 'personnel introuvable dans cet établissement',
+          });
+          continue;
+        }
+        if (member.status !== 'active') {
+          rejected++;
+          results.push({ eventId, status: 'rejected', reason: 'personnel non actif' });
+          continue;
+        }
+
+        // Le badge du personnel doit toujours être actif côté serveur.
+        const { data: staffBadge } = await supabase
+          .from('staff_badges')
+          .select('id')
+          .eq('user_id', member.userId)
+          .eq('status', 'active')
+          .maybeSingle();
+
+        if (!staffBadge) {
+          rejected++;
+          results.push({
+            eventId,
+            status: 'rejected',
+            reason: 'badge du personnel non actif',
+          });
+          continue;
+        }
+
+        // Doublon : même personne, même jour, même session.
+        const { data: existingStaffSession } = await supabase
+          .from('terminal_attendance_events')
+          .select('id')
+          .eq('staff_user_id', member.userId)
+          .eq('local_date', localDate)
+          .eq('session', session)
+          .maybeSingle();
+
+        if (existingStaffSession) {
+          duplicates++;
+          results.push({
+            eventId,
+            status: 'duplicate',
+            reason: 'pointage déjà enregistré pour cette session',
+            serverRecordId: existingStaffSession.id,
+          });
+          continue;
+        }
+
+        const { error: staffInsertError } = await supabase
+          .from('terminal_attendance_events')
+          .insert({
+            id: eventId,
+            person_type: 'staff',
+            staff_user_id: member.userId,
+            student_id: null,
+            student_code: studentCode,
+            school_id: schoolId,
+            terminal_id: terminal.id,
+            local_date: localDate,
+            scanned_at: scannedAt.toISOString(),
+            session,
+            status,
+            source: typeof raw?.source === 'string' ? raw.source.slice(0, 20) : 'qr',
+            payload_version: 1,
+            idempotency_key: `attendance:${eventId}`,
+          });
+
+        if (staffInsertError) {
+          if (staffInsertError.code === '23505') {
+            duplicates++;
+            results.push({
+              eventId,
+              status: 'duplicate',
+              reason: 'événement déjà synchronisé',
+              serverRecordId: eventId,
+            });
+            continue;
+          }
+          rejected++;
+          results.push({ eventId, status: 'rejected', reason: staffInsertError.message });
+          continue;
+        }
+
+        accepted++;
+        results.push({ eventId, status: 'accepted', serverRecordId: eventId });
+        // Aucune notification parentale pour un membre du personnel.
         continue;
       }
 

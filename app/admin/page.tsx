@@ -23,6 +23,7 @@ import PaymentsModule from '@/components/admin/payments-module';
 import SiteImagesManager from '@/components/admin/site-images-manager';
 import AcademicYearsManager from '@/components/admin/academic-years-manager';
 import BadgesModule from '@/components/admin/badges-module';
+import StaffBadgesModule from '@/components/admin/staff-badges-module';
 import TerminalsModule from '@/components/admin/terminals-module';
 import ScannerSettingsPanel from '@/components/admin/scanner-settings-panel';
 import AcademicYearSelector from '@/components/ui/academic-year-selector';
@@ -566,6 +567,7 @@ export default function AdminDashboard() {
     images: 'Images du site',
     'academic-years': 'Années scolaires',
     badges: 'Badges QR & présence',
+    'badges-staff': 'Badges du personnel',
     terminals: 'Terminaux & paramètres scanner',
   };
 
@@ -909,6 +911,9 @@ export default function AdminDashboard() {
 
           {/* Page Badges QR & présence */}
           {currentPage === 'badges' && <BadgesModule />}
+
+          {/* Page Badges du personnel (enseignants + administration) */}
+          {currentPage === 'badges-staff' && <StaffBadgesModule />}
 
           {/* Page Terminaux scanners + paramètres */}
           {currentPage === 'terminals' && (

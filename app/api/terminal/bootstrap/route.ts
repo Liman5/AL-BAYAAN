@@ -6,6 +6,7 @@ import {
 } from '@/lib/terminalAuth';
 import {
   getScannerSettings,
+  loadStaffForTerminal,
   loadStudentsForTerminal,
   resolveTerminalSchoolId,
 } from '@/lib/scannerConfig';
@@ -68,6 +69,9 @@ export async function GET(request: Request) {
       { since },
     );
 
+    // Personnel (enseignants + administration) disposant d'un badge actif.
+    const { staff, removedStaffCodes } = await loadStaffForTerminal(supabase, schoolId);
+
     // Classes dérivées des élèves synchronisés (aucune classe d'une
     // autre école ne peut donc apparaître sur le terminal).
     const classMap = new Map<string, string>();
@@ -97,7 +101,9 @@ export async function GET(request: Request) {
         settings,
         classes,
         students,
+        staff,
         removedStudentCodes,
+        removedStaffCodes,
         truncated,
         delta: Boolean(since),
       },

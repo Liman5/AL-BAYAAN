@@ -50,6 +50,12 @@ un fonctionnement **100 % hors ligne** : aucun scan ne dépend d'Internet.
 - Export CSV (UTF-8 BOM, compatible Excel).
 - Rétention configurable : les scans **non synchronisés ne sont jamais purgés**.
 
+### Badges & pointage (élèves **et** personnel)
+- Badges QR pour les **élèves** *et* pour les **enseignants / administration** :
+  un seul scanner, deux populations identifiées séparément.
+- Token opaque 256 bits, génération idempotente, révocation, renouvellement.
+- Impression PDF (85,6 × 54 mm, 8 par A4) pour les deux populations.
+
 ### Synchronisation avec AL-BAYAAN (implémentée, active après appairage)
 - Couche complète : `SyncApi`, `RemoteSyncApi`, `SyncService`, file locale,
   backoff exponentiel, DTO, idempotence par `eventId`.
@@ -267,7 +273,7 @@ QR → QrPayloadParser → ScanService (transaction)
 flutter test
 ```
 
-**94 tests — 100 % réussis** (dernière exécution : 14 s) :
+**100 tests — 100 % réussis** (dernière exécution : 16 s) :
 
 | Fichier | Couverture |
 |---|---|
@@ -284,6 +290,7 @@ flutter test
 | `sync_service_state_test.dart` | **diagnostic de synchronisation** : non appairé, synchronisation désactivée, mode hors ligne volontaire, cycle réussi — et persistance de `lastSyncAttempt`/`lastSyncError` |
 | `voice_feedback_test.dart` | **retour vocal** : voix désactivée, succès, retard, doublon, tous les cas de refus (badge inconnu/révoqué, élève inactif, QR invalide, erreur base) |
 | `pin_service_test.dart` | **code administrateur** : configuré au 2ᵉ démarrage (non-régression du bug « redéfini à chaque fois »), jamais stocké en clair, remplacement invalide l'ancien, format refusé |
+| `staff_scan_test.dart` | **pointage du personnel** : enseignant identifié par son badge, doublon refusé (1 seul enregistrement), badge révoqué refusé, personnel désactivé refusé, événement mis en file avec `personType=staff`, token inconnu refusé |
 
 
 

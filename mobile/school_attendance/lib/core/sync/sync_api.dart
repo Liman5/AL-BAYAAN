@@ -37,8 +37,10 @@ abstract class SyncApi {
 class PullResult {
   const PullResult({
     this.students = const <StudentSyncDto>[],
+    this.staff = const <StaffSyncDto>[],
     this.classes = const <ClassSyncDto>[],
     this.removedStudentCodes = const <String>[],
+    this.removedStaffCodes = const <String>[],
     this.config,
     this.schoolName,
     this.cursor,
@@ -48,8 +50,14 @@ class PullResult {
   final List<StudentSyncDto> students;
   final List<ClassSyncDto> classes;
 
+  /// Personnel (enseignants + administration) avec badge actif.
+  final List<StaffSyncDto> staff;
+
   /// Matricules qui ne doivent plus être scannés (élève transféré/radié).
   final List<String> removedStudentCodes;
+
+  /// Matricules du personnel à désactiver localement.
+  final List<String> removedStaffCodes;
 
   /// Configuration scanner imposée par la plateforme (prime sur le local).
   final ScannerConfigDto? config;

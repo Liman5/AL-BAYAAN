@@ -70,6 +70,47 @@ class SchoolClasses extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// Personnel de l'établissement (enseignants + administration).
+///
+/// Même principe que [Students] : le badge QR est un token opaque, et
+/// l'identification fonctionne intégralement hors ligne.
+@DataClassName('StaffMember')
+@TableIndex(name: 'idx_staff_qr_token', columns: {#qrToken}, unique: true)
+@TableIndex(name: 'idx_staff_code', columns: {#staffCode}, unique: true)
+@TableIndex(name: 'idx_staff_name', columns: {#lastName, #firstName})
+class StaffMembers extends Table {
+  /// Identifiant local stable (`staff-<matricule>`).
+  TextColumn get id => text()();
+
+  /// `users.id` côté plateforme.
+  TextColumn get staffUuid => text().nullable()();
+
+  /// Matricule du personnel (teacher_profiles.matricule ou admins.matricule).
+  TextColumn get staffCode => text()();
+
+  TextColumn get firstName => text().withDefault(const Constant(''))();
+  TextColumn get lastName => text().withDefault(const Constant(''))();
+
+  /// `teacher` ou `admin`.
+  TextColumn get staffType => text().withDefault(const Constant('teacher'))();
+
+  /// Libellé affiché (« Enseignant · Mathématiques », « Administration »…).
+  TextColumn get roleLabel => text().withDefault(const Constant('Personnel'))();
+
+  TextColumn get photoLocalPath => text().nullable()();
+  TextColumn get photoRemoteUrl => text().nullable()();
+
+  TextColumn get qrToken => text()();
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+  BoolColumn get badgeRevoked => boolean().withDefault(const Constant(false))();
+
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get lastSyncedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 /// Événements de présence — immuables après création.
 @DataClassName('AttendanceRecord')
 @TableIndex(
@@ -86,6 +127,10 @@ class AttendanceRecords extends Table {
   TextColumn get id => text()();
 
   TextColumn get studentId => text()();
+
+  /// `student` ou `staff` : distingue un élève d'un membre du personnel.
+  /// Pour le personnel, `studentId` contient le `users.id` correspondant.
+  TextColumn get personType => text().withDefault(const Constant('student'))();
   TextColumn get studentUuid => text().nullable()();
   TextColumn get studentCode => text()();
   TextColumn get classId => text().nullable()();

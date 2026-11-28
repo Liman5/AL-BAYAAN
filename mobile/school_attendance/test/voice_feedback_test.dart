@@ -43,6 +43,7 @@ void main() {
   AttendanceRecord record({String status = 'present'}) => AttendanceRecord(
         id: 'evt-1',
         studentId: 'stu-1',
+        personType: 'student',
         studentCode: 'ALB-0001',
         className: '3e A',
         scannedAtUtc: DateTime.utc(2026, 11, 27, 7, 14),

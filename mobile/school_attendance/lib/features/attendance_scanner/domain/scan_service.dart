@@ -2,6 +2,7 @@ import '../../../app/config/app_config.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/scanner/qr_payload_parser.dart';
 import '../../../core/utils/app_time.dart';
+import '../../staff/data/staff_repository.dart';
 import '../../students/data/student_repository.dart';
 import '../../sync/data/log_repository.dart';
 import '../../terminal_settings/data/settings_repository.dart';
@@ -17,6 +18,7 @@ class ScanService {
   ScanService({
     required AppDatabase database,
     required StudentRepository students,
+    required StaffRepository staff,
     required AttendanceRepository attendance,
     required SettingsRepository settings,
     required LogRepository logs,
@@ -24,6 +26,7 @@ class ScanService {
     Clock clock = const SystemClock(),
   })  : _db = database,
         _students = students,
+        _staff = staff,
         _attendance = attendance,
         _settings = settings,
         _logs = logs,
@@ -32,6 +35,7 @@ class ScanService {
 
   final AppDatabase _db;
   final StudentRepository _students;
+  final StaffRepository _staff;
   final AttendanceRepository _attendance;
   final SettingsRepository _settings;
   final LogRepository _logs;
@@ -54,9 +58,71 @@ class ScanService {
         final student = await _students.findByQrToken(token);
 
         if (student == null) {
-          await _logs.warn('scan.unknown_badge');
-          return const ScanOutcome.studentNotFound();
+          // ---------- Personnel (enseignants + administration) ----------
+          final member = await _staff.findByQrToken(token);
+
+          if (member == null) {
+            await _logs.warn('scan.unknown_badge');
+            return const ScanOutcome.studentNotFound();
+          }
+          if (!member.isActive) {
+            await _logs.warn('scan.inactive_staff', details: member.staffCode);
+            return ScanOutcome.inactiveStudent(staff: member);
+          }
+          if (member.badgeRevoked) {
+            await _logs.warn('scan.staff_badge_revoked', details: member.staffCode);
+            return ScanOutcome.badgeRevoked(staff: member);
+          }
+
+          final now = _clock.now();
+          if (!AppTime.isPlausibleDeviceDate(now)) {
+            await _logs.error('scan.invalid_device_date');
+            return const ScanOutcome.databaseError(
+              'La date du terminal est incorrecte. Vérifiez les réglages Android.',
+            );
+          }
+
+          final personId = member.staffUuid ?? member.id;
+          final existing = await _attendance.findForSession(
+            studentId: personId,
+            localDate: AppTime.dateKey(now),
+            session: AppConfig.defaultSession,
+          );
+
+          if (existing != null) {
+            await _logs.info('scan.duplicate_staff', details: member.staffCode);
+            return ScanOutcome(
+              ScanResultType.alreadyRegistered,
+              staff: member,
+              existingRecord: existing,
+            );
+          }
+
+          final status = rules.statusFor(now);
+          final record = await _attendance.createStaffRecord(
+            personId: personId,
+            personCode: member.staffCode,
+            personUuid: member.staffUuid,
+            roleLabel: member.roleLabel,
+            nowLocal: now,
+            attendanceStatus: status.value,
+            terminalId: settings.terminalId,
+            session: AppConfig.defaultSession,
+          );
+
+          await _logs.info(
+            'scan.staff_registered',
+            details:
+                '${member.staffCode} • ${status.value} • ${AppTime.timeWithSeconds(now)}',
+          );
+
+          return ScanOutcome(
+            ScanResultType.success,
+            staff: member,
+            record: record,
+          );
         }
+
         if (!student.isActive) {
           await _logs.warn(
             'scan.inactive_student',

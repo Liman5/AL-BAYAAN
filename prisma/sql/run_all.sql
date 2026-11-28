@@ -131,6 +131,10 @@
 --     RLS activée, aucun accès anon/authenticated.
 \i 30-badges-terminaux.sql
 
+-- 31. Badges QR du personnel (enseignants + administration)
+--     et ouverture des pointages aux adultes de l'établissement.
+\i 31-staff-badges.sql
+
 \echo '✅ Schéma AL-BAYAAN créé avec succès !'
 \echo ''
 \echo '⚠️ ÉTAPE SUIVANTE : Après avoir exécuté ce script, lancez le serveur et'

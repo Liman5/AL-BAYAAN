@@ -35,6 +35,18 @@ L'administrateur technique doit exécuter le fichier
 > Les badges ne sont **jamais** créés automatiquement à l'inscription : c'est
 > vous qui décidez quand un élève reçoit sa carte.
 
+### 2.3 bis Créer les badges du personnel (enseignants, direction)
+
+1. Ouvrir **Administration → Badges personnel**.
+2. Filtrer éventuellement par type (Enseignants / Administration).
+3. Cocher les personnes concernées → **Générer pour la sélection**.
+4. **Imprimer** : même format de carte que les élèves.
+
+Le personnel scanne son badge au même terminal : l'écran affiche son nom,
+son matricule et sa fonction (« Enseignant · Mathématiques », « Administration »).
+Un enseignant ou un directeur peut donc être pointé comme un élève, sans
+mélange : les deux populations sont identifiées séparément dans les rapports.
+
 ### 2.3 Imprimer les cartes
 
 1. Sélectionner les élèves concernés.

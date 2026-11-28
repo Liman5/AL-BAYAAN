@@ -72,6 +72,7 @@ class AttendanceSyncDto {
     required this.session,
     this.classId,
     this.className,
+    this.personType = 'student',
   });
 
   factory AttendanceSyncDto.fromQueuePayload(String payloadJson) {
@@ -88,6 +89,7 @@ class AttendanceSyncDto {
       session: '${map['session'] ?? 'morning'}',
       classId: map['classId'] as String?,
       className: map['className'] as String?,
+      personType: '${map['personType'] ?? 'student'}',
     );
   }
 
@@ -102,6 +104,9 @@ class AttendanceSyncDto {
   final String session;
   final String? classId;
   final String? className;
+
+  /// `student` ou `staff`.
+  final String personType;
 
   /// Identifiant d'idempotence : le serveur doit ignorer un doublon.
   String get idempotencyKey => 'attendance:$eventId';
@@ -118,6 +123,7 @@ class AttendanceSyncDto {
         'session': session,
         'classId': classId,
         'className': className,
+        'personType': personType,
       };
 }
 
@@ -158,6 +164,48 @@ class StudentSyncDto {
   final String lastName;
   final String? classId;
   final String className;
+  final String? photoRemoteUrl;
+  final bool isActive;
+  final bool badgeRevoked;
+}
+
+/// Membre du personnel reçu du serveur (synchronisation descendante).
+class StaffSyncDto {
+  const StaffSyncDto({
+    required this.staffCode,
+    required this.qrToken,
+    this.staffUuid,
+    this.firstName = '',
+    this.lastName = '',
+    this.staffType = 'teacher',
+    this.roleLabel = 'Personnel',
+    this.photoRemoteUrl,
+    this.isActive = true,
+    this.badgeRevoked = false,
+  });
+
+  factory StaffSyncDto.fromJson(Map<String, dynamic> json) {
+    return StaffSyncDto(
+      staffCode: '${json['staffCode'] ?? json['staff_code'] ?? ''}',
+      qrToken: '${json['qrToken'] ?? json['qr_token'] ?? ''}',
+      staffUuid: json['staffUuid'] as String?,
+      firstName: '${json['firstName'] ?? json['first_name'] ?? ''}',
+      lastName: '${json['lastName'] ?? json['last_name'] ?? ''}',
+      staffType: '${json['staffType'] ?? 'teacher'}',
+      roleLabel: '${json['roleLabel'] ?? 'Personnel'}',
+      photoRemoteUrl: json['photoRemoteUrl'] as String?,
+      isActive: json['isActive'] as bool? ?? true,
+      badgeRevoked: json['badgeRevoked'] as bool? ?? false,
+    );
+  }
+
+  final String staffCode;
+  final String qrToken;
+  final String? staffUuid;
+  final String firstName;
+  final String lastName;
+  final String staffType;
+  final String roleLabel;
   final String? photoRemoteUrl;
   final bool isActive;
   final bool badgeRevoked;

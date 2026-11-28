@@ -99,6 +99,75 @@ class AttendanceRepository {
         .getSingle();
   }
 
+  /// Crée l'événement de présence d'un **membre du personnel** + l'élément
+  /// de synchronisation.
+  ///
+  /// `studentId` reçoit l'identifiant de la personne (users.id) : l'index
+  /// d'unicité (personne, jour, session) protège aussi les adultes.
+  Future<AttendanceRecord> createStaffRecord({
+    required String personId,
+    required String personCode,
+    required String? personUuid,
+    required String roleLabel,
+    required DateTime nowLocal,
+    required String attendanceStatus,
+    required String terminalId,
+    required String session,
+  }) async {
+    final recordId = _uuid.v4();
+    final localDate = AppTime.dateKey(nowLocal);
+    final scannedAtUtc = nowLocal.toUtc();
+
+    await _db.into(_db.attendanceRecords).insert(
+          AttendanceRecordsCompanion.insert(
+            id: recordId,
+            studentId: personId,
+            personType: const Value('staff'),
+            studentUuid: Value(personUuid),
+            studentCode: personCode,
+            classId: const Value(null),
+            className: Value(roleLabel),
+            scannedAtUtc: scannedAtUtc,
+            localDate: localDate,
+            localMinutes: AppTime.minutesOfDay(nowLocal),
+            session: Value(session),
+            attendanceStatus: attendanceStatus,
+            terminalId: terminalId,
+            createdAt: _clock.now().toUtc(),
+          ),
+        );
+
+    final payload = <String, dynamic>{
+      'id': recordId,
+      'personType': 'staff',
+      'studentUuid': personUuid,
+      'studentCode': personCode,
+      'classId': null,
+      'className': roleLabel,
+      'scannedAtUtc': AppTime.isoUtc(nowLocal),
+      'localDate': localDate,
+      'localMinutes': AppTime.minutesOfDay(nowLocal),
+      'session': session,
+      'attendanceStatus': attendanceStatus,
+      'terminalId': terminalId,
+      'source': 'qr',
+    };
+
+    await _db.into(_db.syncQueue).insert(
+          SyncQueueCompanion.insert(
+            id: _uuid.v4(),
+            eventType: 'attendance.created',
+            entityId: recordId,
+            payloadJson: jsonEncode(payload),
+            createdAt: _clock.now().toUtc(),
+          ),
+        );
+
+    return (_db.select(_db.attendanceRecords)
+          ..where((t) => t.id.equals(recordId)))
+        .getSingle();
+  }
+
   Future<DayAttendanceCounts> countsForDay(String localDate) async {
     final rows = await (_db.select(_db.attendanceRecords)
           ..where((t) => t.localDate.equals(localDate)))

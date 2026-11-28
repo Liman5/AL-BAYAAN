@@ -435,7 +435,36 @@ Les appels de classe (`attendance_records`, faits par les enseignants) restent
 distincts : les deux sources sont affichées séparément pour éviter toute
 confusion (un scan d'entrée n'est pas un appel de présence en classe).
 
-## 15. Ce qui reste volontairement hors périmètre
+## 15. Personnel : enseignants et administration (migration 31)
+
+Le même badge QR peut être émis pour **les adultes** de l'établissement.
+
+### Base de données (`31-staff-badges.sql`)
+
+| Élément | Détail |
+|---|---|
+| `staff_badges` | 1 badge par personne (`users.id`), `staff_type` = `teacher` ou `admin`, token opaque + empreinte, statut |
+| `terminal_attendance_events` | + `person_type` (`student`\|`staff`), + `staff_user_id`, `student_id` devient **nullable** |
+| Unicité | index partiels : `(student_id, local_date, session)` **et** `(staff_user_id, local_date, session)` → un seul pointage par personne et par session, même avec deux terminaux |
+| Sécurité | RLS activée, aucun accès anon/authenticated |
+
+### API
+
+| Route | Rôle |
+|---|---|
+| `GET/POST/PATCH /api/admin/staff-badges` | liste des enseignants + administration, génération, révocation, renouvellement, marquage d'impression |
+| `GET /api/terminal/bootstrap` | ajoute `staff[]` (badge actif) et `removedStaffCodes` |
+| `POST /api/terminal/attendance` | accepte `personType: 'staff'` : validation du matricule dans `teacher_profiles` puis `admins`, badge actif obligatoire, doublon par session, **aucune notification parentale** |
+
+### Application
+
+* table locale `staff_members` (Drift v6) : identifiant, matricule, nom, rôle, token, statut ;
+* le scan cherche d'abord un élève, **puis** un membre du personnel (`ScanService`) ;
+* l'overlay affiche « Matricule : ENS-0001 » et le rôle (« Enseignant · Mathématiques », « Administration ») ;
+* l'événement local porte `personType = 'staff'` et part dans la même file de synchronisation ;
+* écran admin **Badges personnel** : filtres, sélection, génération, révocation, renouvellement, PDF.
+
+## 16. Ce qui reste volontairement hors périmètre
 
 * Envoi effectif des notifications (fournisseur SMS/WhatsApp/push non choisi).
 * Téléchargement automatique des photos vers le terminal (`sync_photos`

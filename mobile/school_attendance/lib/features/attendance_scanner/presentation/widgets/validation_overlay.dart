@@ -37,7 +37,7 @@ class ValidationOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final visual = FeedbackVisual.fromOutcome(outcome);
-    final card = _buildCard(visual, outcome.student);
+    final card = _buildCard(visual);
 
     final animated = animationsEnabled
         ? TweenAnimationBuilder<double>(
@@ -64,7 +64,9 @@ class ValidationOverlay extends StatelessWidget {
     );
   }
 
-  Widget _buildCard(FeedbackVisual visual, Student? student) {
+  Widget _buildCard(FeedbackVisual visual) {
+    final student = outcome.student;
+    final staff = outcome.staff;
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 520),
       child: Container(
@@ -91,6 +93,10 @@ class ValidationOverlay extends StatelessWidget {
                 children: [
                   if (student != null) ...[
                     _studentRow(student, visual),
+                    const SizedBox(height: 14),
+                  ],
+                  if (student == null && staff != null) ...[
+                    _staffRow(staff, visual),
                     const SizedBox(height: 14),
                   ],
                   _timeBlock(visual),
@@ -214,6 +220,81 @@ class ValidationOverlay extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   'Classe : ${student.className.isEmpty ? '—' : student.className}',
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _staffRow(StaffMember staff, FeedbackVisual visual) {
+    final fullName = '${staff.firstName} ${staff.lastName}'.trim();
+    final initials =
+        '${staff.firstName.isNotEmpty ? staff.firstName[0] : ''}'
+                '${staff.lastName.isNotEmpty ? staff.lastName[0] : ''}'
+            .toUpperCase();
+
+    return Row(
+      children: [
+        if (showPhoto) ...[
+          Container(
+            width: 78,
+            height: 78,
+            decoration: BoxDecoration(
+              color: visual.softColor,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: visual.color.withValues(alpha: 0.25)),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              initials.isEmpty ? '?' : initials,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+                color: visual.color,
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+        ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                fullName.isEmpty ? staff.staffCode : fullName,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 20,
+                  height: 1.15,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              if (showMatricule) ...[
+                const SizedBox(height: 4),
+                Text(
+                  'Matricule : ${staff.staffCode}',
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+              if (showClassName) ...[
+                const SizedBox(height: 2),
+                Text(
+                  staff.roleLabel,
                   style: const TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w600,

@@ -18,6 +18,7 @@ part 'app_database.g.dart';
 @DriftDatabase(
   tables: [
     Students,
+    StaffMembers,
     SchoolClasses,
     AttendanceRecords,
     Settings,
@@ -29,7 +30,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration {
@@ -64,6 +65,11 @@ class AppDatabase extends _$AppDatabase {
           await m.addColumn(settings, settings.adminPinSalt);
           await m.addColumn(settings, settings.adminPinHash);
           await m.addColumn(settings, settings.adminPinIterations);
+        }
+        // v6 : personnel (enseignants + administration) et type de personne.
+        if (from < 6) {
+          await m.createTable(staffMembers);
+          await m.addColumn(attendanceRecords, attendanceRecords.personType);
         }
       },
       beforeOpen: (OpeningDetails details) async {

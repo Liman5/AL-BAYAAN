@@ -158,6 +158,16 @@ class RemoteSyncApi implements SyncApi {
           .whereType<String>()
           .toList();
 
+      final staff = (payload['staff'] as List? ?? const [])
+          .whereType<Map>()
+          .map((row) => StaffSyncDto.fromJson(Map<String, dynamic>.from(row)))
+          .toList();
+
+      final removedStaff =
+          (payload['removedStaffCodes'] as List? ?? const [])
+              .whereType<String>()
+              .toList();
+
       final rawConfig = payload['settings'];
       final config = rawConfig is Map
           ? ScannerConfigDto.fromJson(Map<String, dynamic>.from(rawConfig))
@@ -168,12 +178,19 @@ class RemoteSyncApi implements SyncApi {
 
       return PullResult(
         students: students,
+        staff: staff,
         classes: classes,
         removedStudentCodes: removed,
+        removedStaffCodes: removedStaff,
         config: config,
         schoolName: schoolName,
         cursor: payload['cursor'] as String? ?? cursor,
-        notModified: students.isEmpty && classes.isEmpty && removed.isEmpty,
+        notModified:
+            students.isEmpty &&
+            classes.isEmpty &&
+            staff.isEmpty &&
+            removed.isEmpty &&
+            removedStaff.isEmpty,
       );
     } on DioException catch (error) {
       final status = error.response?.statusCode;

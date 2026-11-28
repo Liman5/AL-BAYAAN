@@ -18,6 +18,7 @@ import '../../features/attendance_scanner/presentation/scanner_controller.dart';
 import '../../features/history/data/history_exporter.dart';
 import '../../features/history/domain/history_filter.dart';
 import '../../features/import_students/data/student_import_service.dart';
+import '../../features/staff/data/staff_repository.dart';
 import '../../features/students/data/student_photo_service.dart';
 import '../../features/students/data/student_repository.dart';
 import '../../features/sync/data/log_repository.dart';
@@ -40,6 +41,10 @@ final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
 
 final studentRepositoryProvider = Provider<StudentRepository>((ref) {
   return StudentRepository(ref.watch(databaseProvider));
+});
+
+final staffRepositoryProvider = Provider<StaffRepository>((ref) {
+  return StaffRepository(ref.watch(databaseProvider));
 });
 
 final attendanceRepositoryProvider = Provider<AttendanceRepository>((ref) {
@@ -82,6 +87,7 @@ final scanServiceProvider = Provider<ScanService>((ref) {
   return ScanService(
     database: ref.watch(databaseProvider),
     students: ref.watch(studentRepositoryProvider),
+    staff: ref.watch(staffRepositoryProvider),
     attendance: ref.watch(attendanceRepositoryProvider),
     settings: ref.watch(settingsRepositoryProvider),
     logs: ref.watch(logRepositoryProvider),
@@ -131,6 +137,7 @@ final syncServiceProvider = Provider<SyncService>((ref) {
     syncRepository: ref.watch(syncRepositoryProvider),
     settingsRepository: ref.watch(settingsRepositoryProvider),
     studentRepository: ref.watch(studentRepositoryProvider),
+    staffRepository: ref.watch(staffRepositoryProvider),
     logs: ref.watch(logRepositoryProvider),
     clock: ref.watch(clockProvider),
   );
